@@ -29,6 +29,7 @@ import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
 import de.mineformers.core.block.MetaBlock
 import de.mineformers.core.item.ItemBlockMeta
+import scala.language.existentials
 
 /**
  * BlockEntry representing a block in the registry's map

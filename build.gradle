@@ -21,7 +21,8 @@ buildscript {
 apply plugin: 'forge'
 apply plugin: 'scala'
 
-sourceCompatibility = 1.7
+sourceCompatibility = 1.6
+targetCompatibility = 1.6
 version = '1.0'
 group = "de.mineformers.core" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "mfcore"
@@ -53,6 +54,10 @@ jar {
     }
 }
 
+compileScala {
+    scalaCompileOptions.optimize = true
+}
+
 // add a source jar
 task sourceJar(type: Jar) {
     from sourceSets.main.allSource
@@ -60,9 +65,9 @@ task sourceJar(type: Jar) {
 }
 
 // add a javadoc jar
-task javadocJar(type: Jar, dependsOn: javadoc) {
+task javadocJar(type: Jar, dependsOn: scaladoc) {
     appendix = 'javadoc'
-    from 'build/docs/javadoc'
+    from 'build/docs/scaladoc'
 }
 
 // because the normal output has been made to be obfuscated

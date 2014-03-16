@@ -162,7 +162,7 @@ class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
   override def equals(that: Any): Boolean = {
     that match {
       case vec: Vector3 => return vec.x == x && vec.y == y && vec.z == z
-      case coords: (Double, Double, Double) => return coords._1 == x && coords._2 == y && coords._3 == z
+      case coords: (_, _, _) => return coords._1 == x && coords._2 == y && coords._3 == z
     }
     false
   }

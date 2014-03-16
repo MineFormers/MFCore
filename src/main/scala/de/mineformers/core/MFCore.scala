@@ -28,6 +28,11 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{TransformerExclusions, MCVersi
 import de.mineformers.core.asm.transformer.MFCoreAccessTransformer
 import de.mineformers.core.impl.asm.CoreClassTransformer
 
+/**
+ * MFCore
+ *
+ * @author PaleoCrafter
+ */
 @MCVersion("1.7.2")
 @IFMLLoadingPlugin.SortingIndex(1001)
 @TransformerExclusions(Array(
@@ -35,12 +40,6 @@ import de.mineformers.core.impl.asm.CoreClassTransformer
   "de.mineformers.core.impl.asm.",
   "scala."
 ))
-
-/**
- * MFCore
- *
- * @author PaleoCrafter
- */
 class MFCore extends IFMLLoadingPlugin {
   /**
    * @return the [[MFCoreAccessTransformer]] class name

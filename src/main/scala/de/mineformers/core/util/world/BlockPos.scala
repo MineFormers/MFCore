@@ -165,7 +165,7 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
   override def equals(that: Any): Boolean = {
     that match {
       case pos: BlockPos => return pos.x == x && pos.y == y && pos.z == z
-      case coords: (Int, Int, Int) => return coords._1 == x && coords._2 == y && coords._3 == z
+      case coords: (_, _, _) => return coords._1 == x && coords._2 == y && coords._3 == z
     }
     false
   }
