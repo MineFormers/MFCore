@@ -1,0 +1,6 @@
+#MFCore Access Transformer
+# Block
+public net.minecraft.block.Block field_149770_b # unlocalizedName
+
+# Item
+public net.minecraft.item.Item field_77774_bZ # unlocalizedName
