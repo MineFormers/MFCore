@@ -6,6 +6,11 @@ import org.objectweb.asm.{Type, Opcodes}
 import de.mineformers.core.util.ASMUtil
 import scala.util.control.Breaks
 
+/**
+ * WorldRendererTransformer
+ *
+ * @author PaleoCrafter
+ */
 class WorldRendererTransformer extends ClassTransformer {
   final val MUpdateRendererMcp = "updateRenderer"
   final val MUpdateRendererSrg = "func_147892_a"
@@ -13,8 +18,17 @@ class WorldRendererTransformer extends ClassTransformer {
   final val FBlockAccessMcp = "blockAccess"
   final val FBlockAccessSrg = "field_147845_a"
 
+  /**
+   * @param className the name of the class
+   * @return true, if the transformer needs to edit it
+   */
   override def transforms(className: String): Boolean = className == "net.minecraft.client.renderer.WorldRenderer"
 
+  /**
+   * Transform the given class
+   * @param clazz the class to transform
+   * @return true, if the class was changed, otherwise false
+   */
   override def transform(clazz: ClassNode): Boolean = {
     val m = ASMUtil.getMinecraftMethod(clazz, MUpdateRendererMcp, MUpdateRendererSrg)
     val insns = new InsnList()
