@@ -9,3 +9,5 @@ bin/*
 *.iml
 .settings/*
 /bin
+gradle.properties
+init.gradle

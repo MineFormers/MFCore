@@ -5,6 +5,7 @@ import org.objectweb.asm.tree._
 import org.objectweb.asm.{Type, Opcodes}
 import de.mineformers.core.util.ASMUtil
 import scala.util.control.Breaks
+import cpw.mods.fml.common.FMLCommonHandler
 
 /**
  * WorldRendererTransformer
@@ -31,25 +32,53 @@ class WorldRendererTransformer extends ClassTransformer {
    */
   override def transform(clazz: ClassNode): Boolean = {
     val m = ASMUtil.getMinecraftMethod(clazz, MUpdateRendererMcp, MUpdateRendererSrg)
-    val insns = new InsnList()
+    val insnsPre = new InsnList()
+    // Call the pre render hook, if it returns true, return the method
+    val lblTrue = new LabelNode() // Label for if-statement
+    val lblFalse = new LabelNode()
+    insnsPre.add(new VarInsnNode(Opcodes.ALOAD, 16)) // Pass 'renderer' as argument to onRenderByTypePost
+    insnsPre.add(new VarInsnNode(Opcodes.ALOAD, 16)) // Pass 'renderer' as argument to getfield
+    insnsPre.add(new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/RenderBlocks", ASMUtil.validateName(FBlockAccessMcp, FBlockAccessSrg), "Lnet/minecraft/world/IBlockAccess;")) // Pass 'blockAccess' as argument to onRenderByTypePost
+    insnsPre.add(new VarInsnNode(Opcodes.ILOAD, 23)) // Pass 'x' as argument to onRenderByTypePost
+    insnsPre.add(new VarInsnNode(Opcodes.ILOAD, 21)) // Pass 'y' as argument to onRenderByTypePost
+    insnsPre.add(new VarInsnNode(Opcodes.ILOAD, 22)) // Pass 'z' as argument to onRenderByTypePost
+    insnsPre.add(new VarInsnNode(Opcodes.ALOAD, 24)) // Pass 'block' as argument to onRenderByTypePost
+    val name = "onRenderByTypePre"
+    val desc = Type.getMethodDescriptor(Type.BOOLEAN_TYPE, Type.getObjectType("net/minecraft/client/renderer/RenderBlocks"), Type.getObjectType("net/minecraft/world/IBlockAccess"), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.getObjectType("net/minecraft/block/Block")) // Method descriptor for onRenderByTypePre
+    insnsPre.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "de/mineformers/core/impl/asm/ASMHooks", name, desc)) // Invoke onRenderByTypePre
+    insnsPre.add(new JumpInsnNode(Opcodes.IFEQ, lblTrue)) // Use the result as if jump
+    insnsPre.add(new InsnNode(Opcodes.ICONST_1))
+    insnsPre.add(new VarInsnNode(Opcodes.ISTORE, 19))
+    insnsPre.add(new JumpInsnNode(Opcodes.GOTO, lblFalse))
+    insnsPre.add(lblTrue)
+
+    val insnsPost = new InsnList()
     // Call the post render hook
-    insns.add(new VarInsnNode(Opcodes.ALOAD, 16)) // Pass 'renderer' as argument to onRenderByTypePost
-    insns.add(new VarInsnNode(Opcodes.ALOAD, 16)) // Pass 'renderer' as argument to getfield
-    insns.add(new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/RenderBlocks", ASMUtil.validateName(FBlockAccessMcp, FBlockAccessSrg), "Lnet/minecraft/world/IBlockAccess;")) // Pass 'blockAccess' as argument to onRenderByTypePost
-    insns.add(new VarInsnNode(Opcodes.ILOAD, 23)) // Pass 'x' as argument to onRenderByTypePost
-    insns.add(new VarInsnNode(Opcodes.ILOAD, 21)) // Pass 'y' as argument to onRenderByTypePost
-    insns.add(new VarInsnNode(Opcodes.ILOAD, 22)) // Pass 'z' as argument to onRenderByTypePost
-    insns.add(new VarInsnNode(Opcodes.ALOAD, 24)) // Pass 'block' as argument to onRenderByTypePost
+    insnsPost.add(new VarInsnNode(Opcodes.ALOAD, 16)) // Pass 'renderer' as argument to onRenderByTypePost
+    insnsPost.add(new VarInsnNode(Opcodes.ALOAD, 16)) // Pass 'renderer' as argument to getfield
+    insnsPost.add(new FieldInsnNode(Opcodes.GETFIELD, "net/minecraft/client/renderer/RenderBlocks", ASMUtil.validateName(FBlockAccessMcp, FBlockAccessSrg), "Lnet/minecraft/world/IBlockAccess;")) // Pass 'blockAccess' as argument to onRenderByTypePost
+    insnsPost.add(new VarInsnNode(Opcodes.ILOAD, 23)) // Pass 'x' as argument to onRenderByTypePost
+    insnsPost.add(new VarInsnNode(Opcodes.ILOAD, 21)) // Pass 'y' as argument to onRenderByTypePost
+    insnsPost.add(new VarInsnNode(Opcodes.ILOAD, 22)) // Pass 'z' as argument to onRenderByTypePost
+    insnsPost.add(new VarInsnNode(Opcodes.ALOAD, 24)) // Pass 'block' as argument to onRenderByTypePost
     val namePost = "onRenderByTypePost"
     val descPost = Type.getMethodDescriptor(Type.VOID_TYPE, Type.getObjectType("net/minecraft/client/renderer/RenderBlocks"), Type.getObjectType("net/minecraft/world/IBlockAccess"), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.getObjectType("net/minecraft/block/Block")) // Method descriptor for onRenderByTypePost
-    insns.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "de/mineformers/core/impl/asm/ASMHooks", namePost, descPost)) // Invoke onRenderByTypePost
+    insnsPost.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "de/mineformers/core/impl/asm/ASMHooks", namePost, descPost)) // Invoke onRenderByTypePost
 
     val loop = new Breaks
     loop.breakable(for (i <- 0 until m.instructions.size()) {
+      var visitedPre = false
       m.instructions.get(i) match {
         case v: VarInsnNode => if (v.`var` == 19) {
-          if (v.getOpcode == Opcodes.ISTORE && v.getPrevious.getOpcode == Opcodes.IOR && v.getPrevious.getPrevious.getOpcode == Opcodes.INVOKEVIRTUAL) {
-            m.instructions.insertBefore(v.getNext, insns)
+          if (v.getOpcode == Opcodes.ILOAD && v.getNext.getOpcode == Opcodes.ALOAD && !visitedPre) {
+            visitedPre = true
+            m.instructions.insertBefore(v, insnsPre)
+          }
+        }
+        case i: IincInsnNode => if(i.getOpcode == Opcodes.IINC) {
+          if(i.`var` == 23 && i.getNext.getOpcode == Opcodes.GOTO) {
+            m.instructions.insertBefore(i, insnsPost)
+            m.instructions.insertBefore(i, lblFalse)
             loop.break()
           }
         }

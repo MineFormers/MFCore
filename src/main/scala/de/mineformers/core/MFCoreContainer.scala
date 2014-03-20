@@ -23,13 +23,10 @@
  ******************************************************************************/
 package de.mineformers.core
 
-import cpw.mods.fml.common.{FMLCommonHandler, LoadController, ModMetadata, DummyModContainer}
+import cpw.mods.fml.common.{LoadController, ModMetadata, DummyModContainer}
 import com.google.common.collect.ImmutableList
 import com.google.common.eventbus.{Subscribe, EventBus}
 import cpw.mods.fml.common.event.FMLPreInitializationEvent
-import cpw.mods.fml.common.eventhandler.SubscribeEvent
-import de.mineformers.core.event.RenderBlockEvent
-
 /**
  * MFCoreContainer
  *
