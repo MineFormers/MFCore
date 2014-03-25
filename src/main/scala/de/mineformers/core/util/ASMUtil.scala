@@ -54,7 +54,7 @@ object ASMUtil {
    * @param srgName the SRG name of the method
    * @return a [[MethodNode]] if found
    */
-  def getMinecraftMethod(clazz: ClassNode, mcpName: String, srgName: String): MethodNode = {
+  def getMappedMethod(clazz: ClassNode, mcpName: String, srgName: String): MethodNode = {
     val m = findMethod(clazz, if (mcpEnv) mcpName else srgName)
     if (m == null)
       throw new NoSuchMethodException(mcpName + " in " + clazz.name)

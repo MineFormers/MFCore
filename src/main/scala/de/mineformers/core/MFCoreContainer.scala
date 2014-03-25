@@ -27,6 +27,9 @@ import cpw.mods.fml.common.{LoadController, ModMetadata, DummyModContainer}
 import com.google.common.collect.ImmutableList
 import com.google.common.eventbus.{Subscribe, EventBus}
 import cpw.mods.fml.common.event.FMLPreInitializationEvent
+import cpw.mods.fml.client.registry.ClientRegistry
+import net.minecraft.client.settings.KeyBinding
+
 /**
  * MFCoreContainer
  *

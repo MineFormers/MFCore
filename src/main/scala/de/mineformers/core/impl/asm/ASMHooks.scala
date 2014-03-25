@@ -47,8 +47,8 @@ object ASMHooks {
    * @param block the [[Block]] instance of the block rendered
    * @return true if the posted event is cancelled (prevents the block from being rendered)
    */
-  def onRenderByTypePre(renderer: RenderBlocks, world: IBlockAccess, x: Int, y: Int, z: Int, block: Block): Boolean =
-    FMLCommonHandler.instance().bus().post(new RenderBlockEvent.Pre(world, x, y, z, block, block.getRenderType, renderer))
+  def onRenderByTypePre(renderer: RenderBlocks, world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, renderPass: Int): Boolean =
+    FMLCommonHandler.instance().bus().post(new RenderBlockEvent.Pre(world, x, y, z, block, block.getRenderType, renderPass, renderer))
 
   /**
    * Called after RenderBlocks#renderBlockByRenderType in WorldRenderer#updateRenderer.
@@ -60,7 +60,7 @@ object ASMHooks {
    * @param z the z position of the block rendered
    * @param block the [[Block]] instance of the block rendered
    */
-  def onRenderByTypePost(renderer: RenderBlocks, world: IBlockAccess, x: Int, y: Int, z: Int, block: Block): Unit =
-    FMLCommonHandler.instance().bus().post(new RenderBlockEvent.Post(world, x, y, z, block, block.getRenderType, renderer))
+  def onRenderByTypePost(renderer: RenderBlocks, world: IBlockAccess, x: Int, y: Int, z: Int, block: Block, renderPass: Int): Unit =
+    FMLCommonHandler.instance().bus().post(new RenderBlockEvent.Post(world, x, y, z, block, block.getRenderType, renderPass, renderer))
 
 }

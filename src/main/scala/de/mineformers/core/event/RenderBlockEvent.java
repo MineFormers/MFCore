@@ -28,6 +28,7 @@ import cpw.mods.fml.common.eventhandler.Event;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 /**
  * RenderBlockEvent
@@ -41,15 +42,17 @@ public class RenderBlockEvent extends Event {
     public final int x, y, z;
     public final Block block;
     public final int renderType;
+    public final int renderPass;
     public final RenderBlocks renderer;
 
-    public RenderBlockEvent(IBlockAccess blockAccess, int x, int y, int z, Block block, int renderType, RenderBlocks renderer) {
+    public RenderBlockEvent(IBlockAccess blockAccess, int x, int y, int z, Block block, int renderType, int renderPass, RenderBlocks renderer) {
         this.blockAccess = blockAccess;
         this.x = x;
         this.y = y;
         this.z = z;
         this.block = block;
         this.renderType = renderType;
+        this.renderPass = renderPass;
         this.renderer = renderer;
     }
 
@@ -59,8 +62,8 @@ public class RenderBlockEvent extends Event {
      */
     @Cancelable
     public static class Pre extends RenderBlockEvent {
-        public Pre(IBlockAccess blockAccess, int x, int y, int z, Block block, int renderType, RenderBlocks renderer) {
-            super(blockAccess, x, y, z, block, renderType, renderer);
+        public Pre(IBlockAccess blockAccess, int x, int y, int z, Block block, int renderType, int renderPass, RenderBlocks renderer) {
+            super(blockAccess, x, y, z, block, renderType, renderPass, renderer);
         }
     }
 
@@ -69,8 +72,8 @@ public class RenderBlockEvent extends Event {
      * Will also be called if the Pre event was cancelled.
      */
     public static class Post extends RenderBlockEvent {
-        public Post(IBlockAccess blockAccess, int x, int y, int z, Block block, int renderType, RenderBlocks renderer) {
-            super(blockAccess, x, y, z, block, renderType, renderer);
+        public Post(IBlockAccess blockAccess, int x, int y, int z, Block block, int renderType, int renderPass, RenderBlocks renderer) {
+            super(blockAccess, x, y, z, block, renderType, renderPass, renderer);
         }
     }
 
