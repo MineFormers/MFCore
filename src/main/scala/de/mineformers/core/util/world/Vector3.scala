@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,8 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
-
+ */
 package de.mineformers.core.util.world
 
 import scala.collection.mutable

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core.item
 
 import net.minecraft.item.Item
@@ -39,6 +39,7 @@ class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
   def this(name: String, tab: CreativeTabs) = this(name, name, tab)
 
   this.setUnlocalizedName(name)
+  this.setCreativeTab(tab)
   this.setTextureName(texture)
 
 }

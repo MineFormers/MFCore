@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,15 +20,21 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core
 
 import cpw.mods.fml.common.{LoadController, ModMetadata, DummyModContainer}
 import com.google.common.collect.ImmutableList
 import com.google.common.eventbus.{Subscribe, EventBus}
-import cpw.mods.fml.common.event.FMLPreInitializationEvent
-import cpw.mods.fml.client.registry.ClientRegistry
-import net.minecraft.client.settings.KeyBinding
+import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
+import de.mineformers.core.registry.{SharedItemRegistry, SharedBlockRegistry}
+import de.mineformers.core.block.TestBlock
+import de.mineformers.core.item.{TestItem, BaseItem}
+import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.item.ItemStack
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.EntityLivingBase
+import de.mineformers.core.client.shape2d.Point
 
 /**
  * MFCoreContainer
@@ -62,5 +68,8 @@ class MFCoreContainer extends DummyModContainer(new ModMetadata) {
    */
   @Subscribe
   def preInit(event: FMLPreInitializationEvent): Unit = {
+    SharedBlockRegistry.add("test123", new TestBlock)
+    SharedItemRegistry.add("test123456", new TestItem)
   }
+
 }

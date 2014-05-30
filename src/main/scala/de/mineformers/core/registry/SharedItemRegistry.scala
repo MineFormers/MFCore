@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core.registry
 
 import net.minecraft.item.Item
@@ -39,19 +39,12 @@ case class ItemEntry(item: Item, modId: String = null)
  *
  * @author PaleoCrafter
  */
-object SharedItemRegistry extends SharedRegistry[String, ItemEntry] {
-  /**
-   * Helper method
-   * @param key the key to register the item with
-   * @param item the item to register
-   * @param modId the mod id for the item to register
-   */
-  def add(key: String, item: Item, modId: String = null): Unit = this.add(key, ItemEntry(item, modId))
+object SharedItemRegistry extends SharedRegistry[String, Item] {
 
   /**
    * Registers the given item
    * @param key the mapping's key
    * @param value the mapping's value
    */
-  override protected def put(key: String, value: ItemEntry): Unit = GameRegistry.registerItem(value.item, key, value.modId)
+  override protected def put(key: String, value: Item): Unit = GameRegistry.registerItem(value, key)
 }

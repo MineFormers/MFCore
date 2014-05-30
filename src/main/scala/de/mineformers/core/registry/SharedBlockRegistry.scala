@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core.registry
 
 import cpw.mods.fml.common.{LoaderState, Loader}
@@ -35,13 +35,9 @@ import scala.language.existentials
  * BlockEntry representing a block in the registry's map
  * @param block the block to register
  * @param itemBlock the ItemBlock class for the supplied block
- * @param modId the mod id to register the block with
  * @param cstrArgs the arguments for the ItemBlock's constructor
  */
-case class BlockEntry(
-                       block: Block,
-                       itemBlock: Class[_ <: ItemBlock] = classOf[ItemBlock],
-                       modId: String = null, cstrArgs: Array[Object] = Array[Object]())
+case class BlockEntry(block: Block, itemBlock: Class[_ <: ItemBlock] = classOf[ItemBlock], cstrArgs: Array[Object] = Array[Object]())
 
 /**
  * SharedBlockRegistry
@@ -56,14 +52,9 @@ object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
    * @param key the key to register the block with
    * @param block the block to register
    * @param itemBlock the ItemBlock class for this block
-   * @param modId the mod id to register the block with
    * @param cstrArgs the constructor arguments for the ItemBlock
    */
-  def add(
-           key: String,
-           block: Block,
-           itemBlock: Class[_ <: ItemBlock] = classOf[ItemBlock],
-           modId: String = null, cstrArgs: Array[Object] = Array[Object]()): Unit = this.add(key, BlockEntry(block, itemBlock, modId, cstrArgs))
+  def add(key: String, block: Block, itemBlock: Class[_ <: ItemBlock] = classOf[ItemBlock], cstrArgs: Array[Object] = Array[Object]()): Unit = this.add(key, BlockEntry(block, itemBlock, cstrArgs))
 
   /**
    * Registers the given entry to the GameRegistry
@@ -73,13 +64,13 @@ object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
   override protected def put(key: String, value: BlockEntry): Unit = {
     if (Loader.instance().isInState(LoaderState.PREINITIALIZATION)) {
       if (value.block.isInstanceOf[MetaBlock] && value.itemBlock == classOf[ItemBlock]) {
-        GameRegistry.registerBlock(value.block, classOf[ItemBlockMeta], key, value.modId)
+        GameRegistry.registerBlock(value.block, classOf[ItemBlockMeta], key)
         return
       }
       if (value.cstrArgs.length > 0)
-        GameRegistry.registerBlock(value.block, value.itemBlock, key, value.modId, value.cstrArgs: _*)
+        GameRegistry.registerBlock(value.block, value.itemBlock, key, value.cstrArgs: _*)
       else
-        GameRegistry.registerBlock(value.block, value.itemBlock, key, value.modId)
+        GameRegistry.registerBlock(value.block, value.itemBlock, key)
     } else {
       System.err.println("A mod was trying to register a block outside the pre init phase")
     }

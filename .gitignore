@@ -3,11 +3,13 @@ build/*
 !build/libs/
 !build/libs/*
 bin/*
+.idea/*
 .gradle/*
 .project
 .classpath
 *.iml
 .settings/*
+eclipse/*
 /bin
 gradle.properties
 init.gradle

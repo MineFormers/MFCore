@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core.util.world
 
 import scala.collection.mutable
@@ -61,7 +61,7 @@ object BlockPos {
  */
 class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
 
-  private var _hashCode = 0
+  private val _hashCode = (x ^ z) * 31 + y
 
   /**
    * @return the X coordinate of this BlockPos
@@ -157,10 +157,7 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
    */
   def *(pos: BlockPos) = BlockPos(coords._1 * pos.x, coords._2 * pos.y, coords._3 * pos.z)
 
-  override def hashCode() = {
-    if (_hashCode == 0) _hashCode = (x ^ z) * 31 + y
-    _hashCode
-  }
+  override def hashCode() = _hashCode
 
   override def equals(that: Any): Boolean = {
     that match {

@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core.block
 
 import net.minecraft.creativetab.CreativeTabs
@@ -42,7 +42,7 @@ import net.minecraft.item.{Item, ItemStack}
  * @param subBlocks an array of [[SubBlock]]s
  * @author PaleoCrafter
  */
-class MetaBlock(baseName: String, tab: CreativeTabs, material: Material, subBlocks: Array[SubBlock]) extends BaseBlock(baseName, baseName, tab, material) {
+class MetaBlock(baseName: String, tab: CreativeTabs, material: Material, subBlocks: Seq[SubBlock]) extends BaseBlock(baseName, baseName, tab, material) {
 
   /**
    * Add all the sub blocks to the creative tab

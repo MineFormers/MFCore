@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,8 +20,10 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core
+
+import net.minecraft.item.Item
 
 package object registry {
 
@@ -30,7 +32,7 @@ package object registry {
   }
 
   object MFItems {
-    def apply(key: String): ItemEntry = SharedItemRegistry(key)
+    def apply(key: String): Item = SharedItemRegistry(key)
   }
 
 }

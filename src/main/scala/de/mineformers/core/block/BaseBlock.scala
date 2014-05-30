@@ -1,4 +1,4 @@
-/*******************************************************************************
+/*
  * The MIT License (MIT)
  *
  * Copyright (c) 2014 MineFormers
@@ -20,7 +20,7 @@
  * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
- ******************************************************************************/
+ */
 package de.mineformers.core.block
 
 import net.minecraft.block.Block
@@ -38,31 +38,12 @@ import net.minecraft.creativetab.CreativeTabs
  * @param texture texture of the block
  * @param tab creative tab for the block
  * @param material material for the block
- * @param teClass TileEntity class, defaults to null
  * @author PaleoCrafter
  */
-class BaseBlock(name: String, texture: String, tab: CreativeTabs, material: Material, teClass: Class[_ <: TileEntity] = null) extends Block(material) {
-
-  def this(name: String, tab: CreativeTabs, material: Material, teClass: Class[_ <: TileEntity] = null) = this(name, name, tab, material, teClass)
+class BaseBlock(name: String, texture: String, tab: CreativeTabs, material: Material) extends Block(material) {
 
   this.setBlockName(name)
   this.setCreativeTab(tab)
   this.setBlockTextureName(Loader.instance().activeModContainer().getModId.toLowerCase + ":" + texture)
-
-  /**
-   * @param meta check if there is a TE for the given metadata
-   * @return true, if the supplied teClass is not null (by default)
-   */
-  override def hasTileEntity(meta: Int): Boolean = {
-    teClass != null
-  }
-
-  /**
-   * By default, creates a new TE from the teClass
-   * @param world a world object
-   * @param meta the meta of the block to get the TE for
-   * @return a TileEntity instance, if hasTileEntity returns true
-   */
-  override def createTileEntity(world: World, meta: Int): TileEntity = if (hasTileEntity(meta)) teClass.newInstance() else null
 
 }
