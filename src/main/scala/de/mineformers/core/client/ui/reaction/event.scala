@@ -24,9 +24,9 @@
 
 package de.mineformers.core.client.ui.reaction
 
-import de.mineformers.core.client.ui.component.Component
 import de.mineformers.core.client.shape2d.Point
 import de.mineformers.core.client.ui.util.MouseButton
+import de.mineformers.core.client.ui._
 
 /**
  * Event
@@ -41,7 +41,7 @@ trait Positioned extends Event {
   def pos: Point = p
 }
 
-case class ComponentEvent[C <: Component[C]](c: C) extends Event
+case class ComponentEvent(c: Comp) extends Event
 
 object MouseEvent {
 

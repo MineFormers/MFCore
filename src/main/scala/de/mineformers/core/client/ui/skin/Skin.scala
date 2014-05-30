@@ -26,9 +26,10 @@ package de.mineformers.core.client.ui.skin
 
 import de.mineformers.core.client.ui.component.Component
 import scala.collection.immutable.HashMap
+import de.mineformers.core.util.renderer.GuiUtils
 import de.mineformers.core.client.shape2d.Point
 import de.mineformers.core.client.ui.skin.drawable.Drawable
-import de.mineformers.core.util.renderer.GuiUtils
+import de.mineformers.core.client.ui._
 
 /**
  * Skin
@@ -36,18 +37,18 @@ import de.mineformers.core.util.renderer.GuiUtils
  * @author PaleoCrafter
  */
 object Skin {
-  private var defaults = HashMap[String, Skin[Component[Any]]]()
-  private var activeSkins = HashMap[String, Skin[Component[Any]]]()
+  private var defaults = HashMap.empty[String, Skin[Comp]]
+  private var activeSkins = HashMap.empty[String, Skin[Comp]]
 
-  def apply[A <: Component[A]](comp: A): Skin[A] = {
+  def apply[C <: Component[C]](comp: Component[C]): Skin[C] = {
     if (!activeSkins.contains(comp.identifier))
       if (defaults.contains(comp.identifier)) {
-        activeSkins += ((comp.identifier, defaults(comp.identifier).asInstanceOf[Skin[A]]))
+        activeSkins += comp.identifier -> defaults(comp.identifier)
       } else {
-        defaults += comp.identifier -> comp.defaultSkin
-        activeSkins += comp.identifier -> comp.defaultSkin
+        defaults += comp.identifier -> comp.defaultSkin.asInstanceOf[Skin[Comp]]
+        activeSkins += comp.identifier -> comp.defaultSkin.asInstanceOf[Skin[Comp]]
       }
-    activeSkins(comp.identifier).asInstanceOf[Skin[A]]
+    activeSkins(comp.identifier).asInstanceOf[Skin[C]]
   }
 
 
@@ -55,12 +56,12 @@ object Skin {
 
   }
 
-  def setDefault[A <: Component[A]](id: String, skin: Skin[A]): Unit = {
-    defaults += id -> skin
+  def setDefault[C <: Component[C]](id: String, skin: Skin[C]): Unit = {
+    defaults += id -> skin.asInstanceOf[Skin[Comp]]
   }
 
-  def set[A <: Component[A]](id: String, skin: Skin[A]): Unit = {
-    activeSkins += id -> skin
+  def set[C <: Component[C]](id: String, skin: Skin[C]): Unit = {
+    activeSkins += id -> skin.asInstanceOf[Skin[Comp]]
   }
 }
 

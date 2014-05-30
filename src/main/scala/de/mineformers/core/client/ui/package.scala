@@ -22,23 +22,15 @@
  * THE SOFTWARE.
  */
 
-package de.mineformers.core.client.ui.skin.container
+package de.mineformers.core.client
 
-import de.mineformers.core.client.ui.skin.Skin
-import de.mineformers.core.client.ui.component.container.Panel
-import de.mineformers.core.client.shape2d.Point
 import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.ui.Comp
 
 /**
- * PanelSkin
+ * package
  *
  * @author PaleoCrafter
  */
-class PanelSkin extends Skin[Panel] {
-
-  override def drawForeground(mousePos: Point, component: Panel): Unit = {
-    component.content.foreach(c => c.skin.draw(mousePos, c))
-  }
-
+package object ui {
+  type Comp = Component[A forSome {type A <: Component[A]}]
 }

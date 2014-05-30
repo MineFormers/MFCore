@@ -36,6 +36,7 @@ import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.ui.component.decoration.Label
 import de.mineformers.core.client.shape2d.Size
 import de.mineformers.core.client.ui.reaction.Event
+import de.mineformers.core.client.ui._
 
 /**
  * TestBlock

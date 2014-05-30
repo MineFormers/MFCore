@@ -32,6 +32,7 @@ import de.mineformers.core.client.ui.component.container.Panel
 import cpw.mods.fml.client.FMLClientHandler
 import de.mineformers.core.client.ui.skin.Skin
 import de.mineformers.core.util.renderer.GuiUtils
+import de.mineformers.core.client.ui._
 
 /**
  * Component
@@ -75,7 +76,7 @@ trait Component[+A <: Component[A]] extends Publisher {
 
   def hovered(mousePosition: Point) = screenBounds contains mousePosition
 
-  def skin: Skin[A] = Skin(this).asInstanceOf[Skin[A]]
+  def skin: Skin[A] = Skin(this)
 
   def defaultSkin: Skin[A]
 

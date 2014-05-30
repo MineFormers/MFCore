@@ -31,6 +31,7 @@ import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.Skin
 import de.mineformers.core.client.ui.skin.container.PanelSkin
 import de.mineformers.core.client.ui.layout.{Constraints, LayoutManager}
+import de.mineformers.core.client.ui.Comp
 
 /**
  * Panel
@@ -53,10 +54,10 @@ class Panel extends Component[Panel] {
     })
   }
 
-  def add(c: Component[_]): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
+  def add[C <: Component[C]](c: C): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
 
-  def add(c: Component[_], constraints: Constraints): Unit = {
-    content :+ c
+  def add[C <: Component[C]](c: C, constraints: Constraints): Unit = {
+    content :+ c.asInstanceOf[Comp]
     if (layout != null)
       layout.setConstraints(c, constraints)
   }
@@ -78,7 +79,7 @@ class Panel extends Component[Panel] {
 
   override def defaultSkin: Skin[Panel] = new PanelSkin
 
-  var content = Seq[Component[Any]]()
+  var content = Seq.empty[Comp]
 
   var layout: LayoutManager[_ <: Constraints] = _
 }
