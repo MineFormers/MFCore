@@ -34,8 +34,12 @@ import net.minecraft.util.{IIcon, ResourceLocation}
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
-import net.minecraft.client.gui.ScaledResolution
 import de.mineformers.core.client.ui.util.Font
+import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.util.ResourceUtils.Resource
+import javax.imageio.ImageIO
+import java.io.IOException
+import net.minecraft.client.gui.ScaledResolution
 
 /**
  * GuiUtils
@@ -43,11 +47,17 @@ import de.mineformers.core.client.ui.util.Font
  * @author PaleoCrafter
  */
 object GuiUtils {
+  def init(): Unit = {
+    shaders.init()
+  }
+
   def mc: Minecraft = FMLClientHandler.instance.getClient
 
   def bindTexture(path: ResourceLocation): Unit = {
     mc.getTextureManager.bindTexture(path)
   }
+
+  def resetColor(): Unit = glColor4f(1F, 1F, 1F, 1F)
 
   def guiScale: Int = {
     val mc: Minecraft = Minecraft.getMinecraft
@@ -92,14 +102,19 @@ object GuiUtils {
     font.draw(text, x, y, z)
   }
 
-  def drawString(text: String, x: Int, y: Int, color: Int, drawShadow: Boolean, zLevel: Int) {
+  def drawString(text: String, x: Int, y: Int, z: Int, color: Int, drawShadow: Boolean) {
+    GL11.glPushMatrix()
     GL11.glDisable(GL11.GL_DEPTH_TEST)
-    GL11.glDisable(GL12.GL_RESCALE_NORMAL)
-    GL11.glTranslatef(0, 0, zLevel)
-    mc.fontRenderer.drawString(text, x, y, color, drawShadow)
-    GL11.glTranslatef(0, 0, -zLevel)
-    GL11.glEnable(GL12.GL_RESCALE_NORMAL)
+    GL11.glTranslatef(0, 0, z)
+    var i = 0
+    val height = mc.fontRenderer.FONT_HEIGHT
+    for (line <- text.split("\\n").mkString("\\\\n").split("\\\\n")) {
+      mc.fontRenderer.drawString(line, x, y + i * (height + 1), color, drawShadow)
+      i += 1
+    }
+    GL11.glTranslatef(0, 0, -z)
     GL11.glEnable(GL11.GL_DEPTH_TEST)
+    GL11.glPopMatrix()
   }
 
   def drawSplitString(text: String, x: Int, y: Int, color: Int, drawShadow: Boolean) {
@@ -211,16 +226,31 @@ object GuiUtils {
     drawQuad(x, y, z, width, height, icon.getMinU, icon.getMinV, icon.getMaxU, icon.getMaxV)
   }
 
-  def renderItemIntoGUI(stack: ItemStack, x: Int, y: Int) {
-    renderItem.renderItemIntoGUI(mc.fontRenderer, mc.getTextureManager, stack, x, y)
+  def drawItemStack(stack: ItemStack, x: Int, y: Int, customAmount: String = null) {
+    renderItem.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.getTextureManager, stack, x, y)
+    renderItem.renderItemOverlayIntoGUI(mc.fontRenderer, mc.getTextureManager, stack, x, y, customAmount)
+  }
+
+  private def shaders: ShaderSystem = {
+    if (_shaders == null) {
+      _shaders = new ShaderSystem
+      _shaders.addShader(REPEAT_SHADER, GL_FRAGMENT_SHADER)
+    }
+    _shaders
+  }
+
+  def imageSize(resource: Resource): Size = {
+    try {
+      val image = ImageIO.read(resource.toInputStream)
+      Size(image.getWidth, image.getHeight)
+    } catch {
+      case e: IOException =>
+        Size(0, 0)
+    }
   }
 
   private final val renderItem: RenderItem = new RenderItem
-  private lazy val shaders: ShaderSystem = {
-    val system = new ShaderSystem
-    shaders.addShader(REPEAT_SHADER, GL_FRAGMENT_SHADER)
-    system
-  }
+  private var _shaders: ShaderSystem = null
   private final val REPEAT_SHADER: String = "#version 120\n" + "uniform sampler2D tex; uniform vec2 iconOffset; uniform vec2 iconSize;\n" + "void main() {\n" + "gl_FragColor = texture2D(tex, iconOffset + fract(gl_TexCoord[0].st) * iconSize) * gl_Color;\n" + "}"
 }
 

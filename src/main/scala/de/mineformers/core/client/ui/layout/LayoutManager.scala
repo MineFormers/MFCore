@@ -35,11 +35,11 @@ import de.mineformers.core.client.ui.component.container.Panel
  * @author PaleoCrafter
  */
 trait LayoutManager[C <: Constraints] {
-  def apply(c: Component[_]): Constraints = {
+  def apply(c: Component): C = {
     constraints.getOrElseUpdate(c, defaultConstraints)
   }
 
-  def setConstraints(c: Component[_], constraints: Constraints): Unit = {
+  def setConstraints(c: Component, constraints: Constraints): Unit = {
     if (constraints != null)
       this.constraints.put(c, constraints.asInstanceOf[C])
     else
@@ -48,11 +48,15 @@ trait LayoutManager[C <: Constraints] {
 
   def defaultConstraints: C
 
-  def positionFor(panel: Panel, component: Component[_]): Point
+  def positionFor(panel: Panel, component: Component): Point
 
   def size(panel: Panel): Size
 
-  val constraints = new mutable.LinkedHashMap[Component[_], C]()
+  def reset(): Unit = ()
+
+  def clear(): Unit = constraints.clear()
+
+  val constraints = new mutable.LinkedHashMap[Component, C]()
 }
 
 trait Constraints

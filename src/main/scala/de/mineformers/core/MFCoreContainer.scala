@@ -29,12 +29,15 @@ import com.google.common.eventbus.{Subscribe, EventBus}
 import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
 import de.mineformers.core.registry.{SharedItemRegistry, SharedBlockRegistry}
 import de.mineformers.core.block.TestBlock
-import de.mineformers.core.item.{TestItem, BaseItem}
-import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.item.ItemStack
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.EntityLivingBase
-import de.mineformers.core.client.shape2d.Point
+import de.mineformers.core.item.TestItem
+import java.io.File
+import cpw.mods.fml.client.{FMLFileResourcePack, FMLFolderResourcePack}
+import cpw.mods.fml.relauncher.{Side, SideOnly}
+import net.minecraft.client.Minecraft
+import de.mineformers.core.client.ui.skin.{TextureLoader, GuiMetadataSectionDeserializer, GuiMetadataSection}
+import de.mineformers.core.util.renderer.GuiUtils
+import net.minecraft.client.resources.SimpleReloadableResourceManager
+import de.mineformers.core.network.TestMessage
 
 /**
  * MFCoreContainer
@@ -42,7 +45,6 @@ import de.mineformers.core.client.shape2d.Point
  * @author PaleoCrafter
  */
 class MFCoreContainer extends DummyModContainer(new ModMetadata) {
-
   val meta = getMetadata
   meta.modId = "mfcore"
   meta.name = "MFCore"
@@ -68,8 +70,27 @@ class MFCoreContainer extends DummyModContainer(new ModMetadata) {
    */
   @Subscribe
   def preInit(event: FMLPreInitializationEvent): Unit = {
+    if (event.getSide.isClient)
+      registerClient()
+    TestMessage(1, "")
     SharedBlockRegistry.add("test123", new TestBlock)
     SharedItemRegistry.add("test123456", new TestItem)
   }
 
+  @Subscribe
+  def init(event: FMLInitializationEvent): Unit = {
+
+  }
+
+  @SideOnly(Side.CLIENT)
+  def registerClient(): Unit = {
+    Minecraft.getMinecraft.getResourcePackRepository.rprMetadataSerializer.registerMetadataSectionType(new GuiMetadataSectionDeserializer(), classOf[GuiMetadataSection])
+    GuiUtils.init()
+    Minecraft.getMinecraft.getResourceManager.asInstanceOf[SimpleReloadableResourceManager].registerReloadListener(new TextureLoader)
+  }
+
+  override def getSource: File = MFCore.CoreModLocation
+
+  override def getCustomResourcePackClass: Class[_] =
+    if (MFCore.CoreModLocation.isDirectory) classOf[FMLFolderResourcePack] else classOf[FMLFileResourcePack]
 }

@@ -32,11 +32,13 @@ import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.world.World
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.client.Minecraft
-import de.mineformers.core.client.ui.component.container.Frame
+import de.mineformers.core.client.ui.component.container.{ScrollPanel, Frame}
 import de.mineformers.core.client.ui.component.decoration.Label
-import de.mineformers.core.client.shape2d.Size
-import de.mineformers.core.client.ui.reaction.Event
-import de.mineformers.core.client.ui._
+import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.util.world.RichWorld._
+import de.mineformers.core.client.ui.component.interaction.{TextBox, Button}
+import java.text.DecimalFormat
+import java.util.Locale
 
 /**
  * TestBlock
@@ -67,15 +69,22 @@ class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, M
       field_149994_N
   }
 
-  override def onBlockActivated(p_149727_1_ : World, p_149727_2_ : Int, p_149727_3_ : Int, p_149727_4_ : Int, p_149727_5_ : EntityPlayer, p_149727_6_ : Int, p_149727_7_ : Float, p_149727_8_ : Float, p_149727_9_ : Float): Boolean = {
-    if (p_149727_1_.isRemote) {
+  override def onBlockActivated(world: World, x: Int, y: Int, z: Int, side: EntityPlayer, player: Int, p_149727_7_ : Float, p_149727_8_ : Float, p_149727_9_ : Float): Boolean = {
+    if (world.isClient) {
       val panel = new Frame(Size(100, 100))
-      panel add new Label("test")
-      val proxy = panel.proxy
-      proxy.listenTo(proxy)
-      proxy.reactions += {
-        case e: Event => println(e)
-      }
+      val scroll = new ScrollPanel(Size(92, 92), true, false)
+      val label = new Label("test")
+      val text = new TextBox("test", Size(50, 20))
+      text.position = Point(0, 40)
+      label.position = Point(-10, 5)
+      val button = new Button("test")
+      button.size = Size(100, 20)
+      button.position = Point(10, 10)
+      scroll add text
+      scroll add label
+      scroll add button
+      panel add scroll
+      val proxy = panel.createProxy
       Minecraft.getMinecraft.displayGuiScreen(proxy)
     }
     false

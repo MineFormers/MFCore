@@ -26,6 +26,7 @@ package de.mineformers.core.client.shape2d
 
 import scala.collection.mutable
 import de.mineformers.core.client.shape2d.Rectangle.Bounds
+import com.google.common.base.Objects
 
 /**
  * Rectangle
@@ -33,7 +34,9 @@ import de.mineformers.core.client.shape2d.Rectangle.Bounds
  * @author PaleoCrafter
  */
 object Rectangle {
-  private val cache = new mutable.HashMap[Bounds, Rectangle]
+  private val cache = new mutable.WeakHashMap[Bounds, Rectangle]
+
+  val Empty = Rectangle(0, 0, 0, 0)
 
   type Bounds = (Point, Point)
 
@@ -70,23 +73,18 @@ object Rectangle {
       cache.getOrElseUpdate(newR, new Rectangle(newR))
     }
   }
+
+  def unapply(r: Rectangle): Option[Bounds] = Some((r.start, r.end))
 }
 
-class Rectangle(r: (Point, Point)) {
-
-  def start: Point = r._1
-
-  def end: Point = r._2
-
-  def x: Int = start.x
-
-  def y: Int = start.y
-
-  def size: Size = Size(width, height)
-
-  def width: Int = end.x - start.x
-
-  def height: Int = end.y - start.y
+class Rectangle private(r: Bounds) extends Shape[Rectangle] {
+  val (start, end) = r
+  val x: Int = start.x
+  val y: Int = start.y
+  val width: Int = end.x - start.x
+  val height: Int = end.y - start.y
+  val size: Size = Size(width, height)
+  private val _hashCode = Objects.hashCode(start, end)
 
   def +(p: Point): Rectangle = Rectangle(start, end + p)
 
@@ -104,7 +102,7 @@ class Rectangle(r: (Point, Point)) {
 
   def *(scale: Point): Rectangle = Rectangle(start, width * scale.x, height * scale.y)
 
-  def &(r: Rectangle): Option[Rectangle] = {
+  def intersect(r: Rectangle): Option[Rectangle] = {
     if (r.start xyGreater end)
       return None
     val startX = if (start < r.start) r.start.x else start.x
@@ -120,18 +118,29 @@ class Rectangle(r: (Point, Point)) {
 
   def translate(p: Point): Rectangle = Rectangle(start + p, end + p)
 
+  def center(s: Size): Point = center(Rectangle(Point(0, 0), s))
+
+  def center(r: Rectangle): Point = Point(x + ((width - r.width) / 2), y + ((height - r.height) / 2))
+
+  def centerInSize(s: Size): Point = centerInSize(Rectangle(Point(0, 0), s))
+
+  def centerInSize(r: Rectangle): Point = Point((width - r.width) / 2, (height - r.height) / 2)
+
   def contains(p: Point): Boolean = (p xyGreaterOrEqual start) && (p xyLessOrEqual end)
 
   def contains(r: Rectangle): Boolean = (r.start xyGreaterOrEqual start) && (r.end xyLessOrEqual end)
 
+  override def bounds: Rectangle = this
+
+  override def hashCode = _hashCode
+
   override def equals(obj: scala.Any): Boolean = {
     obj match {
       case r: Rectangle => return r.start == start && r.end == end
-      case t: Bounds => return t == r
+      case (rStart, rEnd) => return rStart == start && rEnd == end
     }
     false
   }
 
   override def toString = s"( start=$start, width=$width, height=$height )"
-
 }

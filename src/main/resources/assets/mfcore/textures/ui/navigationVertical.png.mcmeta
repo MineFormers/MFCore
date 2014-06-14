@@ -1,0 +1,90 @@
+{
+  "gui": {
+    "multi": [
+      {
+        "target": "navigationUp",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            0
+          ],
+          "size": [
+            15,
+            10
+          ]
+        }
+      },
+      {
+        "target": "navigationUp:hovered",
+        "type": "static",
+        "uv": {
+          "start": [
+            15,
+            0
+          ],
+          "size": [
+            15,
+            10
+          ]
+        }
+      },
+      {
+        "target": "navigationUp:disabled",
+        "type": "static",
+        "uv": {
+          "start": [
+            30,
+            0
+          ],
+          "size": [
+            15,
+            10
+          ]
+        }
+      },
+      {
+        "target": "navigationDown",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            10
+          ],
+          "size": [
+            15,
+            10
+          ]
+        }
+      },
+      {
+        "target": "navigationDown:hovered",
+        "type": "static",
+        "uv": {
+          "start": [
+            15,
+            10
+          ],
+          "size": [
+            15,
+            10
+          ]
+        }
+      },
+      {
+        "target": "navigationDown:disabled",
+        "type": "static",
+        "uv": {
+          "start": [
+            30,
+            10
+          ],
+          "size": [
+            15,
+            10
+          ]
+        }
+      }
+    ]
+  }
+}

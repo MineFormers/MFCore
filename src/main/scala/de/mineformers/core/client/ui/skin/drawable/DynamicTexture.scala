@@ -24,10 +24,12 @@
 
 package de.mineformers.core.client.ui.skin.drawable
 
-import de.mineformers.core.client.shape2d.{Rectangle, Point}
-import net.minecraft.util.ResourceLocation
+import de.mineformers.core.client.shape2d.{Size, Rectangle, Point}
 import de.mineformers.core.util.renderer.GuiUtils
 import de.mineformers.core.client.ui.skin.drawable.DynamicTexture.{Side, Corner}
+import de.mineformers.core.util.ResourceUtils.Resource
+import de.mineformers.core.client.ui.skin.DrawableDeserializer
+import com.google.gson.JsonObject
 
 /**
  * DynamicTexture
@@ -50,50 +52,99 @@ object DynamicTexture {
     final val Left = 3
   }
 
+  class Deserializer extends DrawableDeserializer {
+    override def deserialize(typ: String, json: JsonObject): DrawableTexture = {
+      var texture: DynamicTexture = null
+      if (json.has("topLeft")) {
+        val tlObject = json.getAsJsonObject("topLeft")
+        val tObject = json.getAsJsonObject("top")
+        val iObject = json.getAsJsonObject("inner")
+        texture = new DynamicTexture(getUVsFromObject(tlObject), getUVsFromObject(tObject), getUVsFromObject(iObject))
+      } else if (json.has("corners")) {
+        val c = json.getAsJsonObject("corners")
+        val s = json.getAsJsonObject("sides")
+        val inner = json.getAsJsonObject("inner")
+        val uvR: JsonObject => Rectangle = getUVsFromObject
+        texture = new DynamicTexture(Array(uvR(c.getAsJsonObject("topLeft")), uvR(c.getAsJsonObject("topRight")), uvR(c.getAsJsonObject("bottomLeft")), uvR(c.getAsJsonObject("bottomRight"))),
+          Array(uvR(s.getAsJsonObject("top")), uvR(s.getAsJsonObject("right")), uvR(s.getAsJsonObject("bottom")), uvR(s.getAsJsonObject("left"))), getUVsFromObject(inner))
+      } else {
+        texture = new DynamicTexture(Rectangle(0, 0, 0, 0), Rectangle(0, 0, 0, 0), Rectangle(0, 0, 0, 0))
+      }
+      if (json.has("repeatSides"))
+        texture.repeatSides = json.getAsJsonPrimitive("repeatSides").getAsBoolean
+      if (json.has("repeatInner"))
+        texture.repeatInner = json.getAsJsonPrimitive("repeatInner").getAsBoolean
+      texture
+    }
+  }
+
 }
 
-class DynamicTexture(texture: ResourceLocation, textureWidth: Int, textureHeight: Int, corners: Array[Rectangle], sides: Array[Rectangle], inner: Rectangle) extends Drawable {
+class DynamicTexture(_texture: Resource, textureWidth: Int, textureHeight: Int, private var corners: Array[Rectangle], private var sides: Array[Rectangle], private var inner: Rectangle) extends DrawableTexture {
 
-  def this(texture: ResourceLocation, textureWidth: Int = 16, textureHeight: Int = 16, topLeft: Rectangle, top: Rectangle, inner: Rectangle) = this(texture, textureWidth, textureHeight, Array(topLeft, topLeft.translate(topLeft.width + top.width, 0), topLeft.translate(topLeft.width + top.width, topLeft.height + top.width), topLeft.translate(0, topLeft.height + top.width)), Array(top, top.translate(top.width, topLeft.height).resize(top.size.invert), top.translate(0, top.width + top.height), top.translate(-topLeft.width, top.height).resize(top.size.invert)), inner)
+  this.texture = _texture
+  this.textureSize = Size(textureWidth, textureHeight)
 
-  override def draw(mousePos: Point, pos: Point): Unit = {
+  def this(corners: Array[Rectangle], sides: Array[Rectangle], inner: Rectangle) = this(null, 0, 0, corners, sides, inner)
+
+  def this(texture: Resource, textureWidth: Int = 16, textureHeight: Int = 16, topLeft: Rectangle, top: Rectangle, inner: Rectangle) = this(texture, textureWidth, textureHeight, Array(topLeft, topLeft.translate(topLeft.width + top.width, 0), topLeft.translate(topLeft.width + top.width, topLeft.height + top.width), topLeft.translate(0, topLeft.height + top.width)), Array(top, top.translate(top.width, topLeft.height).resize(top.size.invert), top.translate(0, top.width + top.height), top.translate(-topLeft.width, top.height).resize(top.size.invert)), inner)
+
+  def this(topLeft: Rectangle, top: Rectangle, inner: Rectangle) = this(null, 0, 0, topLeft, top, inner)
+
+
+  override def init(): Unit = {
+    if (inner.width == 0) {
+      val topLeft = Rectangle(0, 0, textureSize.width / 3, textureSize.height / 3)
+      val top = Rectangle(topLeft.width, 0, textureSize.width / 3, textureSize.height / 3)
+      inner = Rectangle(topLeft.width, topLeft.height, textureSize.width / 3, textureSize.height / 3)
+      corners = Array(topLeft, topLeft.translate(topLeft.width + top.width, 0), topLeft.translate(topLeft.width + top.width, topLeft.height + top.width), topLeft.translate(0, topLeft.height + top.width))
+      sides = Array(top, top.translate(top.width, topLeft.height).resize(top.size.invert), top.translate(0, top.width + top.height), top.translate(-topLeft.width, top.height).resize(top.size.invert))
+    }
+  }
+
+  override def draw(mousePos: Point, pos: Point, z: Int): Unit = {
+    utils.resetColor()
+    utils.bindTexture(texture)
     for (i <- 0 until corners.length)
-      drawCorner(i, cornerPos(i))
+      drawCorner(i, pos + cornerPos(i), z)
 
     for (i <- 0 until sides.length)
-      drawSide(i, sidePos(i), i % 2 != 0)
+      drawSide(i, pos + sidePos(i), i % 2 != 0, z)
 
-    drawInner(pos +(corners(Corner.TopLeft).width, corners(Corner.TopLeft).height))
+    drawInner(pos +(corners(Corner.TopLeft).width, corners(Corner.TopLeft).height), z)
   }
 
-  def drawCorner(cornerId: Int, pos: Point): Unit = {
+  def drawCorner(cornerId: Int, pos: Point, z: Int): Unit = {
     val corner = corners(cornerId)
-    GuiUtils.drawQuad(pos.x, pos.y, 0, corner.width, corner.height, scaleU(corner.x), scaleV(corner.y), scaleU(corner.end.x), scaleV(corner.end.y))
+    GuiUtils.drawQuad(pos.x, pos.y, z, corner.width, corner.height, scaleU(corner.x), scaleV(corner.y), scaleU(corner.end.x), scaleV(corner.end.y))
   }
 
-  def drawSide(sideId: Int, pos: Point, vertical: Boolean): Unit = {
+  def drawSide(sideId: Int, pos: Point, vertical: Boolean, z: Int): Unit = {
     val side = sides(sideId)
     val width = if (vertical) side.width else size.width - corners(Corner.TopLeft).width - corners(Corner.TopRight).width
     val height = if (vertical) size.height - corners(Corner.TopLeft).height - corners(Corner.BottomLeft).height else side.height
-    if (repeatSides)
-      GuiUtils.drawRectangleRepeated(pos.x, pos.y, 0, width, height, scaleU(side.x), scaleV(side.y), scaleU(side.end.x), scaleV(side.end.y), side.width, side.height)
-    else
-      GuiUtils.drawQuad(pos.x, pos.y, 0, width, height, scaleU(side.x), scaleV(side.y), scaleU(side.end.x), scaleV(side.end.y))
+    if (repeatSides) {
+      if (vertical)
+        GuiUtils.drawRectangleYRepeated(pos.x, pos.y, z, width, height, scaleU(side.x), scaleV(side.y), scaleU(side.end.x), scaleV(side.end.y), side.height)
+      else
+        GuiUtils.drawRectangleXRepeated(pos.x, pos.y, z, width, height, scaleU(side.x), scaleV(side.y), scaleU(side.end.x), scaleV(side.end.y), side.width)
+    } else
+      GuiUtils.drawQuad(pos.x, pos.y, z, width, height, scaleU(side.x), scaleV(side.y), scaleU(side.end.x), scaleV(side.end.y))
   }
 
-  def drawInner(pos: Point): Unit = {
+  def drawInner(pos: Point, z: Int): Unit = {
     val width = size.width - corners(Corner.TopLeft).width - corners(Corner.TopRight).width
     val height = size.height - corners(Corner.TopLeft).height - corners(Corner.BottomLeft).height
     if (repeatInner)
-      GuiUtils.drawRectangleRepeated(pos.x, pos.y, 0, width, height, scaleU(inner.x), scaleV(inner.y), scaleU(inner.end.x), scaleV(inner.end.y), inner.width, inner.height)
+      GuiUtils.drawRectangleRepeated(pos.x, pos.y, z, width, height, scaleU(inner.x), scaleV(inner.y), scaleU(inner.end.x), scaleV(inner.end.y), inner.width, inner.height)
     else
-      GuiUtils.drawQuad(pos.x, pos.y, 0, width, height, scaleU(inner.x), scaleV(inner.y), scaleU(inner.end.x), scaleV(inner.end.y))
+      GuiUtils.drawQuad(pos.x, pos.y, z, width, height, scaleU(inner.x), scaleV(inner.y), scaleU(inner.end.x), scaleV(inner.end.y))
   }
 
   def cornerPos(corner: Int): Point = corner match {
     case Corner.TopLeft => Point(0, 0)
-    case Corner.TopRight => Point(corners(Corner.TopLeft).width + sides(Side.Top).width, 0)
-    case Corner.BottomRight => Point(corners(Corner.BottomLeft).width + sides(Side.Bottom).width, corners(Corner.TopLeft).height + innerHeight)
+    case Corner.TopRight => Point(size.width - corners(Corner.TopRight).width, 0)
+    case Corner.BottomRight => Point(size.width - corners(Corner.BottomRight).width, corners(Corner.TopLeft).height + innerHeight)
     case Corner.BottomLeft => Point(0, corners(Corner.TopLeft).height + innerHeight)
     case _ => Point(0, 0)
   }
@@ -114,8 +165,10 @@ class DynamicTexture(texture: ResourceLocation, textureWidth: Int, textureHeight
 
   def scaleV(v: Int): Float = scaleV * v
 
+  override def toString: String = s"$corners,$sides,$inner"
+
   var repeatSides = true
   var repeatInner = true
-  val scaleU = 1F / textureWidth
-  val scaleV = 1F / textureHeight
+  lazy val scaleU = 1F / textureSize.width
+  lazy val scaleV = 1F / textureSize.height
 }

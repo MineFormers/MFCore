@@ -1,0 +1,6 @@
+{
+  "gui": {
+    "target": "button:hovered",
+    "type": "dynamic"
+  }
+}

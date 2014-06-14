@@ -26,20 +26,26 @@ package de.mineformers.core.client.ui.proxy
 
 import net.minecraft.client.gui.GuiScreen
 import de.mineformers.core.client.ui.reaction.{MouseEvent, KeyEvent}
-import de.mineformers.core.client.ui.component.container.Panel
+import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.shape2d.Point
 import org.lwjgl.input.Mouse
 import de.mineformers.core.util.renderer.GuiUtils
+import de.mineformers.core.client.ui.component.decoration.Tooltip
 
 /**
  * UIScreen
  *
  * @author PaleoCrafter
  */
-class UIScreen(container: Panel) extends GuiScreen with Context {
-  override def initGui(): Unit = container.init(this, this)
+class UIScreen(frame: Frame) extends GuiScreen with Context {
+  override def initGui(): Unit = {
+    frame.proxy = this
+    frame.init(this, this)
+  }
 
   override def mouseClicked(x: Int, y: Int, button: Int): Unit = {
+    if (focused != null)
+      focused.reactions.apply(MouseEvent.Click(Point(x, y), button))
     publish(MouseEvent.Click(Point(x, y), button))
   }
 
@@ -49,7 +55,8 @@ class UIScreen(container: Panel) extends GuiScreen with Context {
   }
 
   override def keyTyped(char: Char, code: Int): Unit = {
-    super.keyTyped(char, code)
+    if (focused == null || !focused.focused)
+      super.keyTyped(char, code)
     publish(KeyEvent.Type(char, code))
   }
 
@@ -60,17 +67,37 @@ class UIScreen(container: Panel) extends GuiScreen with Context {
     val x: Int = Mouse.getX * scaledWidth / this.mc.displayWidth
     val y: Int = scaledHeight - Mouse.getY * scaledHeight / this.mc.displayHeight - 1
     val pos = Point(x, y)
-    if(pos != lastMousePosition) {
+    if (pos != lastMousePosition) {
       publish(MouseEvent.Move(pos, lastMousePosition))
       lastMousePosition = pos
     }
-    container.update(pos)
+    val dWheel = Mouse.getDWheel / 120
+    if (dWheel != 0) {
+      publish(MouseEvent.Scroll(pos, dWheel))
+    }
+    frame.update(pos)
   }
+
+  override def close(): Unit = {
+    this.mc.displayGuiScreen(null)
+    this.mc.setIngameFocus()
+  }
+
+  override def doesGuiPauseGame(): Boolean = false
 
   override def drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
-    container.skin.draw(Point(mouseX, mouseY), container)
+    this.drawWorldBackground(0)
+    val p = Point(mouseX, mouseY)
+    frame.skin.draw(p)
+    tooltip.screen = p + Point(5, 5)
+    val text = frame.deepTooltip(p)
+    if(text != null) {
+      tooltip.text = text
+      tooltip.skin.draw(p)
+    }
   }
 
+  private val tooltip = new Tooltip("")
   private var lastMousePosition = Point(0, 0)
   private var lastDragPosition = Point(0, 0)
 }

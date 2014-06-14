@@ -25,6 +25,7 @@
 package de.mineformers.core.client.ui.skin.drawable
 
 import de.mineformers.core.client.shape2d.{Size, Point}
+import de.mineformers.core.util.renderer.GuiUtils
 
 /**
  * Drawable
@@ -33,7 +34,13 @@ import de.mineformers.core.client.shape2d.{Size, Point}
  */
 trait Drawable {
 
-  def draw(mousePos: Point, pos: Point)
+  def init(): Unit = {
+
+  }
+
+  val utils = GuiUtils
+
+  def draw(mousePos: Point, pos: Point, z: Int)
 
   var size: Size = Size(0, 0)
 

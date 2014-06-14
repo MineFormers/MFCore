@@ -25,6 +25,7 @@ package de.mineformers.core.util.world
 
 import scala.collection.mutable
 import com.google.common.base.Objects
+import java.lang.{Double => JDouble}
 
 /**
  * Vector3
@@ -33,7 +34,7 @@ import com.google.common.base.Objects
  * @author PaleoCrafter
  */
 object Vector3 {
-  private val cache = mutable.HashMap[(Double, Double, Double), Vector3]()
+  private val cache = mutable.WeakHashMap[(Double, Double, Double), Vector3]()
 
   val Zero = Vector3(0, 0, 0)
   val One = Vector3(1, 1, 1)
@@ -54,30 +55,17 @@ object Vector3 {
    * @return a [[Vector3]] instance, either a new one or one from the cache
    */
   def apply(coords: (Double, Double, Double)): Vector3 = cache.getOrElseUpdate(coords, new Vector3(coords))
+
+  def unapply(vec: Vector3): Option[(Double, Double, Double)] = Some((vec.x, vec.y, vec.z))
 }
 
 /**
  * Don't use! Use Vector3(x, y, z) for caching!
  * @param coords a tuple representing the coordinates of this vector
  */
-class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
-
-  var _hashCode = 0
-
-  /**
-   * @return the X coordinate of this vector
-   */
-  def x: Double = coords._1
-
-  /**
-   * @return the Y coordinate of this vector
-   */
-  def y: Double = coords._2
-
-  /**
-   * @return the Z coordinate of this vector
-   */
-  def z: Double = coords._3
+class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3] {
+  val (x, y, z) = coords
+  private val _hashCode = Objects.hashCode(JDouble.valueOf(x), JDouble.valueOf(y), JDouble.valueOf(z))
 
   /**
    * Add the given coordinates to this vector
@@ -86,21 +74,21 @@ class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
    * @param z the Z component to add
    * @return a new (cached) Vector3 with the sum of the coordinates
    */
-  def +(x: Double, y: Double, z: Double) = Vector3(coords._1 + x, coords._2 + y, coords._3 + z)
+  def +(x: Double, y: Double, z: Double): Vector3 = this + Vector3(x, y, z)
 
   /**
    * Add the given coordinates to this vector
    * @param coords a tuple representing the coordinates to add
    * @return a new (cached) Vector3 with the sum of the coordinates
    */
-  def +(coords: (Double, Double, Double)) = Vector3(coords._1 + x, coords._2 + y, coords._3 + z)
+  def +(coords: (Double, Double, Double)): Vector3 = this + Vector3(coords)
 
   /**
    * Add the given coordinates to this vector
    * @param vec another Vector3 to add
    * @return a new (cached) Vector3 with the sum of the coordinates
    */
-  def +(vec: Vector3) = Vector3(coords._1 + vec.x, coords._2 + vec.y, coords._3 + vec.z)
+  def +(vec: Vector3): Vector3 = Vector3(x + vec.x, y + vec.y, z + vec.z)
 
   /**
    * Subtract the given coordinates from this vector
@@ -109,28 +97,28 @@ class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
    * @param z the Z component to subtract
    * @return a new (cached) Vector3 with the difference of the coordinates
    */
-  def -(x: Double, y: Double, z: Double) = Vector3(coords._1 - x, coords._2 - y, coords._3 - z)
+  def -(x: Double, y: Double, z: Double): Vector3 = this - Vector3(x, y, z)
 
   /**
    * Subtract the given coordinates from this vector
    * @param coords a tuple representing the coordinates to subtract
    * @return a new (cached) Vector3 with the difference of the coordinates
    */
-  def -(coords: (Double, Double, Double)) = Vector3(x - coords._1, y - coords._2, z - coords._3)
+  def -(coords: (Double, Double, Double)): Vector3 = this - Vector3(coords)
 
   /**
    * Subtract the given coordinates from this vector
    * @param vec another Vector3 to subtract
    * @return a new (cached) Vector3 with the difference of the coordinates
    */
-  def -(vec: Vector3) = Vector3(coords._1 - vec.x, coords._2 - vec.y, coords._3 - vec.z)
+  def -(vec: Vector3): Vector3 = this + -vec
 
   /**
    * Multiply the coordinates of this vector
    * @param scalar a plain value every component of the Vector3 will be multiplied with
    * @return a new (cached) Vector3 with the product of this vector with the scalar
    */
-  def *(scalar: Double) = Vector3(x * scalar, y * scalar, z * scalar)
+  def *(scalar: Double): Vector3 = Vector3(x * scalar, y * scalar, z * scalar)
 
   /**
    * Multiply the given coordinates with this vector
@@ -138,9 +126,9 @@ class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
    * @param y the Y coordinate to multiply with
    * @param z the Z coordinate to multiply with
    * @return a new (cached) Vector3 with the product of the form
-   *         (this.x * x + this.y * y + this.z * z)
+   *         (this.x * x, this.y * y, this.z * z)
    */
-  def *(x: Double, y: Double, z: Double) = Vector3(coords._1 * x, coords._2 * y, coords._3 * z)
+  def *(x: Double, y: Double, z: Double): Vector3 = this * Vector3(x, y, z)
 
   /**
    * Multiply the given coordinates with this vector
@@ -148,30 +136,19 @@ class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
    * @return a new (cached) Vector3 with the product of the form
    *         (this.x * coords.x, this.y * coords.y, this.z * coords.z)
    */
-  def *(coords: (Double, Double, Double)) = Vector3(coords._1 * x, coords._2 * y, coords._3 * z)
+  def *(coords: (Double, Double, Double)): Vector3 = this * Vector3(coords)
 
   /**
    * Multiply the given coordinates with this vector
    * @param vec a tuple representing the coordinates to multiply with
    * @return a new (cached) Vector3 with the product of the form
-   *         (this.x * vec.x, this.y, vec.y, this.z * vec.z)
+   *         (this.x * vec.x, this.y * vec.y, this.z * vec.z)
    */
-  def *(vec: Vector3) = Vector3(coords._1 * vec.x, coords._2 * vec.y, coords._3 * vec.z)
+  def *(vec: Vector3): Vector3 = Vector3(x * vec.x, y * vec.y, y * vec.z)
 
-  override def equals(that: Any): Boolean = {
-    that match {
-      case vec: Vector3 => return vec.x == x && vec.y == y && vec.z == z
-      case coords: (_, _, _) => return coords._1 == x && coords._2 == y && coords._3 == z
-    }
-    false
-  }
+  def unary_+ = this
 
-  override def compareTo(o: Vector3): Int = {
-    if (x != o.x) return if (x < o.x) 1 else -1
-    if (y != o.y) return if (y < o.y) 1 else -1
-    if (z != o.z) return if (z < o.z) 1 else -1
-    0
-  }
+  def unary_- = Vector3(-x, -y, -z)
 
   /**
    * @return the magnitude (length) of this vector
@@ -333,12 +310,23 @@ class Vector3(coords: (Double, Double, Double)) extends Comparable[Vector3] {
     if (x == 0) y == 0 || z == 0 else y == 0 && z == 0
   }
 
-  override def hashCode() = {
-    if (_hashCode == 0) _hashCode = Objects.hashCode(java.lang.Double.valueOf(x), java.lang.Double.valueOf(y), java.lang.Double.valueOf(z))
-    _hashCode
+  override def equals(that: Any): Boolean = {
+    that match {
+      case Vector3(thatX, thatY, thatZ) => return thatX == x && thatY == y && thatZ == z
+      case (thatX, thatY, thatZ) => return thatX == x && thatY == y && thatZ == z
+    }
+    false
   }
 
-  override def toString = "( " + x + ", " + y + ", " + z + " )"
+  override def compare(o: Vector3): Int = {
+    if (x != o.x) return if (x < o.x) 1 else -1
+    if (y != o.y) return if (y < o.y) 1 else -1
+    if (z != o.z) return if (z < o.z) 1 else -1
+    0
+  }
 
+  override def hashCode = _hashCode
+
+  override def toString = "( " + x + ", " + y + ", " + z + " )"
 }
 

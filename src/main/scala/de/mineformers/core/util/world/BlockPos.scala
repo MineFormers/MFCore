@@ -24,6 +24,10 @@
 package de.mineformers.core.util.world
 
 import scala.collection.mutable
+import com.google.common.base.Objects
+import java.lang.{Integer => JInt}
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.{AxisAlignedBB, Vec3}
 
 /**
  * BlockPos
@@ -32,10 +36,12 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 object BlockPos {
-  private val cache = mutable.HashMap[(Int, Int, Int), BlockPos]()
+  private val cache = mutable.WeakHashMap[(Int, Int, Int), BlockPos]()
 
   val Zero = BlockPos(0, 0, 0)
   val One = BlockPos(1, 1, 1)
+
+  def apply(tag: NBTTagCompound): BlockPos = apply(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"))
 
   /**
    * Create a new [[BlockPos]] based on the given coordinates
@@ -52,6 +58,8 @@ object BlockPos {
    * @return a [[BlockPos]] instance, either a new one or one from the cache
    */
   def apply(coords: (Int, Int, Int)): BlockPos = cache.getOrElseUpdate(coords, new BlockPos(coords))
+
+  def unapply(pos: BlockPos): Option[(Int, Int, Int)] = Some((pos.x, pos.y, pos.z))
 }
 
 /**
@@ -59,24 +67,9 @@ object BlockPos {
  *
  * @param coords a tuple representing the position's coordinates
  */
-class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
-
-  private val _hashCode = (x ^ z) * 31 + y
-
-  /**
-   * @return the X coordinate of this BlockPos
-   */
-  def x: Int = coords._1
-
-  /**
-   * @return the Y coordinate of this BlockPos
-   */
-  def y: Int = coords._2
-
-  /**
-   * @return the Z coordinate of this BlockPos
-   */
-  def z: Int = coords._3
+class BlockPos private(coords: (Int, Int, Int)) extends Ordered[BlockPos] {
+  val (x, y, z) = coords
+  private val _hashCode = Objects.hashCode(JInt.valueOf(x), JInt.valueOf(y), JInt.valueOf(z))
 
   /**
    * Add the given coordinates to this block pos
@@ -85,21 +78,21 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
    * @param z the Z component to add
    * @return a new (cached) BlockPos with the sum of the coordinates
    */
-  def +(x: Int, y: Int, z: Int) = BlockPos(coords._1 + x, coords._2 + y, coords._3 + z)
+  def +(x: Int, y: Int, z: Int): BlockPos = this + BlockPos(x, y, z)
 
   /**
    * Add the given coordinates to this block pos
    * @param coords a tuple representing the coordinates to add
    * @return a new (cached) BlockPos with the sum of the coordinates
    */
-  def +(coords: (Int, Int, Int)) = BlockPos(coords._1 + x, coords._2 + y, coords._3 + z)
+  def +(coords: (Int, Int, Int)): BlockPos = this + BlockPos(coords)
 
   /**
    * Add the given coordinates to this block pos
    * @param pos another BlockPos to add
    * @return a new (cached) BlockPos with the sum of the coordinates
    */
-  def +(pos: BlockPos) = BlockPos(coords._1 + pos.x, coords._2 + pos.y, coords._3 + pos.z)
+  def +(pos: BlockPos): BlockPos = BlockPos(this.x + pos.x, this.y + pos.y, this.z + pos.z)
 
   /**
    * Subtract the given coordinates from this block pos
@@ -108,28 +101,28 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
    * @param z the Z component to subtract
    * @return a new (cached) BlockPos with the difference of the coordinates
    */
-  def -(x: Int, y: Int, z: Int) = BlockPos(coords._1 - x, coords._2 - y, coords._3 - z)
+  def -(x: Int, y: Int, z: Int): BlockPos = this + BlockPos(x, y, z)
 
   /**
    * Subtract the given coordinates from this block pos
    * @param coords a tuple representing the coordinates to subtract
    * @return a new (cached) BlockPos with the difference of the coordinates
    */
-  def -(coords: (Int, Int, Int)) = BlockPos(x - coords._1, y - coords._2, z - coords._3)
+  def -(coords: (Int, Int, Int)): BlockPos = this + BlockPos(coords)
 
   /**
    * Subtract the given coordinates from this block pos
    * @param pos another BlockPos to subtract
    * @return a new (cached) BlockPos with the difference of the coordinates
    */
-  def -(pos: BlockPos) = BlockPos(coords._1 - pos.x, coords._2 - pos.y, coords._3 - pos.z)
+  def -(pos: BlockPos): BlockPos = this + -pos
 
   /**
    * Multiply the coordinates of this block pos
    * @param scalar a plain value every component of the BlockPos will be multiplied with
    * @return a new (cached) BlockPos with the product of this position with the scalar
    */
-  def *(scalar: Int) = BlockPos(x * scalar, y * scalar, z * scalar)
+  def *(scalar: Int): BlockPos = BlockPos(x * scalar, y * scalar, z * scalar)
 
   /**
    * Multiply the given coordinates with this block pos
@@ -137,9 +130,9 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
    * @param y the Y coordinate to multiply with
    * @param z the Z coordinate to multiply with
    * @return a new (cached) BlockPos with the product of the form
-   *         (this.x * x + this.y * y + this.z * z)
+   *         (this.x * x, this.y * y, this.z * z)
    */
-  def *(x: Int, y: Int, z: Int) = BlockPos(coords._1 * x, coords._2 * y, coords._3 * z)
+  def *(x: Int, y: Int, z: Int): BlockPos = this * BlockPos(x, y, z)
 
   /**
    * Multiply the given coordinates with this block pos
@@ -147,32 +140,19 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
    * @return a new (cached) BlockPos with the product of the form
    *         (this.x * coords.x, this.y * coords.y, this.z * coords.z)
    */
-  def *(coords: (Int, Int, Int)) = BlockPos(coords._1 * x, coords._2 * y, coords._3 * z)
+  def *(coords: (Int, Int, Int)): BlockPos = this * BlockPos(coords)
 
   /**
    * Multiply the given coordinates with this block pos
    * @param pos a tuple representing the coordinates to multiply with
    * @return a new (cached) BlockPos with the product of the form
-   *         (this.x * pos.x, this.y, pos.y, this.z * pos.z)
+   *         (this.x * pos.x, this.y * pos.y, this.z * pos.z)
    */
-  def *(pos: BlockPos) = BlockPos(coords._1 * pos.x, coords._2 * pos.y, coords._3 * pos.z)
+  def *(pos: BlockPos): BlockPos = BlockPos(this.x * pos.x, this.y * pos.y, this.z * pos.z)
 
-  override def hashCode() = _hashCode
+  def unary_+ = this
 
-  override def equals(that: Any): Boolean = {
-    that match {
-      case pos: BlockPos => return pos.x == x && pos.y == y && pos.z == z
-      case coords: (_, _, _) => return coords._1 == x && coords._2 == y && coords._3 == z
-    }
-    false
-  }
-
-  override def compareTo(o: BlockPos): Int = {
-    if (x != o.x) return if (x < o.x) 1 else -1
-    if (y != o.y) return if (y < o.y) 1 else -1
-    if (z != o.z) return if (z < o.z) 1 else -1
-    0
-  }
+  def unary_- = BlockPos(-x, -y, -z)
 
   /**
    * @return the magnitude (length) of this block pos
@@ -266,6 +246,26 @@ class BlockPos(coords: (Int, Int, Int)) extends Comparable[BlockPos] {
     if (x == 0) y == 0 || z == 0 else y == 0 && z == 0
   }
 
-  override def toString = "( " + x + ", " + y + ", " + z + " )"
+  def toVec3 = Vec3.createVectorHelper(x, y, z)
 
+  def containedBy(bounds: AxisAlignedBB): Boolean = bounds.minX <= x && bounds.minY <= y && bounds.minZ <= z && bounds.maxX > x && bounds.maxY > y && bounds.maxZ > z
+
+  override def hashCode = _hashCode
+
+  override def equals(that: Any): Boolean = {
+    that match {
+      case BlockPos(thatX, thatY, thatZ) => return this.x == thatX && this.y == thatY && this.z == thatZ
+      case (thatX, thatY, thatZ) => return this.x == thatX && this.y == thatY && this.z == thatZ
+    }
+    false
+  }
+
+  override def compare(o: BlockPos): Int = {
+    if (x != o.x) return if (x < o.x) 1 else -1
+    if (y != o.y) return if (y < o.y) 1 else -1
+    if (z != o.z) return if (z < o.z) 1 else -1
+    0
+  }
+
+  override def toString = "( " + x + ", " + y + ", " + z + " )"
 }

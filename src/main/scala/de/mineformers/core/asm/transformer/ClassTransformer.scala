@@ -24,6 +24,7 @@
 package de.mineformers.core.asm.transformer
 
 import org.objectweb.asm.tree.ClassNode
+import de.mineformers.core.asm.util.ClassInfo
 
 /**
  * ClassTransformer
@@ -35,9 +36,10 @@ trait ClassTransformer {
   /**
    * Transform the given [[ClassNode]]
    * @param clazz the class to transform
+   * @param info additional information about the class to transform
    * @return true, if the class was changed, otherwise false
    */
-  def transform(clazz: ClassNode): Boolean
+  def transform(clazz: ClassNode, info: ClassInfo): Boolean
 
   /**
    * Determine whether the transformer needs to edit the given class.

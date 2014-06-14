@@ -27,6 +27,11 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{TransformerExclusions, MCVersion}
 import de.mineformers.core.asm.transformer.MFCoreAccessTransformer
 import de.mineformers.core.impl.asm.CoreClassTransformer
+import java.io.File
+import org.apache.logging.log4j.LogManager
+import com.google.common.base.Throwables
+import java.net.URISyntaxException
+import de.mineformers.core.network.MFNetworkWrapper
 
 /**
  * MFCore
@@ -35,11 +40,7 @@ import de.mineformers.core.impl.asm.CoreClassTransformer
  */
 @MCVersion("1.7.2")
 @IFMLLoadingPlugin.SortingIndex(1001)
-@TransformerExclusions(Array(
-  "de.mineformers.core.asm.transformer.",
-  "de.mineformers.core.impl.asm.",
-  "scala."
-))
+@TransformerExclusions(Array("de.mineformers.core.asm.", "de.mineformers.core.impl.asm.", "scala."))
 class MFCore extends IFMLLoadingPlugin {
   /**
    * @return the [[MFCoreAccessTransformer]] class name
@@ -54,6 +55,17 @@ class MFCore extends IFMLLoadingPlugin {
    */
   override def injectData(data: java.util.Map[String, AnyRef]): Unit = {
     MFCore.McpEnvironment = !data.get("runtimeDeobfuscationEnabled").asInstanceOf[Boolean]
+    MFCore.CoreModLocation = data.get("coremodLocation").asInstanceOf[File]
+    if (MFCore.CoreModLocation == null) {
+      try {
+        MFCore.CoreModLocation = new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
+      } catch {
+        case e: URISyntaxException => {
+          LogManager.getLogger("malisiscore").error("Failed to acquire source location for MalisisCore!")
+          throw Throwables.propagate(e)
+        }
+      }
+    }
   }
 
   /**
@@ -79,5 +91,7 @@ class MFCore extends IFMLLoadingPlugin {
  * @author PaleoCrafter
  */
 object MFCore {
+  var net: MFNetworkWrapper = null
   var McpEnvironment = false
+  var CoreModLocation: File = null
 }

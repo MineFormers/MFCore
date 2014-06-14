@@ -31,6 +31,7 @@ import de.mineformers.core.util.world.{Vector3, BlockPos}
 import net.minecraft.util.IIcon
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
+import net.minecraft.block.Block
 
 /**
  * SubBlock
@@ -38,7 +39,6 @@ import net.minecraft.item.ItemStack
  * @author PaleoCrafter
  */
 trait SubBlock {
-
   /**
    * @return the unlocalized name for this SubBlock
    */
@@ -81,6 +81,14 @@ trait SubBlock {
   def onActivated(player: EntityPlayer, world: World, pos: BlockPos, hitVec: Vector3, side: ForgeDirection): Boolean = false
 
   /**
+   * Called whenever this SubBlock is broken
+   * @param world the world the block is in
+   * @param pos the position of the block
+   * @param block the block destroyed
+   */
+  def onBreak(world: World, pos: BlockPos, block: Block): Unit = ()
+
+  /**
    * Register the icon(s) for this block
    *
    * @param register the icon register
@@ -100,5 +108,4 @@ trait SubBlock {
   def createTileEntity(world: World): TileEntity = null
 
   protected var icon: IIcon = null
-
 }

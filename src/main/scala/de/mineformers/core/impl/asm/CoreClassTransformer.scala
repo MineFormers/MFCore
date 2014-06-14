@@ -21,6 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package de.mineformers.core.impl.asm
 
 import de.mineformers.core.asm.transformer.CachedClassTransformer
@@ -35,6 +36,6 @@ class CoreClassTransformer extends CachedClassTransformer {
    * Registers every transformer
    */
   override def init(): Unit = {
-    register(new WorldRendererTransformer)
+    register(new MessageTransformer)
   }
 }

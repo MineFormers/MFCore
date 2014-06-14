@@ -24,8 +24,12 @@
 
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.ui.proxy.UIScreen
-import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
+import de.mineformers.core.client.shape2d.{Rectangle, Point, Size}
+import de.mineformers.core.client.ui.component.container.Frame.Anchor
+import de.mineformers.core.client.ui.reaction.Publisher
+import de.mineformers.core.client.ui.skin.drawable.DynamicTexture
+import de.mineformers.core.util.ResourceUtils.Resource
 
 /**
  * Frame
@@ -35,5 +39,36 @@ import de.mineformers.core.client.shape2d.Size
 class Frame(size0: Size) extends Panel {
   size = size0
 
-  def proxy = new UIScreen(this)
+  override def init(channel: Publisher, context: Context): Unit = {
+    this.screen = position + anchor.pos(this, proxy)
+    super.init(channel, context)
+  }
+
+  def createProxy = new UIScreen(this)
+
+  override def update(mousePos: Point): Unit = {
+    super.update(mousePos)
+    this.screen = position + anchor.pos(this, proxy)
+  }
+
+  var proxy: UIScreen = _
+  var anchor = Anchor.Center
+}
+
+object Frame {
+
+  object Anchor extends Enumeration {
+    val HorizontalCenter = Value("horizontalCenter", (frame: Frame, screen: UIScreen) => Point((screen.width - frame.width) / 2, 0))
+    val VerticalCenter = Value("verticalCenter", (frame: Frame, screen: UIScreen) => Point(0, (screen.height - frame.height) / 2))
+    val Center = Value("center", (frame: Frame, screen: UIScreen) => Point((screen.width - frame.width) / 2, (screen.height - frame.height) / 2))
+    val TopLeft = Value("topLeft", (frame: Frame, screen: UIScreen) => Point(0, 0))
+    val TopRight = Value("topRight", (frame: Frame, screen: UIScreen) => Point(screen.width - frame.width, 0))
+    val BottomLeft = Value("bottomLeft", (frame: Frame, screen: UIScreen) => Point(0, screen.height - frame.height))
+    val BottomRight = Value("bottomRight", (frame: Frame, screen: UIScreen) => Point(screen.width - frame.width, screen.height - frame.height))
+
+    class AnchorVal(name: String, val pos: (Frame, UIScreen) => Point) extends Val(nextId, name)
+
+    protected final def Value(name: String, pos: (Frame, UIScreen) => Point): AnchorVal = new AnchorVal(name, pos)
+  }
+
 }

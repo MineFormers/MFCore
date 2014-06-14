@@ -22,15 +22,27 @@
  * THE SOFTWARE.
  */
 
-package de.mineformers.core.client
+package de.mineformers.core.client.ui.component.decoration
 
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.client.ui.component.TextComponent
+import de.mineformers.core.client.ui.util.Font
+import de.mineformers.core.client.shape2d.{Size, Point}
 
 /**
- * package
+ * Tooltip
  *
  * @author PaleoCrafter
  */
-package object ui {
-  type Comp = Component[A forSome {type A <: Component[A]}]
+class Tooltip(private var _text: String, var font: Font = Font.Default) extends TextComponent {
+  zIndex = 100
+  override def text: String = _text
+
+  override def text_=(text: String): Unit = {
+    _text = text
+    this.size = Size(font.width(text) + 8, font.height(text) + 8)
+  }
+
+  override def textOff: Point = Point(4, 4)
+
+  override def update(mousePos: Point): Unit = ()
 }

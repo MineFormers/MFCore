@@ -32,8 +32,7 @@ import de.mineformers.core.client.shape2d.Point
  *
  * @author PaleoCrafter
  */
-trait TextComponent[A <: Component[A]] extends Component[A] {
-  this: A =>
+trait TextComponent extends Component {
   def font: Font
 
   def font_=(font: Font): Unit
@@ -43,4 +42,13 @@ trait TextComponent[A <: Component[A]] extends Component[A] {
   def text_=(text: String): Unit
 
   def textOff: Point = Point(0, 0)
+
+  override var skin: Skin = new TextSkin
+
+  class TextSkin extends Skin {
+    def drawForeground(mousePos: Point): Unit = {
+      font.draw(text, component.screen.x + textOff.x, component.screen.y + textOff.y, component.zIndex)
+    }
+  }
+
 }

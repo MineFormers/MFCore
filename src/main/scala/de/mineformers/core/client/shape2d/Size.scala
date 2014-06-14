@@ -33,7 +33,7 @@ import de.mineformers.core.client.shape2d.Size.Dimensions
  * @author PaleoCrafter
  */
 object Size {
-  private val cache = new mutable.HashMap[Dimensions, Size]
+  private val cache = new mutable.WeakHashMap[Dimensions, Size]
 
   type Dimensions = (Int, Int)
 
@@ -51,15 +51,13 @@ object Size {
    * @return a [[Size]] instance, either a new one or one from the cache
    */
   def apply(dimensions: Dimensions): Size = cache.getOrElseUpdate(dimensions, new Size(dimensions))
+
+  def unapply(s: Size): Option[Dimensions] = Some((s.width, s.height))
 }
 
-class Size(dimensions: Dimensions) {
-
-  lazy val _hashCode = 31 * width + height
-
-  def width: Int = dimensions._1
-
-  def height: Int = dimensions._2
+class Size private(dimensions: Dimensions) {
+  val (width, height) = dimensions
+  private val _hashCode = 31 * width + height
 
   def +(s: Size): Size = Size(width + s.width, height + s.height)
 
@@ -71,13 +69,15 @@ class Size(dimensions: Dimensions) {
 
   def invert = Size(height, width)
 
-  override def hashCode(): Int = _hashCode
+  override def hashCode = _hashCode
 
   override def equals(obj: scala.Any): Boolean = {
     obj match {
-      case s: Size => return s.width == width && s.height == s.height
-      case t: (_, _) => return t == dimensions
+      case Size(sWidth, sHeight) => return sWidth == width && sHeight == height
+      case (sWidth, sHeight) => return sWidth == width && sHeight == height
     }
     false
   }
+
+  override def toString: String = s"( $width, $height )"
 }

@@ -24,30 +24,30 @@
 
 package de.mineformers.core.client.ui.component.decoration
 
-import de.mineformers.core.client.ui.component.{Component, TextComponent}
-import de.mineformers.core.client.shape2d.{Size, Point}
+import de.mineformers.core.client.ui.component.TextComponent
+import de.mineformers.core.client.shape2d.Point
 import de.mineformers.core.client.ui.util.Font
-import de.mineformers.core.client.ui.skin.{TextSkin, Skin}
 
 /**
  * Label
  *
  * @author PaleoCrafter
  */
-class Label(private var _text: String) extends TextComponent[Label] {
+class Label(private var _text: String) extends TextComponent {
+  private var _font: Font = Font.DefaultDark
+
+  size = font.size(_text)
 
   override def font_=(font: Font): Unit = {
     this._font = font
-    val lines = text.split("\\n")
-    size = Size(font.width(utils.longestString(lines: _*)), (font.size + 1) * lines.length - 1)
+    size = font.size(text)
   }
 
   override def font = _font
 
   override def text_=(text: String): Unit = {
     this._text = text
-    val lines = text.split("\\n")
-    size = Size(font.width(utils.longestString(lines: _*)), (font.size + 1) * lines.length - 1)
+    size = font.size(text)
   }
 
   override def text = _text
@@ -55,8 +55,4 @@ class Label(private var _text: String) extends TextComponent[Label] {
   override def update(mousePos: Point): Unit = {
 
   }
-
-  override def defaultSkin: Skin[Label] = new TextSkin[Label]
-
-  var _font: Font = Font.DefaultShadow
 }

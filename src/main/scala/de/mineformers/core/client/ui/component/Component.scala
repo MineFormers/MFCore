@@ -24,27 +24,30 @@
 
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.ui.reaction.Publisher
+import de.mineformers.core.client.ui.reaction.{MouseEvent, Publisher}
 import de.mineformers.core.client.shape2d.{Size, Rectangle, Point}
 import net.minecraft.client.Minecraft
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.component.container.Panel
 import cpw.mods.fml.client.FMLClientHandler
-import de.mineformers.core.client.ui.skin.Skin
 import de.mineformers.core.util.renderer.GuiUtils
-import de.mineformers.core.client.ui._
+import de.mineformers.core.client.ui.skin.TextureManager
+import de.mineformers.core.client.ui.reaction.ComponentEvent.ComponentClicked
+import de.mineformers.core.client.ui.util.MouseButton
 
 /**
  * Component
  *
  * @author PaleoCrafter
  */
-trait Component[+A <: Component[A]] extends Publisher {
-  this: A =>
-
+trait Component extends Publisher {
   def init(channel: Publisher, context: Context): Unit = {
     listenTo(channel)
     this.context = context
+  }
+
+  reactions += {
+    case MouseEvent.Click(p, code) => if (hovered(p) && enabled && visible) context.publish(ComponentClicked(this, MouseButton(code)))
   }
 
   def update(mousePos: Point): Unit
@@ -74,11 +77,13 @@ trait Component[+A <: Component[A]] extends Publisher {
 
   def height = size.height
 
-  def hovered(mousePosition: Point) = screenBounds contains mousePosition
+  def hovered(mousePosition: Point): Boolean = {
+    if (parent != null && parent.clip) (screenBounds contains mousePosition) && parent.hovered(mousePosition) else screenBounds contains mousePosition
+  }
 
-  def skin: Skin[A] = Skin(this)
+  def local(p: Point) = p - screen
 
-  def defaultSkin: Skin[A]
+  var skin: Skin
 
   lazy val mc: Minecraft = FMLClientHandler.instance.getClient
   val utils = GuiUtils
@@ -91,8 +96,31 @@ trait Component[+A <: Component[A]] extends Publisher {
   var parent: Panel = _
   var name: String = _
   var tooltip: String = _
-  var identifier: String = getClass.getSimpleName
+  var identifier: String = getClass.getSimpleName.toLowerCase
+  var background = identifier
+  var zIndex = 0
   private var _bounds: Rectangle = Rectangle(position, width, height)
   private var _screenBounds: Rectangle = Rectangle(screen, width, height)
+
+  trait Skin {
+    val utils = GuiUtils
+
+    val component = Component.this
+
+    protected def drawBackground(mousePos: Point): Unit = {
+      val drawable = TextureManager(component).getOrElse(TextureManager(background).getOrElse(null))
+      if (drawable != null) {
+        drawable.size = size
+        drawable.draw(mousePos, screen, zIndex)
+      }
+    }
+
+    protected def drawForeground(mousePos: Point): Unit
+
+    def draw(mousePos: Point): Unit = {
+      drawBackground(mousePos)
+      drawForeground(mousePos)
+    }
+  }
 
 }

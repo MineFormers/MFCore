@@ -23,15 +23,17 @@
  */
 package de.mineformers.core.util
 
+import org.objectweb.asm.tree._
 import de.mineformers.core.MFCore
-import org.objectweb.asm.tree.{MethodNode, ClassNode}
+import org.objectweb.asm.Opcodes._
+import org.objectweb.asm.Type
 
 /**
  * ASMUtil
  *
  * @author PaleoCrafter
  */
-object ASMUtil {
+object ASMUtils {
 
   /**
    * Find a method for the given name
@@ -59,6 +61,41 @@ object ASMUtil {
     if (m == null)
       throw new NoSuchMethodException(mcpName + " in " + clazz.name)
     m
+  }
+
+  def box(typ: String, cast: Boolean = true): AbstractInsnNode = {
+    val newType = typ match {
+      case "Z" => "java/lang/Boolean"
+      case "C" => "java/lang/Character"
+      case "B" => "java/lang/Byte"
+      case "S" => "java/lang/Short"
+      case "I" => "java/lang/Integer"
+      case "F" => "java/lang/Float"
+      case "J" => "java/lang/Long"
+      case "D" => "java/lang/Double"
+      case _ => typ
+    }
+    if (newType != typ)
+      if (cast) new TypeInsnNode(CHECKCAST, newType) else new MethodInsnNode(INVOKESTATIC, newType, "valueOf", s"($typ)" + Type.getObjectType(newType))
+    else null
+  }
+
+  def unboxingNode(typ: String): MethodInsnNode = {
+    val (name, desc) = typ match {
+      case "java/lang/Boolean" => ("booleanValue", "()Z")
+      case "java/lang/Character" => ("charValue", "()C")
+      case "java/lang/Byte" => ("byteValue", "()B")
+      case "java/lang/Short" => ("shortValue", "()S")
+      case "java/lang/Integer" => ("intValue", "()I")
+      case "java/lang/Float" => ("floatValue", "()F")
+      case "java/lang/Long" => ("longValue", "()J")
+      case "java/lang/Double" => ("doubleValue", "()D")
+      case _ => (null, null)
+    }
+    if (name != null) {
+      new MethodInsnNode(INVOKEVIRTUAL, typ, name, desc)
+    } else
+      null
   }
 
   /**

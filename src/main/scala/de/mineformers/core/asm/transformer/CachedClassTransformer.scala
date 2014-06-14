@@ -28,6 +28,7 @@ import collection.mutable
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.{ClassReader, ClassWriter}
 import org.objectweb.asm.ClassWriter._
+import de.mineformers.core.asm.util.ClassInfo
 
 /**
  * CachedClassTransformer
@@ -60,14 +61,16 @@ trait CachedClassTransformer extends IClassTransformer {
   override def transform(name: String, transformedName: String, bytes: Array[Byte]): Array[Byte] = {
     var transformed: Boolean = false
     var clazz: ClassNode = null
+    var classInfo: ClassInfo = null
     for (transformer <- transformers) {
       if (transformer.transforms(transformedName)) {
         if (clazz == null) {
           val cr = new ClassReader(bytes)
           clazz = new ClassNode()
           cr.accept(clazz, 0)
+          classInfo = ClassInfo.of(clazz)
         }
-        transformed |= transformer.transform(clazz)
+        transformed |= transformer.transform(clazz, classInfo)
       }
     }
     if (transformed) {

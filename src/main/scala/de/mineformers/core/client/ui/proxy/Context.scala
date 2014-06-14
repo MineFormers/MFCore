@@ -25,10 +25,15 @@
 package de.mineformers.core.client.ui.proxy
 
 import de.mineformers.core.client.ui.reaction.Publisher
+import de.mineformers.core.client.ui.component.Focusable
 
 /**
  * Context
  *
  * @author PaleoCrafter
  */
-trait Context extends Publisher
+trait Context extends Publisher {
+  var focused: Focusable = _
+
+  def close(): Unit
+}

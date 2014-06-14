@@ -22,23 +22,49 @@
  * THE SOFTWARE.
  */
 
-package de.mineformers.core.client.ui.skin.container
+package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.ui.skin.Skin
-import de.mineformers.core.client.ui.component.container.Panel
-import de.mineformers.core.client.shape2d.Point
-import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.ui.Comp
+import de.mineformers.core.client.ui.reaction.MouseEvent
+import de.mineformers.core.client.ui.util.MouseButton
 
 /**
- * PanelSkin
+ * Focusable
  *
  * @author PaleoCrafter
  */
-class PanelSkin extends Skin[Panel] {
-
-  override def drawForeground(mousePos: Point, component: Panel): Unit = {
-    component.content.foreach(c => c.skin.draw(mousePos, c))
+trait Focusable extends Component {
+  reactions += {
+    case e: MouseEvent.Click =>
+      if (e.button == MouseButton.Left) {
+        if (!hovered(e.pos) && focused && canLoseFocus) {
+          noFocus()
+        } else if (hovered(e.pos) && !focused) {
+          focus()
+        }
+      }
   }
 
+  def focused = _focused
+
+  private[this] def focused_=(state: Boolean): Unit = _focused = state
+
+  def focus(): Unit = {
+    focused = true
+    context.focused = this
+    gainFocus()
+  }
+
+  def noFocus(): Unit = {
+    focused = false
+    context.focused = null
+    loseFocus()
+  }
+
+  def gainFocus(): Unit
+
+  def loseFocus(): Unit
+
+  def canLoseFocus: Boolean
+
+  private var _focused = !canLoseFocus
 }

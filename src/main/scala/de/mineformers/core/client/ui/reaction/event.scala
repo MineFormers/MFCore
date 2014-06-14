@@ -25,8 +25,10 @@
 package de.mineformers.core.client.ui.reaction
 
 import de.mineformers.core.client.shape2d.Point
+import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.client.ui.util.MouseButton
-import de.mineformers.core.client.ui._
+import de.mineformers.core.client.ui.component.interaction.Button
 
 /**
  * Event
@@ -36,30 +38,40 @@ import de.mineformers.core.client.ui._
 trait Event
 
 trait Positioned extends Event {
-  protected val p: Point
+  private[reaction] val p: Point
 
   def pos: Point = p
 }
 
-case class ComponentEvent(c: Comp) extends Event
+object ComponentEvent {
+
+  case class ValueChanged(c: Component, oldVal: Any, newVal: Any) extends ComponentEvent(c)
+
+  case class ComponentClicked(c: Component, button: MouseButton) extends ComponentEvent(c)
+
+  case class ButtonPressed(b: Button) extends ComponentEvent(b)
+
+}
+
+class ComponentEvent(c: Component) extends Event
 
 object MouseEvent {
 
-  case class Click(protected val p: Point, buttonCode: Int) extends MouseEvent(p) {
+  case class Click(p: Point, buttonCode: Int) extends MouseEvent(p) {
 
     def button = MouseButton(buttonCode)
 
   }
 
-  case class Move(protected val p: Point, lastPos: Point) extends MouseEvent(p)
+  case class Move(p: Point, lastPos: Point) extends MouseEvent(p)
 
-  case class Drag(protected val p: Point, lastPos: Point, lastButtonCode: Int, timeSinceClick: Long) extends MouseEvent(p) {
+  case class Drag(p: Point, lastPos: Point, lastButtonCode: Int, timeSinceClick: Long) extends MouseEvent(p) {
 
     def lastButton = MouseButton(lastButtonCode)
 
   }
 
-  case class Scroll(protected val p: Point, direction: Int) extends MouseEvent(p)
+  case class Scroll(p: Point, direction: Int) extends MouseEvent(p)
 
 }
 

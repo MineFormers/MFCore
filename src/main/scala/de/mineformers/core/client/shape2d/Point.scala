@@ -33,9 +33,12 @@ import de.mineformers.core.client.shape2d.Point.Coordinates
  * @author PaleoCrafter
  */
 object Point {
-  private val cache = new mutable.HashMap[Coordinates, Point]
+  private val cache = new mutable.WeakHashMap[Coordinates, Point]
 
   type Coordinates = (Int, Int)
+
+  val Zero = Point(0, 0)
+  val One = Point(1, 1)
 
   /**
    * Create a new [[Point]] based on the given coordinates
@@ -51,41 +54,35 @@ object Point {
    * @return a [[Point]] instance, either a new one or one from the cache
    */
   def apply(p: Coordinates): Point = cache.getOrElseUpdate(p, new Point(p))
+
+  def unapply(p: Point): Option[Coordinates] = Some((p.x, p.y))
 }
 
-class Point(p: Coordinates) {
+class Point private(p: Coordinates) {
+  val (x, y) = p
+  private val _hashCode = 31 * x + y
 
-  val _hashCode = 31 * x + y
+  def +(p: Coordinates): Point = this + Point(p)
 
-  /**
-   * @return the X coordinate of this Point
-   */
-  def x: Int = p._1
+  def +(s: Size): Point = this + Point(s.width, s.height)
 
-  /**
-   * @return the Y coordinate of this Point
-   */
-  def y: Int = p._2
+  def +(p: Point): Point = Point(x + p.x, y + p.y)
 
-  def +(p: Coordinates) = Point(x + p._1, y + p._2)
+  def -(p: Coordinates): Point = this - Point(p)
 
-  def +(p: Point) = Point(x + p.x, y + p.y)
+  def -(s: Size): Point= this - Point(s.width, s.height)
 
-  def +(s: Size) = Point(x + s.width, y + s.height)
+  def -(p: Point): Point = this + -p
 
-  def -(p: Coordinates) = Point(x - p._1, y - p._2)
+  def *(p: Coordinates): Point = this * Point(p)
 
-  def -(p: Point) = Point(x - p.x, y - p.y)
+  def *(p: Point): Point = Point(x * p.x, y * p.y)
 
-  def *(p: Coordinates) = Point(x * p._1, y * p._2)
+  def /(p: Coordinates): Point = this / Point(p)
 
-  def *(p: Point) = Point(x * p.x, y * p.y)
+  def /(p: Point): Point = Point(x / p.x, y / p.y)
 
-  def /(p: Coordinates) = Point(x / p._1, y / p._2)
-
-  def /(p: Point) = Point(x / p.x, y / p.y)
-
-  def unary_+ = Point(x.abs, y.abs)
+  def unary_+ = this
 
   def unary_- = Point(-x, -y)
 
@@ -94,16 +91,12 @@ class Point(p: Coordinates) {
   /**
    * @return the magnitude (length) of this point
    */
-  def mag = {
-    math.sqrt(magSq)
-  }
+  def mag = math.sqrt(magSq)
 
   /**
    * @return the squared magnitude (length) of this point
    */
-  def magSq = {
-    x * x + y * y
-  }
+  def magSq = x * x + y * y
 
   /**
    * The distance between this point and the given coordinates
@@ -167,11 +160,11 @@ class Point(p: Coordinates) {
     (this - p).magSq
   }
 
-  override def hashCode(): Int = _hashCode
+  override def hashCode = _hashCode
 
-  override def equals(obj: scala.Any): Boolean = {
+  override def equals(obj: Any): Boolean = {
     obj match {
-      case p: Point => return p.x == x && p.y == y
+      case Point(pX, pY) => return pX == x && pY == y
       case (pX, pY) => return pX == x && pY == y
     }
     false

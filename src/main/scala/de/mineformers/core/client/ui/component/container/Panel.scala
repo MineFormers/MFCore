@@ -25,39 +25,47 @@
 package de.mineformers.core.client.ui.component.container
 
 import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.shape2d.{Size, Point}
+import de.mineformers.core.client.shape2d.{Rectangle, Size, Point}
 import de.mineformers.core.client.ui.reaction.Publisher
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.skin.Skin
-import de.mineformers.core.client.ui.skin.container.PanelSkin
-import de.mineformers.core.client.ui.layout.{Constraints, LayoutManager}
-import de.mineformers.core.client.ui.Comp
+import de.mineformers.core.client.ui.layout.{LayoutManager, Constraints}
+import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.skin.ScissorRegion
 
 /**
  * Panel
  *
  * @author PaleoCrafter
  */
-class Panel extends Component[Panel] {
+class Panel extends Component {
   override def init(channel: Publisher, context: Context): Unit = {
     super.init(channel, context)
-    content.foreach(_.init(channel, context))
+    content.foreach(c => {
+      c.parent = this
+      c.init(channel, context)
+      if (layout != null)
+        c.screen = screen + layout.positionFor(this, c) + Point(padding.left, padding.right)
+      else
+        c.screen = screen + c.position + Point(padding.left, padding.right)
+    })
+    if(size == Size(0, 0))
+      size = contentSize
   }
 
   override def update(mousePos: Point): Unit = {
     content.foreach(c => {
       if (layout != null)
-        c.screen = screen + layout.positionFor(this, c)
+        c.screen = screen + layout.positionFor(this, c) + Point(padding.left, padding.right)
       else
-        c.screen = screen + c.position
+        c.screen = screen + c.position + Point(padding.left, padding.right)
       c.update(mousePos)
     })
   }
 
-  def add[C <: Component[C]](c: C): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
+  def add(c: Component): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
 
-  def add[C <: Component[C]](c: C, constraints: Constraints): Unit = {
-    content :+ c.asInstanceOf[Comp]
+  def add(c: Component, constraints: Constraints): Unit = {
+    content :+= c
     if (layout != null)
       layout.setConstraints(c, constraints)
   }
@@ -77,9 +85,65 @@ class Panel extends Component[Panel] {
     }
   }
 
-  override def defaultSkin: Skin[Panel] = new PanelSkin
+  def scissorRegion: ScissorRegion = {
+    var rect = Rectangle(screenBounds.start + Point(padding.left, padding.top), screenBounds.end - Point(padding.right, padding.bottom))
+    if (parent != null) {
+      rect = (rect & parent.scissorRegion.bounds).getOrElse(null)
+    }
+    new ScissorRegion(rect)
+  }
 
-  var content = Seq.empty[Comp]
+  def deepTooltip(p: Point): String = {
+    content foreach {
+      c =>
+        if (c.tooltip != null && c.hovered(p))
+          return c.tooltip
+        else
+          c match {
+            case panel: Panel =>
+              val deep = panel.deepTooltip(p)
+              if (deep != null)
+                return deep
+            case _ =>
+          }
+    }
+    null
+  }
 
+  def content = _content
+
+  def content_=(content: Seq[Component]): Unit = _content = content
+
+  override var skin: Skin = new PanelSkin
   var layout: LayoutManager[_ <: Constraints] = _
+  var clip = true
+  var padding: Padding = Padding(4)
+  private var _content = Seq.empty[Component]
+
+  class PanelSkin extends Skin {
+    override def drawForeground(mousePos: Point): Unit = {
+      val scissor = scissorRegion
+      if (clip) {
+        scissor.activate()
+      }
+      content.foreach(c => c.skin.draw(mousePos))
+      if (clip)
+        scissor.deactivate()
+    }
+  }
+
+}
+
+object Panel {
+
+  case class Padding(left: Int, top: Int, right: Int, bottom: Int)
+
+  object Padding {
+    final val None = Padding(0)
+
+    def apply(horizontal: Int, vertical: Int): Padding = Padding(horizontal, vertical, horizontal, vertical)
+
+    def apply(all: Int): Padding = Padding(all, all)
+  }
+
 }

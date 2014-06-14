@@ -22,20 +22,16 @@
  * THE SOFTWARE.
  */
 
-package de.mineformers.core.client.ui.skin
+package de.mineformers.core.inventory.slot
 
-import de.mineformers.core.client.ui.component.TextComponent
-import de.mineformers.core.client.shape2d.Point
+import net.minecraft.inventory.IInventory
+import net.minecraft.item.ItemStack
 
 /**
- * TextSkin
+ * OutputSlot
  *
  * @author PaleoCrafter
  */
-class TextSkin[C <: TextComponent[C]] extends Skin[C] {
-
-  def drawForeground(mousePos: Point, component: C): Unit = {
-    component.font.draw(component.text, component.screen.x + component.textOff.x, component.screen.y + component.textOff.y)
-  }
-
+class OutputSlot(inventory: IInventory, id: Int, x: Int, y: Int) extends BaseSlot(inventory, id, x, y) {
+  override def isItemValid(par1ItemStack: ItemStack): Boolean = false
 }
