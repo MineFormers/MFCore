@@ -27,7 +27,7 @@ package de.mineformers.core.util.renderer
 import net.minecraft.client.Minecraft
 import cpw.mods.fml.client.FMLClientHandler
 import org.lwjgl.util.Color
-import org.lwjgl.opengl.{GL12, GL11}
+import org.lwjgl.opengl.GL11
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.entity.RenderItem
 import net.minecraft.util.{IIcon, ResourceLocation}
@@ -251,7 +251,13 @@ object GuiUtils {
 
   private final val renderItem: RenderItem = new RenderItem
   private var _shaders: ShaderSystem = null
-  private final val REPEAT_SHADER: String = "#version 120\n" + "uniform sampler2D tex; uniform vec2 iconOffset; uniform vec2 iconSize;\n" + "void main() {\n" + "gl_FragColor = texture2D(tex, iconOffset + fract(gl_TexCoord[0].st) * iconSize) * gl_Color;\n" + "}"
+  private final val REPEAT_SHADER: String =
+    """#version 120
+      |uniform sampler2D tex; uniform vec2 iconOffset; uniform vec2 iconSize;
+      |void main() {
+      | gl_FragColor = texture2D(tex, iconOffset + fract(gl_TexCoord[0].st) * iconSize) * gl_Color;
+      |}
+    """.stripMargin
 }
 
 

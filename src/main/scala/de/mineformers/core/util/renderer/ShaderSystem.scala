@@ -34,13 +34,17 @@ import scala.collection.mutable
  *
  * @author PaleoCrafter
  */
-class ShaderSystem {
+class ShaderSystem(initShaders: (String, Int)*) {
+  private val program: Int = glCreateProgram()
+  for ((shader, typ) <- initShaders)
+    addShader(shader, typ)
 
   def init(): Unit = {
     glLinkProgram(program)
     glValidateProgram(program)
     initialized = true
     active = glGetProgrami(program, GL_LINK_STATUS) == GL_TRUE
+    println(active)
   }
 
   def activate(): Unit = {
@@ -82,11 +86,15 @@ class ShaderSystem {
     }
   }
 
-  def setUniform1i(uniform: String, value: Int) {
+  def setUniform1f(uniform: String, value: Float): Unit = {
+    if (active) glUniform1f(getUniformLocation(uniform), value)
+  }
+
+  def setUniform1i(uniform: String, value: Int): Unit = {
     if (active) glUniform1i(getUniformLocation(uniform), value)
   }
 
-  def setUniform2f(uniform: String, v1: Float, v2: Float) {
+  def setUniform2f(uniform: String, v1: Float, v2: Float): Unit = {
     if (active) glUniform2f(getUniformLocation(uniform), v1, v2)
   }
 
@@ -98,7 +106,6 @@ class ShaderSystem {
   }
 
   private val varLocations: mutable.HashMap[String, Int] = mutable.HashMap[String, Int]()
-  private val program: Int = glCreateProgram()
   private var lastProgram: Int = 0
   private var initialized: Boolean = false
   private var active: Boolean = false
