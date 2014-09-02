@@ -44,7 +44,6 @@ class ShaderSystem(initShaders: (String, Int)*) {
     glValidateProgram(program)
     initialized = true
     active = glGetProgrami(program, GL_LINK_STATUS) == GL_TRUE
-    println(active)
   }
 
   def activate(): Unit = {

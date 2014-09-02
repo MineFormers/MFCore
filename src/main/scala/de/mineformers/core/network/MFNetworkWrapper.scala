@@ -26,12 +26,15 @@ package de.mineformers.core.network
 
 import cpw.mods.fml.common.network.simpleimpl.SimpleIndexedCodec
 import cpw.mods.fml.relauncher.Side
-import cpw.mods.fml.common.network.{FMLOutboundHandler, FMLEmbeddedChannel, NetworkRegistry}
+import cpw.mods.fml.common.network.{FMLOutboundHandler, NetworkRegistry}
+import de.mineformers.core.network.Message.NetReaction
 import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext, SimpleChannelInboundHandler}
 import net.minecraft.network.{Packet, INetHandler}
 import org.apache.logging.log4j.Level
 import de.mineformers.core.util.Log
 import net.minecraft.entity.player.EntityPlayerMP
+
+import scala.reflect.ClassTag
 
 /**
  * MFCodec
@@ -39,39 +42,35 @@ import net.minecraft.entity.player.EntityPlayerMP
  * @author PaleoCrafter
  */
 class MFNetworkWrapper(channelName: String) {
-  def register[M <: Message, R <: Message](message: Class[M], reaction: (M, Message.Context) => R, discriminator: Byte, side: Side) {
-    packetCodec.addDiscriminator(discriminator, message)
-    val channel: FMLEmbeddedChannel = channels.get(side)
-    val `type`: String = channel.findChannelHandlerNameForType(classOf[SimpleIndexedCodec])
-    if (side == Side.SERVER) {
-      addServerHandlerAfter(channel, `type`, reaction, message)
-    } else {
-      addClientHandlerAfter(channel, `type`, reaction, message)
-    }
+  def register[M <: Message]()(implicit ev: ClassTag[M]): Unit = {
+    packetCodec.addDiscriminator(lastDiscriminator, ev.runtimeClass.asInstanceOf[Class[M]])
+    lastDiscriminator = (lastDiscriminator + 1).toByte
   }
 
-  private def addServerHandlerAfter[M <: Message, R <: Message](channel: FMLEmbeddedChannel, `type`: String, reaction: (M, Message.Context) => R, message: Class[M]) {
-    val handler = new FunctionChannelHandler[M, R](message, reaction, Side.SERVER)
-    channel.pipeline.addAfter(`type`, message.getName, handler)
+  def register[M <: Message](discriminator: Byte)(implicit ev: ClassTag[M]): Unit = {
+    packetCodec.addDiscriminator(discriminator, ev.runtimeClass.asInstanceOf[Class[M]])
+    if (lastDiscriminator < discriminator)
+      lastDiscriminator = discriminator
   }
 
-  private def addClientHandlerAfter[M <: Message, R <: Message](channel: FMLEmbeddedChannel, `type`: String, reaction: (M, Message.Context) => R, message: Class[M]) {
-    val handler = new FunctionChannelHandler[M, R](message, reaction, Side.CLIENT)
-    channel.pipeline.addAfter(`type`, message.getName, handler)
+  def addHandler(reaction: NetReaction, side: Side): Unit = {
+    val channel = channels.get(side)
+    val handler = new PartialFunctionChannelHandler(reaction, side)
+    channel.pipeline.addAfter(channel.findChannelHandlerNameForType(classOf[SimpleIndexedCodec]), reaction.toString(), handler)
   }
 
-  class FunctionChannelHandler[M <: Message, R <: Message](request: Class[M], reaction: (M, Message.Context) => R, side: Side) extends SimpleChannelInboundHandler[M](request) {
-    override def channelRead0(ctx: ChannelHandlerContext, msg: M): Unit = {
+  class PartialFunctionChannelHandler(reaction: NetReaction, side: Side) extends SimpleChannelInboundHandler[Message](classOf[Message]) {
+    override def channelRead0(ctx: ChannelHandlerContext, msg: Message): Unit = {
       val iNetHandler: INetHandler = ctx.attr(NetworkRegistry.NET_HANDLER).get
       val context: Message.Context = new Message.Context(iNetHandler, side)
-      val result: R = reaction(msg, context)
+      val result = reaction.applyOrElse((msg, context), null)
       if (result != null) {
         ctx.writeAndFlush(result).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
       }
     }
 
     override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-      Log().log(Level.ERROR, "FunctionChannelHandler exception", cause)
+      Log.log(Level.ERROR, "FunctionChannelHandler exception", cause)
       super.exceptionCaught(ctx, cause)
     }
   }
@@ -82,7 +81,7 @@ class MFNetworkWrapper(channelName: String) {
    *
    * @param message The message to translate into packet form
    * @return A minecraft { @link Packet} suitable for use in minecraft APIs
-  */
+   */
   def getPacketFrom(message: Message): Packet = channels.get(Side.SERVER).generatePacketFrom(message)
 
   /**
@@ -148,4 +147,5 @@ class MFNetworkWrapper(channelName: String) {
 
   private val packetCodec = new SimpleIndexedCodec
   private val channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec)
+  private var lastDiscriminator: Byte = 0
 }

@@ -67,7 +67,7 @@ public abstract class ClassInfo
             case Type.OBJECT:
                 // Type.getClassName incorrectly returns something like "java.lang.Object[][]" instead of "[[Ljava.lang.Object"
                 // so we have to convert the internal name (which is corrent) manually
-                return cache.getUnchecked(ASMUtils.binaryName(type.getInternalName()));
+                return cache.getUnchecked(SevenASMUtils.binaryName(type.getInternalName()));
             case Type.METHOD:
                 throw new IllegalArgumentException("Invalid Type!");
             default:
@@ -85,7 +85,7 @@ public abstract class ClassInfo
      */
     public static ClassInfo of(String className)
     {
-        return cache.getUnchecked(ASMUtils.binaryName(className));
+        return cache.getUnchecked(SevenASMUtils.binaryName(className));
     }
 
     private static ClassInfo create(String className)

@@ -23,11 +23,9 @@
  */
 package de.mineformers.core.block
 
+import de.mineformers.core.mod.MFMod
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
-import net.minecraft.tileentity.TileEntity
-
-import net.minecraft.world.World
 import cpw.mods.fml.common.Loader
 import net.minecraft.creativetab.CreativeTabs
 
@@ -42,8 +40,24 @@ import net.minecraft.creativetab.CreativeTabs
  */
 class BaseBlock(name: String, texture: String, tab: CreativeTabs, material: Material) extends Block(material) {
 
-  this.setBlockName(name)
+  def this(name: String, tab: CreativeTabs, material: Material) = this(name, name, tab, material)
+
+  this.setBlockName({
+    val mod = Loader.instance().activeModContainer()
+    mod.getMod match {
+      case m: MFMod =>
+        m.name(name)
+      case _ => mod.getModId.toLowerCase + ":" + name
+    }
+  })
   this.setCreativeTab(tab)
-  this.setBlockTextureName(Loader.instance().activeModContainer().getModId.toLowerCase + ":" + texture)
+  this.setBlockTextureName({
+    val mod = Loader.instance().activeModContainer()
+    mod.getMod match {
+      case m: MFMod =>
+        m.icon(texture)
+      case _ => mod.getModId.toLowerCase + ":" + texture
+    }
+  })
 
 }

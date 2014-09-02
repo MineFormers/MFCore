@@ -38,9 +38,9 @@ import java.io.File
  */
 object ResourceUtils {
 
-  implicit def resourceToResourceLocation(res: Resource) = res.location
+  implicit def resourceToResourceLocation(res: Resource):ResourceLocation = res.location
 
-  implicit def locationToResource(res: ResourceLocation) = Resource(res)
+  implicit def locationToResource(res: ResourceLocation):Resource = Resource(res)
 
   def findAllInFolder(folder: Resource): List[Resource] = {
     val path = folder.toJarResource
@@ -104,6 +104,8 @@ object ResourceUtils {
         if (meta != null) Some(meta) else None
       } else None
     }
+
+    override def toString: String = domain + ":" + path
   }
 
 }

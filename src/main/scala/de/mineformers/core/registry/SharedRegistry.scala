@@ -23,6 +23,9 @@
  */
 package de.mineformers.core.registry
 
+import de.mineformers.core.util.DictEntry
+import net.minecraftforge.oredict.OreDictionary
+
 import scala.collection.{GenSet, mutable}
 
 /**
@@ -43,9 +46,15 @@ trait SharedRegistry[K, V] extends mutable.Iterable[(K, V)] {
   /**
    * For ease of use
    * @param key the key of the entry to get
-   * @return same as [[get(key)]]
+   * @return same as [[get( k e y )]]
    */
-  def apply(key: K): V = get(key)
+  def apply(key: K): Option[V] = {
+    val v = get(key)
+    if (v == null)
+      None
+    else
+      Some(v)
+  }
 
   /**
    * Add a mapping
@@ -55,6 +64,17 @@ trait SharedRegistry[K, V] extends mutable.Iterable[(K, V)] {
   def add(key: K, value: V): Unit = {
     mappings(key) = value
     put(key, value)
+    value match {
+      case o: DictEntry[_] =>
+        o.dictionaryEntries foreach {
+          e =>
+            val name = e._1
+            e._2 foreach {
+              OreDictionary.registerOre(name, _)
+            }
+        }
+      case _ =>
+    }
   }
 
   /**

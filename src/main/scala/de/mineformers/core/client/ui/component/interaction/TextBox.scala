@@ -24,16 +24,15 @@
 
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.ui.component.{Focusable, TextComponent}
-import de.mineformers.core.client.ui.util.{MouseButton, Font}
-import de.mineformers.core.client.ui.reaction.{KeyEvent, MouseEvent}
-import net.minecraft.client.gui.GuiScreen
-import de.mineformers.core.client.shape2d.{Point, Size}
-import net.minecraft.util.ChatAllowedCharacters
-import org.lwjgl.input.Keyboard
-import de.mineformers.core.client.ui.reaction.ComponentEvent.ValueChanged
-import org.lwjgl.opengl.GL11
 import java.text.DecimalFormat
+
+import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.{Focusable, TextComponent}
+import de.mineformers.core.client.ui.util.ComponentEvent.ValueChanged
+import de.mineformers.core.client.ui.util._
+import net.minecraft.client.gui.GuiScreen
+import net.minecraft.util.ChatAllowedCharacters
+import org.lwjgl.opengl.GL11
 
 /**
  * TextBox
@@ -134,7 +133,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
     val old = this.text
     this.sb.setLength(0)
     this.sb.append(formatter(this.text, text))
-    if(notify)
+    if (notify)
       publish(ValueChanged(this, old, this.text))
     removeSelection()
     this.jumpToEnd()
@@ -295,8 +294,8 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
       }
     case KeyEvent.Type(char, code) =>
       if (focused && enabled) {
-        import TextBox._
-        import Keyboard._
+        import de.mineformers.core.client.ui.component.interaction.TextBox._
+        import org.lwjgl.input.Keyboard._
         if (code == KEY_ESCAPE) {
           if (!canLoseFocus)
             context.close()

@@ -72,7 +72,7 @@ object GuiUtils {
     scaleFactor
   }
 
-  def scaledResolution: ScaledResolution = new ScaledResolution(mc.gameSettings, mc.displayWidth, mc.displayHeight)
+  def scaledResolution: ScaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight)
 
   def scaledWidth(width: Int): Int = width / scaledResolution.getScaleFactor
 

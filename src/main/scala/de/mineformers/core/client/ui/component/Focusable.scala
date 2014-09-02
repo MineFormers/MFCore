@@ -24,8 +24,7 @@
 
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.ui.reaction.MouseEvent
-import de.mineformers.core.client.ui.util.MouseButton
+import de.mineformers.core.client.ui.util.{MouseEvent, MouseButton}
 
 /**
  * Focusable

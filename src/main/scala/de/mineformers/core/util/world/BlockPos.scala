@@ -60,6 +60,11 @@ object BlockPos {
   def apply(coords: (Int, Int, Int)): BlockPos = cache.getOrElseUpdate(coords, new BlockPos(coords))
 
   def unapply(pos: BlockPos): Option[(Int, Int, Int)] = Some((pos.x, pos.y, pos.z))
+
+  def fromArray(array: Array[Int]): BlockPos = {
+    require(array.size >= 3, "BlockPos consists of 3 components")
+    BlockPos(array(0), array(1), array(2))
+  }
 }
 
 /**
@@ -248,7 +253,20 @@ class BlockPos private(coords: (Int, Int, Int)) extends Ordered[BlockPos] {
 
   def toVec3 = Vec3.createVectorHelper(x, y, z)
 
+  def toVector = Vector3(x, y, z)
+
+  def toArray = Array(x, y, z)
+
   def containedBy(bounds: AxisAlignedBB): Boolean = bounds.minX <= x && bounds.minY <= y && bounds.minZ <= z && bounds.maxX > x && bounds.maxY > y && bounds.maxZ > z
+
+  def sharesChunk(bounds: AxisAlignedBB): Boolean = {
+    def toChunkD(d: Double): Int = (d.toInt / 16) * 16
+    def toChunkI(i: Int): Int = (i % 16) * 16
+    val chunkX = toChunkI(x)
+    val chunkY = toChunkI(y)
+    val chunkZ = toChunkI(z)
+    toChunkD(bounds.minX) <= chunkX && toChunkD(bounds.minY) <= chunkY && toChunkD(bounds.minZ) <= chunkZ && toChunkD(bounds.maxX) >= chunkX && toChunkD(bounds.maxY) >= chunkY && toChunkD(bounds.maxZ) >= chunkZ
+  }
 
   override def hashCode = _hashCode
 

@@ -28,7 +28,7 @@ import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{TransformerExclusions, MCVersi
 import de.mineformers.core.asm.transformer.MFCoreAccessTransformer
 import de.mineformers.core.impl.asm.CoreClassTransformer
 import java.io.File
-import org.apache.logging.log4j.LogManager
+import de.mineformers.core.util.Log
 import com.google.common.base.Throwables
 import java.net.URISyntaxException
 import de.mineformers.core.network.MFNetworkWrapper
@@ -38,7 +38,7 @@ import de.mineformers.core.network.MFNetworkWrapper
  *
  * @author PaleoCrafter
  */
-@MCVersion("1.7.2")
+@MCVersion("1.7.10")
 @IFMLLoadingPlugin.SortingIndex(1001)
 @TransformerExclusions(Array("de.mineformers.core.asm.", "de.mineformers.core.impl.asm.", "scala."))
 class MFCore extends IFMLLoadingPlugin {
@@ -60,10 +60,9 @@ class MFCore extends IFMLLoadingPlugin {
       try {
         MFCore.CoreModLocation = new File(getClass.getProtectionDomain.getCodeSource.getLocation.toURI)
       } catch {
-        case e: URISyntaxException => {
-          LogManager.getLogger("malisiscore").error("Failed to acquire source location for MalisisCore!")
+        case e: URISyntaxException =>
+          Log.error("Failed to acquire source location for MFCore!")
           throw Throwables.propagate(e)
-        }
       }
     }
   }

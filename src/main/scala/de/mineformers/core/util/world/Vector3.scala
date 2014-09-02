@@ -23,6 +23,8 @@
  */
 package de.mineformers.core.util.world
 
+import net.minecraft.entity.Entity
+
 import scala.collection.mutable
 import com.google.common.base.Objects
 import java.lang.{Double => JDouble}
@@ -57,13 +59,15 @@ object Vector3 {
   def apply(coords: (Double, Double, Double)): Vector3 = cache.getOrElseUpdate(coords, new Vector3(coords))
 
   def unapply(vec: Vector3): Option[(Double, Double, Double)] = Some((vec.x, vec.y, vec.z))
+
+  def fromEntityCenter(e: Entity) = Vector3(e.posX, e.posY - e.yOffset + e.height / 2.0F, e.posZ)
 }
 
 /**
  * Don't use! Use Vector3(x, y, z) for caching!
  * @param coords a tuple representing the coordinates of this vector
  */
-class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3] {
+class Vector3 private(coords: (Double, Double, Double)) extends VectorLike[Vector3] {
   val (x, y, z) = coords
   private val _hashCode = Objects.hashCode(JDouble.valueOf(x), JDouble.valueOf(y), JDouble.valueOf(z))
 
@@ -107,13 +111,6 @@ class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3]
   def -(coords: (Double, Double, Double)): Vector3 = this - Vector3(coords)
 
   /**
-   * Subtract the given coordinates from this vector
-   * @param vec another Vector3 to subtract
-   * @return a new (cached) Vector3 with the difference of the coordinates
-   */
-  def -(vec: Vector3): Vector3 = this + -vec
-
-  /**
    * Multiply the coordinates of this vector
    * @param scalar a plain value every component of the Vector3 will be multiplied with
    * @return a new (cached) Vector3 with the product of this vector with the scalar
@@ -146,16 +143,7 @@ class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3]
    */
   def *(vec: Vector3): Vector3 = Vector3(x * vec.x, y * vec.y, y * vec.z)
 
-  def unary_+ = this
-
   def unary_- = Vector3(-x, -y, -z)
-
-  /**
-   * @return the magnitude (length) of this vector
-   */
-  def mag = {
-    math.sqrt(magSq)
-  }
 
   /**
    * @return the squared magnitude (length) of this vector
@@ -187,16 +175,6 @@ class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3]
   }
 
   /**
-   * The distance between this vector and the given coordinates
-   * @param vec the coordinates to calculate the distance to
-   * @return the distance between this vector and the given coordinates
-   *         (this - vec).mag
-   */
-  def distance(vec: Vector3) = {
-    (this - vec).mag
-  }
-
-  /**
    * The squared distance between this vector and the given coordinates
    * @param x the X coordinate to calculate the distance to
    * @param y the Y coordinate to calculate the distance to
@@ -216,16 +194,6 @@ class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3]
    */
   def distanceSq(coords: (Double, Double, Double)) = {
     (this - coords).magSq
-  }
-
-  /**
-   * The squared distance between this vector and the given coordinates
-   * @param vec the coordinates to calculate the distance to
-   * @return the squared distance between this vector and the given coordinates
-   *         (this - vec).magSq
-   */
-  def distanceSq(vec: Vector3) = {
-    (this - vec).magSq
   }
 
   /**
@@ -284,16 +252,46 @@ class Vector3 private(coords: (Double, Double, Double)) extends Ordered[Vector3]
     Vector3(d, d1, d2)
   }
 
-  /**
-   * Normalize this vector
-   * @return a new (cached) vector, the same as this one, just normalized
-   */
-  def normalize: Vector3 = {
-    val d = mag
-    if (d != 0)
-      this * (1 / d)
-    else
-      this
+  def rotationMatrix(angle: Float) = {
+    val matrix = Array.ofDim[Double](16)
+    val axis = this.normalize
+    val x = axis.x
+    val y = axis.y
+    val z = axis.z
+    val a = angle * 0.0174532925D
+    val cos = math.cos(a)
+    val ocos = 1.0F - cos
+    val sin = math.sin(a)
+    matrix(0) = x * x * ocos + cos
+    matrix(1) = y * x * ocos + z * sin
+    matrix(2) = x * z * ocos - y * sin
+    matrix(4) = x * y * ocos - z * sin
+    matrix(5) = y * y * ocos + cos
+    matrix(6) = y * z * ocos + x * sin
+    matrix(8) = x * z * ocos + y * sin
+    matrix(9) = y * z * ocos - x * sin
+    matrix(10) = z * z * ocos + cos
+    matrix(15) = 1.0F
+    matrix
+  }
+
+  def rotate(yaw: Double, pitch: Double, roll: Double): Vector3 = {
+    val yawRadians = math.toRadians(yaw)
+    val pitchRadians = math.toRadians(pitch)
+    val rollRadians = math.toRadians(roll)
+    val newX = x * Math.cos(yawRadians) * Math.cos(pitchRadians) + z * (Math.cos(yawRadians) * Math.sin(pitchRadians) * Math.sin(rollRadians) - Math.sin(yawRadians) * Math.cos(rollRadians)) + y * (Math.cos(yawRadians) * Math.sin(pitchRadians) * Math.cos(rollRadians) + Math.sin(yawRadians) * Math.sin(rollRadians))
+    val newY = -x * Math.sin(pitchRadians) + z * Math.cos(pitchRadians) * Math.sin(rollRadians) + y * Math.cos(pitchRadians) * Math.cos(rollRadians)
+    val newZ = x * Math.sin(yawRadians) * Math.cos(pitchRadians) + z * (Math.sin(yawRadians) * Math.sin(pitchRadians) * Math.sin(rollRadians) + Math.cos(yawRadians) * Math.cos(rollRadians)) + y * (Math.sin(yawRadians) * Math.sin(pitchRadians) * Math.cos(rollRadians) - Math.cos(yawRadians) * Math.sin(rollRadians))
+    Vector3(newX, newY, newZ)
+  }
+
+  def rotate(angle: Float, axis: Vector3) = translateByMatrix(axis.rotationMatrix(angle))
+
+  def translateByMatrix(matrix: Array[Double]) = {
+    val x = this.x * matrix(0) + this.y * matrix(1) + this.z * matrix(2) + matrix(3)
+    val y = this.x * matrix(4) + this.y * matrix(5) + this.z * matrix(6) + matrix(7)
+    val z = this.x * matrix(8) + this.y * matrix(9) + this.z * matrix(10) + matrix(11)
+    Vector3(x, y, z)
   }
 
   /**

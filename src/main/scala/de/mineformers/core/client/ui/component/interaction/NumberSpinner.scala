@@ -25,7 +25,8 @@
 package de.mineformers.core.client.ui.component.interaction
 
 import de.mineformers.core.client.ui.component.container.Panel
-import de.mineformers.core.client.ui.reaction.ComponentEvent.{ButtonPressed, ValueChanged}
+import de.mineformers.core.client.ui.util.ComponentEvent
+import ComponentEvent.{ButtonPressed, ValueChanged}
 import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation
 import de.mineformers.core.client.ui.component.container.Panel.Padding

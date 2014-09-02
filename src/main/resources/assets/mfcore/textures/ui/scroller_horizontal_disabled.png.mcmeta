@@ -1,6 +1,6 @@
 {
-  "gui": {
-    "target": "scroller:horizontal:disabled",
-    "type": "static"
-  }
+    "gui": {
+        "target": "scroller:horizontal:disabled",
+        "type": "static"
+    }
 }

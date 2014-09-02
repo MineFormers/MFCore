@@ -26,11 +26,12 @@ package de.mineformers.core.client.ui.component.container
 
 import de.mineformers.core.client.ui.component.Component
 import de.mineformers.core.client.shape2d.{Rectangle, Size, Point}
-import de.mineformers.core.client.ui.reaction.Publisher
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.layout.{LayoutManager, Constraints}
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.skin.ScissorRegion
+import de.mineformers.core.reaction.Publisher
+import org.lwjgl.opengl.GL11
 
 /**
  * Panel
@@ -48,7 +49,7 @@ class Panel extends Component {
       else
         c.screen = screen + c.position + Point(padding.left, padding.right)
     })
-    if(size == Size(0, 0))
+    if (size == Size(0, 0))
       size = contentSize
   }
 
@@ -60,6 +61,16 @@ class Panel extends Component {
         c.screen = screen + c.position + Point(padding.left, padding.right)
       c.update(mousePos)
     })
+  }
+
+  /**
+   * Installed reaction won't receive events from the given publisher anylonger.
+   */
+  override def deafTo(ps: Publisher*): Unit = {
+    super.deafTo(ps: _*)
+    content foreach {
+      _.deafTo(ps: _*)
+    }
   }
 
   def add(c: Component): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
@@ -88,7 +99,7 @@ class Panel extends Component {
   def scissorRegion: ScissorRegion = {
     var rect = Rectangle(screenBounds.start + Point(padding.left, padding.top), screenBounds.end - Point(padding.right, padding.bottom))
     if (parent != null) {
-      rect = (rect & parent.scissorRegion.bounds).getOrElse(null)
+      rect = (rect & parent.scissorRegion.bounds).orNull
     }
     new ScissorRegion(rect)
   }
@@ -120,13 +131,18 @@ class Panel extends Component {
   var padding: Padding = Padding(4)
   private var _content = Seq.empty[Component]
 
+  override def toString: String = s"Panel(layout=$layout, clip=$clip, padding=$padding, content=${content.mkString("[", ",", "]")})"
+
   class PanelSkin extends Skin {
     override def drawForeground(mousePos: Point): Unit = {
       val scissor = scissorRegion
       if (clip) {
         scissor.activate()
       }
-      content.foreach(c => c.skin.draw(mousePos))
+      content.foreach { c =>
+        GL11.glColor4f(1F, 1F, 1F, 1F)
+        c.skin.draw(mousePos)
+      }
       if (clip)
         scissor.deactivate()
     }

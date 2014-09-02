@@ -23,6 +23,8 @@
  */
 package de.mineformers.core.item
 
+import cpw.mods.fml.common.Loader
+import de.mineformers.core.mod.MFMod
 import net.minecraft.item.Item
 import net.minecraft.creativetab.CreativeTabs
 
@@ -38,8 +40,22 @@ class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
 
   def this(name: String, tab: CreativeTabs) = this(name, name, tab)
 
-  this.setUnlocalizedName(name)
+  this.setUnlocalizedName({
+    val mod = Loader.instance().activeModContainer()
+    mod.getMod match {
+      case m: MFMod =>
+        m.name(name)
+      case _ => mod.getModId.toLowerCase + ":" + name
+    }
+  })
   this.setCreativeTab(tab)
-  this.setTextureName(texture)
+  this.setTextureName({
+    val mod = Loader.instance().activeModContainer()
+    mod.getMod match {
+      case m: MFMod =>
+        m.icon(texture)
+      case _ => mod.getModId.toLowerCase + ":" + texture
+    }
+  })
 
 }

@@ -27,9 +27,10 @@ package de.mineformers.core.client.ui.component.container
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
 import de.mineformers.core.client.shape2d.{Rectangle, Point, Size}
 import de.mineformers.core.client.ui.component.container.Frame.Anchor
-import de.mineformers.core.client.ui.reaction.Publisher
 import de.mineformers.core.client.ui.skin.drawable.DynamicTexture
+import de.mineformers.core.reaction.Publisher
 import de.mineformers.core.util.ResourceUtils.Resource
+import net.minecraft.client.Minecraft
 
 /**
  * Frame
@@ -44,7 +45,12 @@ class Frame(size0: Size) extends Panel {
     super.init(channel, context)
   }
 
-  def createProxy = new UIScreen(this)
+  def showProxy(): Unit = {
+    this.proxy = newProxy
+    Minecraft.getMinecraft.displayGuiScreen(proxy)
+  }
+
+  def newProxy = new UIScreen(this)
 
   override def update(mousePos: Point): Unit = {
     super.update(mousePos)

@@ -1,6 +1,6 @@
 {
-  "gui": {
-    "target": "textbox",
-    "type": "dynamic"
-  }
+    "gui": {
+        "target": "textbox",
+        "type": "dynamic"
+    }
 }

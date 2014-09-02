@@ -23,10 +23,14 @@
  */
 package de.mineformers.core.util
 
+import de.mineformers.core.asm.util.Instruction.{MethodOp, TypeOp}
+import org.objectweb.asm.Type
 import org.objectweb.asm.tree._
 import de.mineformers.core.MFCore
 import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.Type
+import de.mineformers.core.asm.util.{Instruction, SevenASMUtils}
+import scala.util.control.Breaks
 
 /**
  * ASMUtil
@@ -63,7 +67,7 @@ object ASMUtils {
     m
   }
 
-  def box(typ: String, cast: Boolean = true): AbstractInsnNode = {
+  def box(typ: String, cast: Boolean = true): Option[Instruction[AbstractInsnNode]] = {
     val newType = typ match {
       case "Z" => "java/lang/Boolean"
       case "C" => "java/lang/Character"
@@ -76,11 +80,11 @@ object ASMUtils {
       case _ => typ
     }
     if (newType != typ)
-      if (cast) new TypeInsnNode(CHECKCAST, newType) else new MethodInsnNode(INVOKESTATIC, newType, "valueOf", s"($typ)" + Type.getObjectType(newType))
-    else null
+      if (cast) Some(TypeOp(CHECKCAST, newType)) else Some(MethodOp(INVOKESTATIC, newType, "valueOf", s"($typ)" + Type.getObjectType(newType)))
+    else None
   }
 
-  def unboxingNode(typ: String): MethodInsnNode = {
+  def unboxingNode(typ: String): Option[MethodOp] = {
     val (name, desc) = typ match {
       case "java/lang/Boolean" => ("booleanValue", "()Z")
       case "java/lang/Character" => ("charValue", "()C")
@@ -93,9 +97,31 @@ object ASMUtils {
       case _ => (null, null)
     }
     if (name != null) {
-      new MethodInsnNode(INVOKEVIRTUAL, typ, name, desc)
+      Some(MethodOp(INVOKEVIRTUAL, typ, name, desc))
     } else
-      null
+      None
+  }
+
+  def findListStart(find: Seq[AbstractInsnNode], in: InsnList): AbstractInsnNode = {
+    import scala.collection.JavaConversions._
+    val list = in.iterator().toList
+    for (i <- 0 until list.length) {
+      import Breaks._
+      breakable {
+        val elem = list(i)
+        if (!SevenASMUtils.matches(elem, find.head))
+          break()
+        if (i + find.size > in.size())
+          return null
+        val sub = list.slice(i, i + find.size)
+        for(j <- 0 until sub.length) {
+          if(!SevenASMUtils.matches(sub(j), find(j)))
+            break()
+        }
+        return elem
+      }
+    }
+    null
   }
 
   /**

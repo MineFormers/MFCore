@@ -27,9 +27,10 @@ package de.mineformers.core.client.ui.component.container
 import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.interaction.ScrollBar
 import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation
-import de.mineformers.core.client.ui.reaction.{Event, Positioned, Publisher}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.util.Positioned
+import de.mineformers.core.reaction.{Event, Publisher}
 import org.lwjgl.opengl.GL11
 
 /**

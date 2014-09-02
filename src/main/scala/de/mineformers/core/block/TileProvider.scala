@@ -23,26 +23,23 @@
  */
 package de.mineformers.core.block
 
+import net.minecraft.block.Block
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
-import net.minecraft.block.Block
 
 /**
  * TileProvider
  *
  * @author PaleoCrafter
  */
-trait TileProvider extends Block {
-
-  def teClass: Class[_ <: TileEntity]
+trait TileProvider[T <: TileEntity] {
+  this: Block =>
 
   /**
    * @param meta check if there is a TE for the given metadata
    * @return true, if the supplied teClass is not null (by default)
    */
-  override def hasTileEntity(meta: Int): Boolean = {
-    teClass != null
-  }
+  override def hasTileEntity(meta: Int): Boolean = true
 
   /**
    * By default, creates a new TE from the teClass
@@ -50,11 +47,12 @@ trait TileProvider extends Block {
    * @param meta the meta of the block to get the TE for
    * @return a TileEntity instance, if hasTileEntity returns true
    */
-  override def createTileEntity(world: World, meta: Int): TileEntity = if (hasTileEntity(meta)) teClass.newInstance() else null
+  override def createTileEntity(world: World, meta: Int): TileEntity = tileClass.newInstance()
 
   override def onBlockEventReceived(world: World, x: Int, y: Int, z: Int, eventId: Int, eventArgument: Int): Boolean = {
     val tileentity: TileEntity = world.getTileEntity(x, y, z)
     if (tileentity != null) tileentity.receiveClientEvent(eventId, eventArgument) else false
   }
 
+  def tileClass: Class[T]
 }

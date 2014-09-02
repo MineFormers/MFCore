@@ -25,12 +25,19 @@
 package de.mineformers.core.network
 
 import cpw.mods.fml.common.network.simpleimpl.IMessage
+import de.mineformers.core.network.serializer.TileDescriptionSerializer
+import de.mineformers.core.tileentity.TileDescription
 import io.netty.buffer.ByteBuf
+import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.{NetHandlerPlayServer, INetHandler}
 import cpw.mods.fml.common.network.ByteBufUtils
+import net.minecraftforge.common.util.ForgeDirection
 import scala.collection.immutable.HashMap
 import cpw.mods.fml.relauncher.Side
 import net.minecraft.client.network.NetHandlerPlayClient
+import scala.language.existentials
+import java.lang.{Byte => JByte, Short => JShort, Long => JLong, Boolean => JBoolean, Double => JDouble, Float => JFloat}
 
 /**
  * Message
@@ -40,65 +47,141 @@ import net.minecraft.client.network.NetHandlerPlayClient
 class Message extends IMessage {
   override def fromBytes(buf: ByteBuf): Unit = {
     for (field <- fields) {
-      val serializer = serializers.get(field).getOrElse(null)
+      val serializer = serializers.get(field.getName).orNull
       if (serializer != null) {
-        set(field, serializer.deserialize(buf))
+        field.set(this, serializer.deserialize(buf))
       }
     }
   }
 
   override def toBytes(buf: ByteBuf): Unit = {
     for (field <- fields) {
-      val serializer = serializers.get(field).getOrElse(null)
+      val serializer = serializers.get(field.getName).orNull
       if (serializer != null) {
-        serializer.serialize(get(field), buf)
+        serializer.serialize(field.get(this), buf)
       }
     }
   }
 
-  def set(field: String, value: Any): Unit = {
-  }
-
-  def get(field: String): Any = null
-
   def serializers = {
     if (_serializers == null) {
-      val fields = this.getClass.getFields
+      val fields = this.getClass.getDeclaredFields.sortBy(_.getName)
       _serializers = HashMap.empty[String, Message.Serializer[Any]]
       for (field <- fields) {
         field.setAccessible(true)
         val serializer = Message.getSerializer(field.getType)
-        _serializers += field.getName -> serializer.getOrElse(null).asInstanceOf[Message.Serializer[Any]]
+        _serializers += field.getName -> serializer.orNull.asInstanceOf[Message.Serializer[Any]]
       }
     }
     _serializers
   }
 
-  val fields = this.getClass.getFields.map(_.getName)
+  val fields = this.getClass.getDeclaredFields.sortBy(_.getName)
 
   var _serializers: Map[String, Message.Serializer[Any]] = null
 }
 
 object Message {
+  type NetReaction = PartialFunction[(Message, Message.Context), Message]
   private var serializers = HashMap.empty[Class[_], Serializer[Any]]
 
   addSerializer(classOf[String], new Serializer[String] {
-    override def serialize(target: String, buffer: ByteBuf): Unit = ByteBufUtils.writeUTF8String(buffer, target)
+    override def serialize0(target: String, buffer: ByteBuf): Unit = ByteBufUtils.writeUTF8String(buffer, target)
 
-    override def deserialize(buffer: ByteBuf): String = ByteBufUtils.readUTF8String(buffer)
+    override def deserialize0(buffer: ByteBuf): String = ByteBufUtils.readUTF8String(buffer)
   })
 
   addSerializer(Integer.TYPE, new Serializer[Integer] {
-    override def serialize(target: Integer, buffer: ByteBuf): Unit = buffer.writeInt(target)
+    override def serialize0(target: Integer, buffer: ByteBuf): Unit = buffer.writeInt(target)
 
-    override def deserialize(buffer: ByteBuf): Integer = buffer.readInt()
+    override def deserialize0(buffer: ByteBuf): Integer = buffer.readInt()
   })
+
+  addSerializer(JByte.TYPE, new Serializer[JByte] {
+    override def serialize0(target: JByte, buffer: ByteBuf): Unit = buffer.writeByte(target.byteValue())
+
+    override def deserialize0(buffer: ByteBuf): JByte = buffer.readByte()
+  })
+
+  addSerializer(JShort.TYPE, new Serializer[JShort] {
+    override def serialize0(target: JShort, buffer: ByteBuf): Unit = buffer.writeShort(target.shortValue())
+
+    override def deserialize0(buffer: ByteBuf): JShort = buffer.readShort()
+  })
+
+  addSerializer(JLong.TYPE, new Serializer[JLong] {
+    override def serialize0(target: JLong, buffer: ByteBuf): Unit = buffer.writeLong(target)
+
+    override def deserialize0(buffer: ByteBuf): JLong = buffer.readLong()
+  })
+
+  addSerializer(Character.TYPE, new Serializer[Character] {
+    override def serialize0(target: Character, buffer: ByteBuf): Unit = buffer.writeChar(target.charValue())
+
+    override def deserialize0(buffer: ByteBuf): Character = buffer.readChar()
+  })
+
+  addSerializer(JBoolean.TYPE, new Serializer[JBoolean] {
+    override def serialize0(target: JBoolean, buffer: ByteBuf): Unit = buffer.writeBoolean(target)
+
+    override def deserialize0(buffer: ByteBuf): JBoolean = buffer.readBoolean()
+  })
+
+  addSerializer(JFloat.TYPE, new Serializer[JFloat] {
+    override def serialize0(target: JFloat, buffer: ByteBuf): Unit = buffer.writeFloat(target)
+
+    override def deserialize0(buffer: ByteBuf): JFloat = buffer.readFloat()
+  })
+
+  addSerializer(JDouble.TYPE, new Serializer[JDouble] {
+    override def serialize0(target: JDouble, buffer: ByteBuf): Unit = buffer.writeDouble(target)
+
+    override def deserialize0(buffer: ByteBuf): JDouble = buffer.readDouble()
+  })
+
+  addSerializer(classOf[ItemStack], new Serializer[ItemStack] {
+    override def serialize0(target: ItemStack, buffer: ByteBuf): Unit = ByteBufUtils.writeItemStack(buffer, target)
+
+    override def deserialize0(buffer: ByteBuf): ItemStack = ByteBufUtils.readItemStack(buffer)
+  })
+
+  addSerializer(classOf[NBTTagCompound], new Serializer[NBTTagCompound] {
+    override def serialize0(target: NBTTagCompound, buffer: ByteBuf): Unit = ByteBufUtils.writeTag(buffer, target)
+
+    override def deserialize0(buffer: ByteBuf): NBTTagCompound = ByteBufUtils.readTag(buffer)
+  })
+
+  addSerializer(classOf[ForgeDirection], new Serializer[ForgeDirection] {
+    override def serialize0(target: ForgeDirection, buffer: ByteBuf): Unit = buffer.writeInt(target.ordinal())
+
+    override def deserialize0(buffer: ByteBuf): ForgeDirection = ForgeDirection.getOrientation(buffer.readInt())
+  })
+
+  addSerializer(classOf[TileDescription], new TileDescriptionSerializer)
+
+  def serialize[A](target: A, buffer: ByteBuf): Boolean = {
+    getSerializer[A](target.getClass.asInstanceOf[Class[A]]) match {
+      case Some(s) =>
+        s.serialize(target, buffer)
+        true
+      case _ =>
+        false
+    }
+  }
 
   def addSerializer[A](clazz: Class[A], serializer: Serializer[A]): Unit = {
     serializers += clazz -> serializer.asInstanceOf[Serializer[Any]]
   }
 
-  def getSerializer[A](clazz: Class[A]): Option[Serializer[A]] = serializers.get(clazz).asInstanceOf[Option[Serializer[A]]]
+  def getSerializer[A](clazz: Class[A]): Option[Serializer[A]] = serializers.get(clazz).asInstanceOf[Option[Serializer[A]]] match {
+    case s: Some[Serializer[A]] => s
+    case None => serializers find {
+      e =>
+        clazz.isAssignableFrom(e._1)
+    } map {
+      _._2.asInstanceOf[Serializer[A]]
+    }
+  }
 
   class Context(netHandler: INetHandler, val side: Side) {
     def serverHandler: NetHandlerPlayServer = netHandler.asInstanceOf[NetHandlerPlayServer]
@@ -107,11 +190,22 @@ object Message {
   }
 
   trait Serializer[T] {
-    def serialize(target: T, buffer: ByteBuf)
+    def serialize(target: T, buffer: ByteBuf): Unit = {
+      buffer.writeByte(if (target != null) 1 else 0)
+      if (target != null)
+        serialize0(target, buffer)
+    }
 
-    def deserialize(buffer: ByteBuf): T
+    def deserialize(buffer: ByteBuf): T = {
+      if (buffer.readByte() == 0)
+        null.asInstanceOf[T]
+      else deserialize0(buffer)
+    }
+
+    protected def serialize0(target: T, buffer: ByteBuf)
+
+    protected def deserialize0(buffer: ByteBuf): T
   }
 
 }
 
-case class TestMessage(i: Int, s: String) extends Message

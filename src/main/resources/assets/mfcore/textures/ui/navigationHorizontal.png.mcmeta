@@ -1,90 +1,90 @@
 {
-  "gui": {
-    "multi": [
-      {
-        "target": "navigationRight",
-        "type": "static",
-        "uv": {
-          "start": [
-            0,
-            0
-          ],
-          "size": [
-            10,
-            15
-          ]
-        }
-      },
-      {
-        "target": "navigationRight:hovered",
-        "type": "static",
-        "uv": {
-          "start": [
-            10,
-            0
-          ],
-          "size": [
-            10,
-            15
-          ]
-        }
-      },
-      {
-        "target": "navigationRight:disabled",
-        "type": "static",
-        "uv": {
-          "start": [
-            20,
-            0
-          ],
-          "size": [
-            10,
-            15
-          ]
-        }
-      },
-      {
-        "target": "navigationLeft",
-        "type": "static",
-        "uv": {
-          "start": [
-            0,
-            15
-          ],
-          "size": [
-            10,
-            15
-          ]
-        }
-      },
-      {
-        "target": "navigationLeft:hovered",
-        "type": "static",
-        "uv": {
-          "start": [
-            10,
-            15
-          ],
-          "size": [
-            10,
-            15
-          ]
-        }
-      },
-      {
-        "target": "navigationLeft:disabled",
-        "type": "static",
-        "uv": {
-          "start": [
-            20,
-            15
-          ],
-          "size": [
-            10,
-            15
-          ]
-        }
-      }
-    ]
-  }
+    "gui": {
+        "multi": [
+            {
+                "target": "navigationRight",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        0,
+                        0
+                    ],
+                    "size": [
+                        10,
+                        15
+                    ]
+                }
+            },
+            {
+                "target": "navigationRight:hovered",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        10,
+                        0
+                    ],
+                    "size": [
+                        10,
+                        15
+                    ]
+                }
+            },
+            {
+                "target": "navigationRight:disabled",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        20,
+                        0
+                    ],
+                    "size": [
+                        10,
+                        15
+                    ]
+                }
+            },
+            {
+                "target": "navigationLeft",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        0,
+                        15
+                    ],
+                    "size": [
+                        10,
+                        15
+                    ]
+                }
+            },
+            {
+                "target": "navigationLeft:hovered",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        10,
+                        15
+                    ],
+                    "size": [
+                        10,
+                        15
+                    ]
+                }
+            },
+            {
+                "target": "navigationLeft:disabled",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        20,
+                        15
+                    ],
+                    "size": [
+                        10,
+                        15
+                    ]
+                }
+            }
+        ]
+    }
 }

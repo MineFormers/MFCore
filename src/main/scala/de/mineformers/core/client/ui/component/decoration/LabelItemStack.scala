@@ -27,8 +27,8 @@ package de.mineformers.core.client.ui.component.decoration
 import de.mineformers.core.client.ui.component.Component
 import de.mineformers.core.client.shape2d.{Size, Point}
 import net.minecraft.item.ItemStack
-import org.lwjgl.opengl.GL11
-import net.minecraft.client.renderer.RenderHelper
+import org.lwjgl.opengl.{GL12, GL11}
+import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 
 /**
  * ItemStack
@@ -61,13 +61,18 @@ class LabelItemStack(val stacks: Array[ItemStack], drawSlot: Boolean = true, val
   override var skin: Skin = new ItemStackSkin
   private var last = System.currentTimeMillis()
 
+  override def toString: String = s"LabelItemStack(stacks=${stacks.mkString("[", ",", "]")}}, drawSlot=$drawSlot, addAmount=$addAmount)"
+
   class ItemStackSkin extends Skin {
     override protected def drawForeground(mousePos: Point): Unit = {
+      OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F)
       RenderHelper.enableGUIStandardItemLighting()
+      GL11.glEnable(GL12.GL_RESCALE_NORMAL)
       if (drawSlot)
         utils.drawItemStack(current, screen.x + 1, screen.y + 1, if (addAmount > 0) (current.stackSize * addAmount).toString else if (addAmount == 0) "" else null)
       else
         utils.drawItemStack(current, screen.x, screen.y, if (addAmount > 0) (current.stackSize * addAmount).toString else if (addAmount == 0) "" else null)
+      RenderHelper.disableStandardItemLighting()
       GL11.glDisable(GL11.GL_LIGHTING)
     }
   }

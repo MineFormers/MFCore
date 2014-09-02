@@ -24,8 +24,8 @@
 
 package de.mineformers.core.client.ui.proxy
 
+import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
 import net.minecraft.client.gui.GuiScreen
-import de.mineformers.core.client.ui.reaction.{MouseEvent, KeyEvent}
 import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.shape2d.Point
 import org.lwjgl.input.Mouse
@@ -59,7 +59,6 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
       super.keyTyped(char, code)
     publish(KeyEvent.Type(char, code))
   }
-
 
   override def updateScreen(): Unit = {
     val scaledWidth = GuiUtils.scaledResolution.getScaledWidth

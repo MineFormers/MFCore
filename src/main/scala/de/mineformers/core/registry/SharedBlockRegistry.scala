@@ -24,12 +24,15 @@
 package de.mineformers.core.registry
 
 import cpw.mods.fml.common.{LoaderState, Loader}
+import cpw.mods.fml.relauncher.{Side, SideOnly}
+import de.mineformers.core.client.util.{SimpleRendering, ItemBlockRendering, TileRendering}
 import net.minecraft.item.ItemBlock
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
-import de.mineformers.core.block.MetaBlock
+import de.mineformers.core.block.{TileProvider, MetaBlock}
 import de.mineformers.core.item.ItemBlockMeta
 import scala.language.existentials
+import de.mineformers.core.util.Log
 
 /**
  * BlockEntry representing a block in the registry's map
@@ -71,8 +74,34 @@ object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
         GameRegistry.registerBlock(value.block, value.itemBlock, key, value.cstrArgs: _*)
       else
         GameRegistry.registerBlock(value.block, value.itemBlock, key)
+      value.block match {
+        case tileProvider: TileProvider[_] =>
+          val cls = tileProvider.tileClass
+          GameRegistry.registerTileEntity(cls, Loader.instance().activeModContainer().getModId + ":" + cls.getSimpleName)
+        case _ =>
+      }
     } else {
-      System.err.println("A mod was trying to register a block outside the pre init phase")
+      Log.error("A mod was trying to register a block outside the pre init phase")
+    }
+  }
+
+  @SideOnly(Side.CLIENT)
+  def registerRenderers(): Unit = {
+    this foreach {
+      e =>
+        val block = e._2.block
+        block match {
+          case tileRendering: TileRendering[_, _] => tileRendering.registerRenderer()
+          case _ =>
+        }
+        block match {
+          case itemRendering: ItemBlockRendering[_] => itemRendering.registerItemRenderer()
+          case _ =>
+        }
+        block match {
+          case simpleRendering: SimpleRendering[_] => simpleRendering.registerSimpleRenderer()
+          case _ =>
+        }
     }
   }
 }

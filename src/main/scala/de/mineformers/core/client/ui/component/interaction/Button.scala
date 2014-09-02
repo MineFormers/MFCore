@@ -26,8 +26,8 @@ package de.mineformers.core.client.ui.component.interaction
 
 import de.mineformers.core.client.ui.component.TextComponent
 import de.mineformers.core.client.shape2d.{Size, Point}
-import de.mineformers.core.client.ui.util.{MouseButton, Font}
-import de.mineformers.core.client.ui.reaction.ComponentEvent.{ButtonPressed, ComponentClicked}
+import de.mineformers.core.client.ui.util.{ComponentEvent, MouseButton, Font}
+import ComponentEvent.{ButtonPressed, ComponentClicked}
 
 /**
  * Button

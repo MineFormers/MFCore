@@ -24,8 +24,8 @@
 
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.client.ui.reaction.Publisher
 import de.mineformers.core.client.ui.component.Focusable
+import de.mineformers.core.reaction.Publisher
 
 /**
  * Context
