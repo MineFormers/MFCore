@@ -1,0 +1,6 @@
+{
+    "gui": {
+        "target": "textbox",
+        "type": "dynamic"
+    }
+}

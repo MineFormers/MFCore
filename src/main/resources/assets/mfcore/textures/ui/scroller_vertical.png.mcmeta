@@ -1,0 +1,6 @@
+{
+    "gui": {
+        "target": "scroller:vertical",
+        "type": "static"
+    }
+}

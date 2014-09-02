@@ -1,0 +1,90 @@
+{
+    "gui": {
+        "multi": [
+            {
+                "target": "tabTop",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        0,
+                        0
+                    ],
+                    "size": [
+                        28,
+                        32
+                    ]
+                }
+            },
+            {
+                "target": "tabTop:disabled",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        28,
+                        0
+                    ],
+                    "size": [
+                        28,
+                        32
+                    ]
+                }
+            },
+            {
+                "target": "tabTop:first",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        56,
+                        0
+                    ],
+                    "size": [
+                        28,
+                        32
+                    ]
+                }
+            },
+            {
+                "target": "tabBottom",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        0,
+                        32
+                    ],
+                    "size": [
+                        28,
+                        32
+                    ]
+                }
+            },
+            {
+                "target": "tabBottom:disabled",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        28,
+                        32
+                    ],
+                    "size": [
+                        28,
+                        32
+                    ]
+                }
+            },
+            {
+                "target": "tabBottom:first",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        56,
+                        32
+                    ],
+                    "size": [
+                        28,
+                        32
+                    ]
+                }
+            }
+        ]
+    }
+}

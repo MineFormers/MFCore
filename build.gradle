@@ -1,0 +1,139 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = "sonatype"
+            url = "https://oss.sonatype.org/content/repositories/snapshots/"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+    }
+}
+
+apply plugin: 'scala'
+apply plugin: 'forge'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+version = '1.2'
+group = "de.mineformers" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "mfcore"
+
+minecraft {
+    if (file("../run").exists()) {
+		runDir = "../run"
+	} else {
+		runDir = "eclipse"
+	}
+    version = "1.7.10-10.13.1.1212-new"
+}
+
+processResources {
+    // replace stuff in mcmod.info, nothing else
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+
+        // replace version and mcversion
+        expand 'version': project.version, 'mcversion': project.minecraft.version
+    }
+
+    // copy everything else, thats not the mcmod.info
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
+
+jar {
+    classifier = 'universal'
+    manifest {
+        attributes 'FMLCorePlugin': 'de.mineformers.core.MFCore'
+    }
+}
+
+compileScala {
+    scalaCompileOptions.optimize = true
+}
+
+// add a source jar
+task sourceJar(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'src'
+}
+
+// add a javadoc jar
+task javadocJar(type: Jar, dependsOn: scaladoc) {
+    classifier = 'javadoc'
+    from 'build/docs/scaladoc'
+}
+
+// because the normal output has been made to be obfuscated
+task deobfJar(type: Jar) {
+    from sourceSets.main.output
+    classifier = 'deobf'
+}
+
+artifacts {
+    archives sourceJar
+    archives deobfJar
+    archives javadocJar
+}
+
+uploadArchives {
+    if(project.hasProperty("url")) {
+        repositories {
+            logger.info('Publishing to files server')
+
+            mavenDeployer {
+
+                repository(url: project.ext.url) {
+                    authentication(userName: project.ext.username, password: project.ext.password)
+                }
+
+                pom {
+                    groupId = project.group
+                    version = project.version
+                    artifactId = project.archivesBaseName
+                    project {
+                        name project.archivesBaseName
+                        packaging 'jar'
+                        description 'Core functionality for MineFormers mods'
+                        url 'https://github.com/MineFormers/MFCore'
+
+                        scm {
+                            url 'https://github.com/MineFormers/MFCore'
+                            connection 'scm:git:git://github.com/MineFormers/MFCore.git'
+                            developerConnection 'scm:git:git@github.com:MineFormers/MFCore.git'
+                        }
+
+                        issueManagement {
+                            system 'github'
+                            url 'https://github.com/MineFormers/MFCore/issues'
+                        }
+
+                        licenses {
+                            license {
+                                name 'MIT License'
+                                url 'http://opensource.org/licenses/MIT'
+                                distribution 'repo'
+                            }
+                        }
+
+                        developers {
+                            developer {
+                                id 'PaleoCrafter'
+                                name 'Paleo Crafter'
+                                roles { role 'developer' }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
