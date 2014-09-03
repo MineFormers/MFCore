@@ -84,7 +84,7 @@ class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, M
       scroll add label
       scroll add button
       panel add scroll
-      val proxy = panel.createProxy
+      val proxy = panel.newProxy
       Minecraft.getMinecraft.displayGuiScreen(proxy)
     }
     false

@@ -22,36 +22,43 @@
  * THE SOFTWARE.
  */
 
-package de.mineformers.core.client.util
+package de.mineformers.core.block;
 
-import cpw.mods.fml.client.registry.RenderingRegistry
-import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.client.renderer.SimpleBlockRenderer
-import net.minecraft.block.Block
+import cpw.mods.fml.relauncher.Side;
+import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.IIcon;
+
+import java.util.HashMap;
 
 /**
- * SimpleRendering
+ * IconsHolder
+ * Only to be used by Rotation
  *
  * @author PaleoCrafter
  */
-trait SimpleRendering[R <: SimpleBlockRenderer] {
-  this: Block =>
-  var renderType = -1
+class IconsHolder
+{
+    @SideOnly(Side.CLIENT)
+    private HashMap<String, IIcon> icons;
 
-  @SideOnly(Side.CLIENT)
-  def createSimpleRenderer: R
+    @SideOnly(Side.CLIENT)
+    public IIcon apply(String key) {
+        return getIcon(key);
+    }
 
-  @SideOnly(Side.CLIENT)
-  def registerSimpleRenderer(): Unit = {
-    val renderer = createSimpleRenderer
-    renderType = renderer.renderType
-    println(renderType)
-    RenderingRegistry.registerBlockHandler(renderer.renderType, renderer)
-  }
+    @SideOnly(Side.CLIENT)
+    public IIcon getIcon(String key)
+    {
+        if(icons == null)
+            icons = new HashMap<>();
+        return icons.get(key);
+    }
 
-  override def getRenderType: Int = renderType
-
-  override def renderAsNormalBlock(): Boolean = false
-
-  override def isOpaqueCube: Boolean = false
+    @SideOnly(Side.CLIENT)
+    public void setIcon(String key, IIcon icon)
+    {
+        if(icons == null)
+            icons = new HashMap<>();
+        icons.put(key, icon);
+    }
 }

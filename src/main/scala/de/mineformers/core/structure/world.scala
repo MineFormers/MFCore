@@ -174,7 +174,7 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
 
   def height = structure.getHeight
 
-  def checkChunks(): Unit = {
+  def checkChunks(pos: BlockPos): Unit = {
     if (pos.sharesChunk(bounds))
       update()
   }

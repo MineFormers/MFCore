@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher
 import net.minecraft.client.renderer.{OpenGlHelper, Tessellator}
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.ForgeHooksClient
 import org.lwjgl.opengl.GL11
 
 /**
@@ -70,7 +71,6 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
   }
 
   def render(pass: Int): Unit = {
-    GL11.glDisable(GL11.GL_LIGHTING)
     this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture)
     GL11.glColor4f(1F, 1F, 1F, 1F)
     this.updateList()
@@ -80,15 +80,12 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
 
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-
-    GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
   }
 
   def renderTiles(pass: Int): Unit = {
-    if (pass != 0)
-      return
+    ForgeHooksClient.setRenderPass(pass)
     try {
-      for (tile <- tiles) {
+      for (tile <- tiles if tile.shouldRenderInPass(pass)) {
         val x = tile.xCoord
         val y = tile.yCoord
         val z = tile.zCoord
@@ -112,6 +109,7 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
       case e: Exception =>
         Log.error("Failed to render tiles", e)
     }
+    ForgeHooksClient.setRenderPass(-1)
   }
 }
 

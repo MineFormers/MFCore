@@ -263,9 +263,8 @@ class BlockPos private(coords: (Int, Int, Int)) extends Ordered[BlockPos] {
     def toChunkD(d: Double): Int = (d.toInt / 16) * 16
     def toChunkI(i: Int): Int = (i % 16) * 16
     val chunkX = toChunkI(x)
-    val chunkY = toChunkI(y)
     val chunkZ = toChunkI(z)
-    toChunkD(bounds.minX) <= chunkX && toChunkD(bounds.minY) <= chunkY && toChunkD(bounds.minZ) <= chunkZ && toChunkD(bounds.maxX) >= chunkX && toChunkD(bounds.maxY) >= chunkY && toChunkD(bounds.maxZ) >= chunkZ
+    toChunkD(bounds.minX) <= chunkX && toChunkD(bounds.minZ) <= chunkZ && toChunkD(bounds.maxX) >= chunkX && toChunkD(bounds.maxZ) >= chunkZ
   }
 
   override def hashCode = _hashCode

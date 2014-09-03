@@ -1,6 +1,7 @@
 package de.mineformers.core.client.renderer
 
 import de.mineformers.core.structure.StructureWorld
+import de.mineformers.core.util.MathUtils
 import de.mineformers.core.util.renderer.ShaderSystem
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.culling.Frustrum
@@ -44,21 +45,23 @@ class StructureWorldRenderer() {
     val camZ: Double = cam.lastTickPosZ + (cam.posZ - cam.lastTickPosZ) * partialTicks
     frustrum.setPosition(camX, camY, camZ)
     if (frustrum.isBoundingBoxInFrustum(world.bounds)) {
+      val step: Float = MathUtils.pulsate(Minecraft.getSystemTime % 10000, 0, 1, 10000).toFloat
       GL11.glPushMatrix()
       GL11.glEnable(GL11.GL_BLEND)
-      GL11.glAlphaFunc(GL11.GL_GREATER, 0.1F)
+      GL11.glDisable(GL11.GL_ALPHA_TEST)
       translateToWorldCoords(Minecraft.getMinecraft.renderViewEntity, partialTicks)
       GL11.glTranslatef(x, y, z)
       GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA)
       shaders.activate()
       shaders.setUniform1i("tex", 0)
-      shaders.setUniform1f("alpha", 0.5F)
+      shaders.setUniform1f("alpha", step)
       val list = world.localWorldAccess.getChunkRenderers
       for (pass <- 0 until 2)
         list foreach {
           _.render(pass)
         }
       shaders.deactivate()
+      GL11.glEnable(GL11.GL_ALPHA_TEST)
       GL11.glDisable(GL11.GL_BLEND)
       GL11.glPopMatrix()
     }

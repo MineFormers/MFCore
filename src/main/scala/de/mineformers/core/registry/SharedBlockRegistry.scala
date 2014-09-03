@@ -25,12 +25,13 @@ package de.mineformers.core.registry
 
 import cpw.mods.fml.common.{LoaderState, Loader}
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.client.util.{SimpleRendering, ItemBlockRendering, TileRendering}
+import de.mineformers.core.client.util.Rendering
 import net.minecraft.item.ItemBlock
 import cpw.mods.fml.common.registry.GameRegistry
 import net.minecraft.block.Block
 import de.mineformers.core.block.{TileProvider, MetaBlock}
 import de.mineformers.core.item.ItemBlockMeta
+import net.minecraft.tileentity.TileEntity
 import scala.language.existentials
 import de.mineformers.core.util.Log
 
@@ -91,15 +92,8 @@ object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
       e =>
         val block = e._2.block
         block match {
-          case tileRendering: TileRendering[_, _] => tileRendering.registerRenderer()
-          case _ =>
-        }
-        block match {
-          case itemRendering: ItemBlockRendering[_] => itemRendering.registerItemRenderer()
-          case _ =>
-        }
-        block match {
-          case simpleRendering: SimpleRendering[_] => simpleRendering.registerSimpleRenderer()
+          case rendering: Rendering with TileProvider[_] => rendering.proxy.registerRenderers(rendering, rendering.tileClass.asInstanceOf[Class[_ <: TileEntity]])
+          case rendering: Rendering => rendering.proxy.registerRenderers(rendering, null)
           case _ =>
         }
     }

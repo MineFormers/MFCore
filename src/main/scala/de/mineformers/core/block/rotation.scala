@@ -24,6 +24,7 @@
 
 package de.mineformers.core.block
 
+import cpw.mods.fml.relauncher.SideOnly
 import de.mineformers.core.block.Rotatable.Side
 import de.mineformers.core.tileentity.Rotation
 import net.minecraft.block.{BlockPistonBase, Block}
@@ -53,20 +54,26 @@ trait Rotatable {
 
   def getRotation(world: World, x: Int, y: Int, z: Int): ForgeDirection
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def getIcon(world: World, x: Int, y: Int, z: Int, side: Rotatable.Side): IIcon = getIcon(world.getBlockMetadata(x, y, z), side)
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def getIcon(meta: Int, side: Rotatable.Side): IIcon
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def getIconSide(side: ForgeDirection, rotation: ForgeDirection): Rotatable.Side
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIcon(side: Int, meta: Int): IIcon = getIcon(meta, Rotatable.Side.fromDirection(ForgeDirection.getOrientation(side)))
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIcon(world: IBlockAccess, x: Int, y: Int, z: Int, side: Int): IIcon = {
     val w = Minecraft.getMinecraft.theWorld
     val direction = ForgeDirection.getOrientation(side)
     getIcon(w, x, y, z, getIconSide(direction, getRotation(w, x, y, z)))
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def registerBlockIcons(iconRegister: IIconRegister): Unit = {
     for (s <- iconSuffixes)
       icons += s -> iconRegister.registerIcon(this.textureProxy + (if (!hasSingleIcon) "_" + s else ""))
@@ -74,10 +81,13 @@ trait Rotatable {
       blockIcon = iconRegister.registerIcon(this.textureProxy + (if (!hasSingleIcon) "_" + defaultIcon else ""))
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def textureProxy: String
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def iconSuffixes: Seq[String]
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def defaultIcon: String = null
 
   protected val icons = collection.mutable.Map.empty[String, IIcon]
@@ -156,6 +166,7 @@ trait Rotatable4D extends Rotatable {
     }
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIconSide(side: ForgeDirection, rotation: ForgeDirection): Rotatable.Side = {
     val opposite = rotation.getOpposite
     import Rotatable.Side._
@@ -168,6 +179,7 @@ trait Rotatable4D extends Rotatable {
     }
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIcon(meta: Int, side: Side): IIcon = {
     import Rotatable.Side._
     side match {
@@ -179,6 +191,7 @@ trait Rotatable4D extends Rotatable {
     }
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def iconSuffixes: Seq[String] = Seq("front", "back", "top", "bottom", "sides")
 }
 
@@ -194,6 +207,7 @@ trait Rotatable6D extends Rotatable {
     }
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIconSide(side: ForgeDirection, rotation: ForgeDirection): Rotatable.Side = {
     val opposite = rotation.getOpposite
     import Rotatable.Side._
@@ -204,6 +218,7 @@ trait Rotatable6D extends Rotatable {
     }
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIcon(meta: Int, side: Side): IIcon = {
     import Rotatable.Side._
     side match {
@@ -213,6 +228,7 @@ trait Rotatable6D extends Rotatable {
     }
   }
 
+  @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def iconSuffixes: Seq[String] = Seq("front", "back", "sides")
 }
 

@@ -24,25 +24,41 @@
 
 package de.mineformers.core.client.util
 
+import cpw.mods.fml.client.registry.{ClientRegistry, ISimpleBlockRenderingHandler, RenderingRegistry}
 import cpw.mods.fml.relauncher.{Side, SideOnly}
+import de.mineformers.core.client.renderer.TileRenderer
 import net.minecraft.block.Block
 import net.minecraft.item.Item
+import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.client.{MinecraftForgeClient, IItemRenderer}
 
 /**
- * ItemBlockRendering
+ * RenderingProxy
  *
  * @author PaleoCrafter
  */
-trait ItemBlockRendering[R <: IItemRenderer] {
-  this: Block =>
+trait RenderingProxy {
+  @SideOnly(Side.CLIENT)
+  def createTileRenderer: TileRenderer[_] = null
 
   @SideOnly(Side.CLIENT)
-  def createItemRenderer: R
+  def createItemRenderer: IItemRenderer = null
 
   @SideOnly(Side.CLIENT)
-  def registerItemRenderer(): Unit = {
-    val renderer = createItemRenderer
-    MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(this), renderer)
+  def createSimpleRenderer: ISimpleBlockRenderingHandler = null
+
+  @SideOnly(Side.CLIENT)
+  def registerRenderers(block: Block with Rendering, tileClass: Class[_ <: TileEntity]): Unit = {
+    val itemRenderer = createItemRenderer
+    if (itemRenderer != null)
+      MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(block), itemRenderer)
+    val tileRenderer = createTileRenderer
+    if (tileRenderer != null && tileClass != null)
+      ClientRegistry.bindTileEntitySpecialRenderer(tileClass, tileRenderer)
+    val simpleRenderer = createSimpleRenderer
+    if (simpleRenderer != null) {
+      block.renderType = simpleRenderer.getRenderId
+      RenderingRegistry.registerBlockHandler(simpleRenderer.getRenderId, simpleRenderer)
+    }
   }
 }

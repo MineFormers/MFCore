@@ -28,12 +28,13 @@ import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.block.Block
 import scala.collection.mutable
+
 /**
  * Structure
  *
  * @author PaleoCrafter
  */
-class Structure(private val layers: mutable.ListBuffer[Layer] = mutable.ListBuffer.empty[Layer]) {
+class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty[Layer]) {
   private val entities = mutable.ListBuffer.empty[NBTTagCompound]
 
   def addLayer(layer: Layer): Unit = {
@@ -44,6 +45,12 @@ class Structure(private val layers: mutable.ListBuffer[Layer] = mutable.ListBuff
   def replaceLayer(y: Int, layer: Layer): Unit = {
     if (getLayer(y) == null) throw new IllegalArgumentException("Layer out of height")
     layers(y) = layer
+  }
+
+  def setLayer(y: Int, layer: Layer): Unit = {
+    for (y1 <- getHeight until (y + 1))
+      addLayer(new Layer(getWidth, getLength))
+    replaceLayer(y, layer)
   }
 
   def getBlock(x: Int, y: Int, z: Int): BlockInfo = {

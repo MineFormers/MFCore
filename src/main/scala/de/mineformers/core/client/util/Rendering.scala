@@ -24,32 +24,24 @@
 
 package de.mineformers.core.client.util
 
-import cpw.mods.fml.client.registry.ClientRegistry
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.block.TileProvider
-import de.mineformers.core.client.renderer.TileRenderer
 import net.minecraft.block.Block
 
-import net.minecraft.tileentity.TileEntity
-
 /**
- * TileRendering
+ * Rendering
  *
  * @author PaleoCrafter
  */
-trait TileRendering[T <: TileEntity, R <: TileRenderer[T]] {
-  this: Block with TileProvider[T] =>
+trait Rendering {
+  this: Block =>
+
+  lazy val proxy = createProxy
+  var renderType = -1
 
   @SideOnly(Side.CLIENT)
-  def createTileRenderer: R
+  protected def createProxy: RenderingProxy
 
-  @SideOnly(Side.CLIENT)
-  def registerRenderer(): Unit = {
-    val renderer = createTileRenderer
-    ClientRegistry.bindTileEntitySpecialRenderer(tileClass, renderer)
-  }
-
-  override def getRenderType: Int = -1
+  override def getRenderType: Int = renderType
 
   override def renderAsNormalBlock(): Boolean = false
 
