@@ -24,8 +24,11 @@
 
 package de.mineformers.core.util.world;
 
+import de.mineformers.core.util.Log;
 import net.minecraft.block.Block;
+import net.minecraft.init.Blocks;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldServer;
 
 /**
  * SphereUtils
@@ -34,7 +37,8 @@ import net.minecraft.world.World;
  */
 public class SphereUtils
 {
-    public static void set(World world, Block block, BlockPos center, double radius) {
+    public static void set(World world, Block block, BlockPos center, double radius)
+    {
         radius += 0.5;
 
         final double invRadiusX = 1 / radius;
@@ -45,22 +49,31 @@ public class SphereUtils
         final int ceilRadiusZ = (int) Math.ceil(radius);
 
         double nextXn = 0;
-        forX: for (int x = 0; x <= ceilRadiusX; ++x) {
+        forX:
+        for (int x = 0; x <= ceilRadiusX; ++x)
+        {
             final double xn = nextXn;
             nextXn = (x + 1) * invRadiusX;
             double nextYn = 0;
-            forY: for (int y = 0; y <= ceilRadiusY; ++y) {
+            forY:
+            for (int y = 0; y <= ceilRadiusY; ++y)
+            {
                 final double yn = nextYn;
                 nextYn = (y + 1) * invRadiusY;
                 double nextZn = 0;
-                forZ: for (int z = 0; z <= ceilRadiusZ; ++z) {
+                forZ:
+                for (int z = 0; z <= ceilRadiusZ; ++z)
+                {
                     final double zn = nextZn;
                     nextZn = (z + 1) * invRadiusZ;
 
                     double distanceSq = Vector3.apply(xn, yn, zn).magSq();
-                    if (distanceSq > 1) {
-                        if (z == 0) {
-                            if (y == 0) {
+                    if (distanceSq > 1)
+                    {
+                        if (z == 0)
+                        {
+                            if (y == 0)
+                            {
                                 break forX;
                             }
                             break forY;
@@ -81,7 +94,71 @@ public class SphereUtils
         }
     }
 
-    private static void setBlock(World world, BlockPos pos, Block block) {
-        world.setBlock(pos.x(), pos.y(), pos.z(), block, 0, 3);
+    public static void destroy(World world, BlockPos center, double radius)
+    {
+        radius += 0.5;
+
+        final double invRadiusX = 1 / radius;
+        final double invRadiusY = 1 / radius;
+        final double invRadiusZ = 1 / radius;
+        final int ceilRadiusX = (int) Math.ceil(radius);
+        final int ceilRadiusY = (int) Math.ceil(radius);
+        final int ceilRadiusZ = (int) Math.ceil(radius);
+
+        double nextXn = 0;
+        forX:
+        for (int x = 0; x <= ceilRadiusX; ++x)
+        {
+            final double xn = nextXn;
+            nextXn = (x + 1) * invRadiusX;
+            double nextYn = 0;
+            forY:
+            for (int y = 0; y <= ceilRadiusY; ++y)
+            {
+                final double yn = nextYn;
+                nextYn = (y + 1) * invRadiusY;
+                double nextZn = 0;
+                forZ:
+                for (int z = 0; z <= ceilRadiusZ; ++z)
+                {
+                    final double zn = nextZn;
+                    nextZn = (z + 1) * invRadiusZ;
+
+                    double distanceSq = Vector3.apply(xn, yn, zn).magSq();
+                    if (distanceSq > 1)
+                    {
+                        if (z == 0)
+                        {
+                            if (y == 0)
+                            {
+                                break forX;
+                            }
+                            break forY;
+                        }
+                        break forZ;
+                    }
+
+                    destroyBlock(world, center.$plus(x, y, z));
+                    destroyBlock(world, center.$plus(-x, y, z));
+                    destroyBlock(world, center.$plus(x, -y, z));
+                    destroyBlock(world, center.$plus(x, y, -z));
+                    destroyBlock(world, center.$plus(-x, -y, z));
+                    destroyBlock(world, center.$plus(x, -y, -z));
+                    destroyBlock(world, center.$plus(-x, y, -z));
+                    destroyBlock(world, center.$plus(-x, -y, -z));
+                }
+            }
+        }
+    }
+
+    private static void destroyBlock(World world, BlockPos pos)
+    {
+        if (world.getBlock(pos.x(), pos.y(), pos.z()).getBlockHardness(world, pos.x(), pos.y(), pos.z()) >= 0)
+            world.setBlock(pos.x(), pos.y(), pos.z(), Blocks.air, 0, 2);
+    }
+
+    private static void setBlock(World world, BlockPos pos, Block block)
+    {
+        world.setBlock(pos.x(), pos.y(), pos.z(), block, 0, 2);
     }
 }

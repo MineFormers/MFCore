@@ -83,5 +83,5 @@ class MessageTransformer extends ClassTransformer {
    * @param className the name of the class
    * @return true, if the transformer needs to edit it
    */
-  override def transforms(className: String): Boolean = className.endsWith("Message")
+  override def transforms(className: String): Boolean = true
 }

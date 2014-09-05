@@ -41,6 +41,10 @@ import scala.language.implicitConversions
  */
 object Implicits {
 
+  implicit def funcToRunnable(func: => Unit) = new Runnable {
+    override def run(): Unit = func
+  }
+
   implicit class RichWorld(world: World) {
     def selectEntities[A <: Entity](clazz: Class[A], box: AxisAlignedBB): List[Entity] = selectEntities(box, clazz)(null)
 

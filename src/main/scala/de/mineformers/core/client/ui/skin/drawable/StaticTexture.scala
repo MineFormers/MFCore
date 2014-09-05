@@ -24,6 +24,7 @@
 
 package de.mineformers.core.client.ui.skin.drawable
 
+import de.mineformers.core.client.util.RenderUtils
 import de.mineformers.core.util.ResourceUtils.Resource
 import de.mineformers.core.client.shape2d.{Rectangle, Size, Point}
 import de.mineformers.core.client.ui.skin.DrawableDeserializer
@@ -48,7 +49,7 @@ class StaticTexture(_texture: Resource, var textureWidth: Int, var textureHeight
 
   override def draw(mousePos: Point, pos: Point, z: Int): Unit = {
     utils.resetColor()
-    utils.bindTexture(texture)
+    RenderUtils.bindTexture(texture)
     if (uv != null)
       utils.drawQuad(pos.x, pos.y, z, size.width, size.height, scaledU(uv.start), scaledV(uv.start), scaledU(uv.end), scaledV(uv.end))
     else

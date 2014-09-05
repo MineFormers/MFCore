@@ -34,6 +34,7 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
   def updateList(): Unit = {
     if (update) {
       this.update = false
+      val pos = structure.pos
       val minX = bounds.minX.toInt
       val maxX = bounds.maxX.toInt min structure.width
       val minY = bounds.minY.toInt
@@ -51,8 +52,6 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
         for (y <- minY until maxY; x <- minX until maxX; z <- minZ until maxZ) {
           try {
             val block = structure.getBlock(x, y, z)
-            val pos = structure.pos
-            //renderBlocks.setRenderAllFaces(true)
             if (mc.theWorld.getBlock(pos.x + x, pos.y + y, pos.z + z) == Blocks.air || mc.theWorld.getBlock(pos.x + x, pos.y + y, pos.z + z) == null)
               if (block != null && block.canRenderInPass(pass)) {
                 renderBlocks.renderBlockByRenderType(block, x, y, z)

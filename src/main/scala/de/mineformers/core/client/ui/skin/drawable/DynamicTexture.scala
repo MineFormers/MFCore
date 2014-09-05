@@ -25,6 +25,7 @@
 package de.mineformers.core.client.ui.skin.drawable
 
 import de.mineformers.core.client.shape2d.{Size, Rectangle, Point}
+import de.mineformers.core.client.util.RenderUtils
 import de.mineformers.core.util.renderer.GuiUtils
 import de.mineformers.core.client.ui.skin.drawable.DynamicTexture.{Side, Corner}
 import de.mineformers.core.util.ResourceUtils.Resource
@@ -104,7 +105,7 @@ class DynamicTexture(_texture: Resource, textureWidth: Int, textureHeight: Int, 
 
   override def draw(mousePos: Point, pos: Point, z: Int): Unit = {
     utils.resetColor()
-    utils.bindTexture(texture)
+    RenderUtils.bindTexture(texture)
     for (i <- 0 until corners.length)
       drawCorner(i, pos + cornerPos(i), z)
 

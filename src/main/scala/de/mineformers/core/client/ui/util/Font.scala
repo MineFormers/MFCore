@@ -26,7 +26,7 @@ package de.mineformers.core.client.ui.util
 
 import scala.collection.mutable
 import net.minecraft.client.gui.FontRenderer
-import de.mineformers.core.util.renderer.GuiUtils.mc
+import de.mineformers.core.client.util.RenderUtils.mc
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.{GL12, GL11}
 import de.mineformers.core.util.renderer.GuiUtils

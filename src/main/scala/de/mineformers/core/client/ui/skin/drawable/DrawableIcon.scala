@@ -25,6 +25,7 @@
 package de.mineformers.core.client.ui.skin.drawable
 
 import de.mineformers.core.client.shape2d.{Size, Point}
+import de.mineformers.core.client.util.RenderUtils
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.util.IIcon
@@ -38,7 +39,7 @@ class DrawableIcon(icon: IIcon, sheet: String) extends Drawable {
   size = Size(16, 16)
 
   override def draw(mousePos: Point, pos: Point, z: Int): Unit = {
-    GuiUtils.bindTexture(sheet match {
+    RenderUtils.bindTexture(sheet match {
       case "item" | "items" => TextureMap.locationItemsTexture
       case _ => TextureMap.locationBlocksTexture
     })

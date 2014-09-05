@@ -25,7 +25,7 @@
 package de.mineformers.core.util.renderer
 
 import net.minecraft.client.Minecraft
-import cpw.mods.fml.client.FMLClientHandler
+import de.mineformers.core.client.util.RenderUtils._
 import org.lwjgl.util.Color
 import org.lwjgl.opengl.GL11
 import net.minecraft.client.renderer.Tessellator
@@ -49,12 +49,6 @@ import net.minecraft.client.gui.ScaledResolution
 object GuiUtils {
   def init(): Unit = {
     shaders.init()
-  }
-
-  def mc: Minecraft = FMLClientHandler.instance.getClient
-
-  def bindTexture(path: ResourceLocation): Unit = {
-    mc.getTextureManager.bindTexture(path)
   }
 
   def resetColor(): Unit = glColor4f(1F, 1F, 1F, 1F)

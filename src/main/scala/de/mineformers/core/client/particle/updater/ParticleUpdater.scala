@@ -24,10 +24,10 @@
 
 package de.mineformers.core.client.particle.updater
 
+import de.mineformers.core.client.util.RenderUtils
 import net.minecraft.client.renderer.Tessellator
 import org.lwjgl.opengl.GL11
 import net.minecraft.client.particle.EntityFX
-import de.mineformers.core.util.renderer.GuiUtils
 import de.mineformers.core.client.particle.ParticleFX
 
 /**
@@ -46,7 +46,7 @@ trait ParticleUpdater {
     GL11.glEnable(GL11.GL_BLEND)
     GL11.glBlendFunc(GL11.GL_SRC_ALPHA, 1)
 
-    GuiUtils.bindTexture(fx.resource)
+    RenderUtils.bindTexture(fx.resource)
     GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.75F)
 
     val minU = 0F

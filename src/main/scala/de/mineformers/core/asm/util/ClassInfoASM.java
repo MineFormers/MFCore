@@ -4,25 +4,26 @@ import com.google.common.collect.ImmutableList;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+import sun.management.MethodInfo;
+import sun.reflect.FieldInfo;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
- * Licensed under LGPL v3
+ * ClassInfoASM
  *
- * @author diesieben07
+ * @author PaleoCrafter
  */
-final class ClassInfoFromNode extends ClassInfo {
+final class ClassInfoASM extends ClassInfo {
 
     private final ClassNode clazz;
 
-    ClassInfoFromNode(ClassNode clazz) {
+    ClassInfoASM(ClassNode clazz) {
         this.clazz = clazz;
     }
 
     @Override
-    public Collection<String> interfaces() {
+    public List<String> interfaces() {
         return clazz.interfaces;
     }
 
@@ -47,18 +48,13 @@ final class ClassInfoFromNode extends ClassInfo {
         return 0;
     }
 
-    private List<Type[]> constructors;
     @Override
-    public List<Type[]> constructorTypes() {
-        if (constructors == null) {
-            ImmutableList.Builder<Type[]> builder = ImmutableList.builder();
-            for (MethodNode method : clazz.methods) {
-                if (method.name.equals("<init>")) {
-                    builder.add(Type.getArgumentTypes(method.desc));
-                }
-            }
-            constructors = builder.build();
-        }
-        return constructors;
+    public Type getComponentType() {
+        throw new IllegalStateException("Not an array");
     }
+
+    private static boolean isHidden(String name) {
+        return name.equals("<init>") || name.equals("<clinit>");
+    }
+
 }

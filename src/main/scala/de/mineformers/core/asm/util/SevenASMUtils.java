@@ -5,8 +5,11 @@ import com.google.common.base.Predicate;
 import com.google.common.base.Predicates;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import de.mineformers.core.MFCore;
+import net.minecraft.launchwrapper.IClassNameTransformer;
+import net.minecraft.launchwrapper.Launch;
 import org.apache.commons.lang3.ArrayUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Opcodes;
@@ -36,6 +39,38 @@ public final class SevenASMUtils
     }
 
     // *** bytecode analyzing helpers *** //
+
+    private static IClassNameTransformer nameTransformer;
+    private static boolean nameTransChecked = false;
+
+    /**
+     * get the active {@link net.minecraft.launchwrapper.IClassNameTransformer}, if any
+     *
+     * @return the active transformer, or null if none
+     */
+    public static IClassNameTransformer getClassNameTransformer() {
+        if (!nameTransChecked) {
+            nameTransformer = Iterables.getOnlyElement(Iterables.filter(Launch.classLoader.getTransformers(), IClassNameTransformer.class), null);
+            nameTransChecked = true;
+        }
+        return nameTransformer;
+    }
+
+    /**
+     * transform the class name with the current {@link net.minecraft.launchwrapper.IClassNameTransformer}, if any
+     *
+     * @param untransformedName the un-transformed name of the class
+     * @return the transformed name of the class
+     */
+    public static String transformName(String untransformedName) {
+        IClassNameTransformer t = getClassNameTransformer();
+        return internalName(t == null ? untransformedName : t.remapClassName(binaryName(untransformedName)));
+    }
+
+    public static String untransformName(String untransformedName) {
+        IClassNameTransformer t = getClassNameTransformer();
+        return internalName(t == null ? untransformedName : t.unmapClassName(binaryName(untransformedName)));
+    }
 
     /**
      * finds the last return instruction in the given method.
