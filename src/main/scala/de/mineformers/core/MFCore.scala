@@ -25,7 +25,6 @@ package de.mineformers.core
 
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{TransformerExclusions, MCVersion}
-import de.mineformers.core.asm.transformer.MFCoreAccessTransformer
 import de.mineformers.core.impl.asm.CoreClassTransformer
 import java.io.File
 import de.mineformers.core.util.Log
@@ -42,10 +41,7 @@ import de.mineformers.core.network.MFNetworkWrapper
 @IFMLLoadingPlugin.SortingIndex(1001)
 @TransformerExclusions(Array("de.mineformers.core.asm.", "de.mineformers.core.impl.asm.", "scala."))
 class MFCore extends IFMLLoadingPlugin {
-  /**
-   * @return the [[MFCoreAccessTransformer]] class name
-   */
-  override def getAccessTransformerClass: String = classOf[MFCoreAccessTransformer].getName
+  override def getAccessTransformerClass: String = null
 
   /**
    * Get data from the running Minecraft instance.
