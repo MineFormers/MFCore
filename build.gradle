@@ -117,14 +117,14 @@ artifacts {
 }
 
 uploadArchives {
-    if (project.hasProperty("url")) {
+    if (System.getenv("mavenUrl") != null) {
         repositories {
             logger.info('Publishing to files server')
 
             mavenDeployer {
 
-                repository(url: project.ext.url) {
-                    authentication(userName: project.ext.username, password: project.ext.password)
+                repository(url: System.getenv("mavenUrl")) {
+                    authentication(userName: System.getenv("mavenUser"), password: System.getenv("mavenPassword"))
                 }
 
                 pom {
