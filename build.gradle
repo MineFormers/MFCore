@@ -34,12 +34,12 @@ group = "de.mineformers" // http://maven.apache.org/guides/mini/guide-naming-con
 archivesBaseName = "mfcore"
 
 def jarVersion = ""
-ext.displayVersion = ""
+project.displayVersion = ""
 if (System.getenv("BUILD_NUMBER") != null) {
     if(System.getenv("BUILD_NUMBER").isInteger()) {
         jarVersion = ".${System.getenv("BUILD_NUMBER")}"
     }
-    ext.displayVersion = System.getenv("BUILD_NUMBER")
+    project.displayVersion = System.getenv("BUILD_NUMBER")
 }
 
 version = "$version$jarVersion"
@@ -75,7 +75,7 @@ processResources {
         include 'mcmod.info', 'version.properties'
 
         // replace version and mcversion
-        expand 'version': project.version, 'mcversion': project.minecraft.version, 'build': ext.displayVersion
+        expand 'version': project.version, 'mcversion': project.minecraft.version, 'build': project.displayVersion
     }
 
     // copy everything else, thats not the mcmod.info
