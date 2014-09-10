@@ -33,13 +33,16 @@ version = '0.3.0'
 group = "de.mineformers" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "mfcore"
 
-def jarVersion = ""
-project.displayVersion = ""
+ext {
+    jarVersion = ""
+    displayVersion = ""
+}
+
 if (System.getenv("BUILD_NUMBER") != null) {
     if(System.getenv("BUILD_NUMBER").isInteger()) {
         jarVersion = ".${System.getenv("BUILD_NUMBER")}"
     }
-    project.displayVersion = System.getenv("BUILD_NUMBER")
+    displayVersion = System.getenv("BUILD_NUMBER")
 }
 
 version = "$version$jarVersion"
@@ -85,13 +88,13 @@ processResources {
 }
 
 tasks.withType(JavaCompile) {
-	sourceCompatibility = 1.7
-	targetCompatibility = 1.7
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
 }
 
 tasks.withType(ScalaCompile) {
-	sourceCompatibility = 1.7
-	targetCompatibility = 1.7
+    sourceCompatibility = 1.7
+    targetCompatibility = 1.7
     scalaCompileOptions.optimize = true
     scalaCompileOptions.additionalParameters = ['-Yclosure-elim', '-Yinline']
 }
