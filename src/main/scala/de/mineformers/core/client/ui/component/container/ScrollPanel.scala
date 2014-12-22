@@ -21,14 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.container
 
 import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.interaction.ScrollBar
 import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.util.Positioned
 import de.mineformers.core.reaction.{Event, Publisher}
 import org.lwjgl.opengl.GL11
@@ -111,7 +110,6 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
     case e: Positioned => if (hovered(e.pos)) publish(e)
     case e: Event => publish(e)
   }
-
   private[component] var scrollBarHorizontal = new ScrollBar(size.width - (if (scrollVertical) 16 else 2), Orientation.Horizontal)
   private[component] var scrollBarVertical = new ScrollBar(size.height - (if (scrollHorizontal) 16 else 2), Orientation.Vertical)
   private var channel: Publisher = _

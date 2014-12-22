@@ -21,11 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util
 
-import org.apache.logging.log4j.{Marker, Level, LogManager}
 import org.apache.logging.log4j.message.Message
+import org.apache.logging.log4j.{Level, LogManager, Marker}
 
 /**
  * Log

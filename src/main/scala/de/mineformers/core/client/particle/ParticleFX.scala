@@ -23,15 +23,15 @@
  */
 package de.mineformers.core.client.particle
 
+import java.lang.reflect.Field
+
+import de.mineformers.core.client.particle.updater.ParticleUpdater
 import de.mineformers.core.util.world.Vector3
 import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.EffectRenderer
-import net.minecraft.client.particle.EntityFX
+import net.minecraft.client.particle.{EffectRenderer, EntityFX}
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
-import java.lang.reflect.Field
-import de.mineformers.core.client.particle.updater.ParticleUpdater
 
 /**
  * ParticleFX
@@ -54,7 +54,7 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
     }
   }
 
-  override def renderParticle(tessellator: Tessellator, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float):Unit = {
+  override def renderParticle(tessellator: Tessellator, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float): Unit = {
     tessellator.draw
     updater.render(tessellator, partialTicks, arX, arXZ, arZ, arYZ, arXY, this)
     try {

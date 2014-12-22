@@ -21,14 +21,26 @@ import org.lwjgl.opengl.GL11
 class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: Int, baseZ: Int) {
   val bounds = AxisAlignedBB.getBoundingBox(baseX * ChunkWidth, baseY * ChunkHeight, baseZ * ChunkLength, (baseX + 1) * ChunkWidth, (baseY + 1) * ChunkHeight, (baseZ + 1) * ChunkLength)
   val centered = BlockPos(((baseX + 0.5) * ChunkWidth).toInt, ((baseY + 0.5) * ChunkHeight).toInt, ((baseZ + 0.5) * ChunkLength).toInt)
-  var tiles = (for ((pos, tile) <- structure.tiles if pos.containedBy(bounds)) yield tile).toList
   val glList = GL11.glGenLists(2)
-  var update = true
   val mc = Minecraft.getMinecraft
+  var tiles = (for ((pos, tile) <- structure.tiles if pos.containedBy(bounds)) yield tile).toList
+  var update = true
 
   def dispose(): Unit = {
     tiles = null
     GL11.glDeleteLists(glList, 2)
+  }
+
+  def render(pass: Int): Unit = {
+    this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture)
+    GL11.glColor4f(1F, 1F, 1F, 1F)
+    this.updateList()
+    GL11.glCallList(glList + pass)
+
+    renderTiles(pass)
+
+    GL11.glEnable(GL11.GL_BLEND)
+    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
   }
 
   def updateList(): Unit = {
@@ -67,18 +79,6 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
         GL11.glEndList()
       }
     }
-  }
-
-  def render(pass: Int): Unit = {
-    this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture)
-    GL11.glColor4f(1F, 1F, 1F, 1F)
-    this.updateList()
-    GL11.glCallList(glList + pass)
-
-    renderTiles(pass)
-
-    GL11.glEnable(GL11.GL_BLEND)
-    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
   }
 
   def renderTiles(pass: Int): Unit = {

@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.renderer
 
-import cpw.mods.fml.client.registry.{RenderingRegistry, ISimpleBlockRenderingHandler}
+import cpw.mods.fml.client.registry.{ISimpleBlockRenderingHandler, RenderingRegistry}
 
 /**
  * SimpleBlockRenderer
@@ -33,6 +32,7 @@ import cpw.mods.fml.client.registry.{RenderingRegistry, ISimpleBlockRenderingHan
  */
 abstract class SimpleBlockRenderer extends ISimpleBlockRenderingHandler {
   val renderType = RenderingRegistry.getNextAvailableRenderId
+
   override def getRenderId: Int = renderType
 
   override def shouldRender3DInInventory(modelId: Int): Boolean = true

@@ -21,15 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.ui.component.container.Panel
-import de.mineformers.core.client.ui.util.ComponentEvent
-import ComponentEvent.{ButtonPressed, ValueChanged}
 import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation
+import de.mineformers.core.client.ui.component.container.Panel
 import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation
+import de.mineformers.core.client.ui.util.ComponentEvent
+import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ValueChanged}
 
 /**
  * NumberSpinner
@@ -41,7 +40,6 @@ class NumberSpinner(textWidth: Int = 50, var min: Int = 1, var max: Int = -1, va
   private var _value = start
   val text = new TextBox(start.toString, Size(textWidth, 12))
   text.formatter = TextBox.IntegerFormatter
-
   val btnUp = new NavigationButton(Orientation.Up)
   btnUp.position = Point(textWidth + 1, 1)
   val btnDown = new NavigationButton(Orientation.Down)

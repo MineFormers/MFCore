@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.util
 
 /**
@@ -32,7 +31,6 @@ package de.mineformers.core.client.ui.util
 object MouseButton extends Enumeration {
   type MouseButton = Value
   val Left, Right, Middle, Unknown = Value
-
   val Default = Array(Left, Right, Middle)
 
   def get(code: Int): MouseButton = {

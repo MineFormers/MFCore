@@ -23,13 +23,13 @@
  */
 package de.mineformers.core.util
 
-import de.mineformers.core.asm.util.Instruction.{MethodOp, TypeOp}
-import org.objectweb.asm.Type
-import org.objectweb.asm.tree._
 import de.mineformers.core.MFCore
+import de.mineformers.core.asm.util.Instruction.{MethodOp, TypeOp}
+import de.mineformers.core.asm.util.{Instruction, SevenASMUtils}
 import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.Type
-import de.mineformers.core.asm.util.{Instruction, SevenASMUtils}
+import org.objectweb.asm.tree._
+
 import scala.util.control.Breaks
 
 /**
@@ -38,7 +38,6 @@ import scala.util.control.Breaks
  * @author PaleoCrafter
  */
 object ASMUtils {
-
   /**
    * Find a method for the given name
    * @param clazz the class to search the method in
@@ -106,7 +105,7 @@ object ASMUtils {
     import scala.collection.JavaConversions._
     val list = in.iterator().toList
     for (i <- 0 until list.length) {
-      import Breaks._
+      import scala.util.control.Breaks._
       breakable {
         val elem = list(i)
         if (!SevenASMUtils.matches(elem, find.head))
@@ -114,8 +113,8 @@ object ASMUtils {
         if (i + find.size > in.size())
           return null
         val sub = list.slice(i, i + find.size)
-        for(j <- 0 until sub.length) {
-          if(!SevenASMUtils.matches(sub(j), find(j)))
+        for (j <- 0 until sub.length) {
+          if (!SevenASMUtils.matches(sub(j), find(j)))
             break()
         }
         return elem
@@ -135,5 +134,4 @@ object ASMUtils {
    * @return true, if we're running in an MCP mapped environment
    */
   def mcpEnv = MFCore.McpEnvironment
-
 }

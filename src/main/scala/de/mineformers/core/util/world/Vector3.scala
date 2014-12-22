@@ -23,11 +23,12 @@
  */
 package de.mineformers.core.util.world
 
+import java.lang.{Double => JDouble}
+
+import com.google.common.base.Objects
 import net.minecraft.entity.Entity
 
 import scala.collection.mutable
-import com.google.common.base.Objects
-import java.lang.{Double => JDouble}
 
 /**
  * Vector3
@@ -37,7 +38,6 @@ import java.lang.{Double => JDouble}
  */
 object Vector3 {
   private val cache = mutable.WeakHashMap[(Double, Double, Double), Vector3]()
-
   val Zero = Vector3(0, 0, 0)
   val One = Vector3(1, 1, 1)
   val Center = Vector3(0.5D, 0.5D, 0.5D)

@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.shape2d
 
-import scala.collection.mutable
-import de.mineformers.core.client.shape2d.Rectangle.Bounds
 import com.google.common.base.Objects
+import de.mineformers.core.client.shape2d.Rectangle.Bounds
+
+import scala.collection.mutable
 
 /**
  * Rectangle
@@ -35,9 +35,7 @@ import com.google.common.base.Objects
  */
 object Rectangle {
   private val cache = new mutable.WeakHashMap[Bounds, Rectangle]
-
   val Empty = Rectangle(0, 0, 0, 0)
-
   type Bounds = (Point, Point)
 
   /**

@@ -21,12 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.reaction
 
 import scala.collection.mutable.ListBuffer
 
 object Reactions {
+
+  type Reaction = PartialFunction[Event, Unit]
+
+  /**
+   * A Reaction implementing this trait is strongly referenced in the reaction list
+   */
+  trait StronglyReferenced
 
   class Impl extends Reactions {
     private val parts = new ListBuffer[Reaction]
@@ -47,13 +53,6 @@ object Reactions {
       for (p <- parts) if (p isDefinedAt e) p(e)
     }
   }
-
-  type Reaction = PartialFunction[Event, Unit]
-
-  /**
-   * A Reaction implementing this trait is strongly referenced in the reaction list
-   */
-  trait StronglyReferenced
 
   class Wrapper(listener: Any)(r: Reaction) extends Reaction with StronglyReferenced with Proxy {
     def self = listener

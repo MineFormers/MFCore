@@ -21,18 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.skin
 
-import scala.collection.immutable.HashMap
-import de.mineformers.core.client.ui.skin.drawable.{StaticTexture, DynamicTexture, DrawableTexture}
-import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.shape2d.{Size, Point, Rectangle}
-import de.mineformers.core.util.ResourceUtils.Resource
+import com.google.common.collect.ImmutableMap
 import com.google.gson.{JsonArray, JsonObject}
+import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.client.ui.skin.drawable.{DrawableTexture, DynamicTexture, StaticTexture}
+import de.mineformers.core.util.ResourceUtils.Resource
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.resources.data.IMetadataSection
-import com.google.common.collect.ImmutableMap
+
+import scala.collection.immutable.HashMap
 
 /**
  * TextureManager
@@ -76,7 +76,7 @@ object TextureManager {
         import scala.collection.JavaConversions._
         for (entry <- meta.map.entrySet()) {
           val drawable = entry.getValue
-          if(drawable != null) {
+          if (drawable != null) {
             drawable.texture = resource
             drawable.textureSize = GuiUtils.imageSize(resource)
             drawable.init()
@@ -96,7 +96,7 @@ object TextureManager {
         import scala.collection.JavaConversions._
         for (entry <- meta.map.entrySet()) {
           val drawable = entry.getValue
-          if(drawable != null) {
+          if (drawable != null) {
             drawable.texture = resource
             drawable.textureSize = GuiUtils.imageSize(resource)
             drawable.init()

@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.tileentity
 
 import java.lang.reflect.Field
@@ -32,7 +31,7 @@ import de.mineformers.core.network.Message.Serializer
 import de.mineformers.core.network.{Message, TileDescriptionMessage}
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.Packet
-import net.minecraft.tileentity.TileEntity
+
 import scala.collection.mutable
 
 /**
@@ -41,6 +40,9 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 final class TileDescription(val parentClass: Class[Describable]) {
+  val fields = Describable.collectFields(parentClass)
+  val values = mutable.Map.empty[Field, Any]
+
   def this() = this(null)
 
   def write(buf: ByteBuf): Unit = {
@@ -74,9 +76,6 @@ final class TileDescription(val parentClass: Class[Describable]) {
       f.set(parent, values(f))
     }
   }
-
-  val fields = Describable.collectFields(parentClass)
-  val values = mutable.Map.empty[Field, Any]
 }
 
 /**
@@ -86,6 +85,12 @@ final class TileDescription(val parentClass: Class[Describable]) {
  */
 trait Describable {
   this: MFTile =>
+  final override def getDescriptionPacket: Packet = {
+    if (description == null)
+      return null
+
+    MFCore.net.getPacketFrom(new TileDescriptionMessage(xCoord, yCoord, zCoord, description))
+  }
 
   def description: TileDescription = {
     val desc = new TileDescription(this.getClass.asInstanceOf[Class[Describable]])
@@ -94,13 +99,6 @@ trait Describable {
   }
 
   def onDescription(): Unit
-
-  final override def getDescriptionPacket: Packet = {
-    if (description == null)
-      return null
-
-    MFCore.net.getPacketFrom(new TileDescriptionMessage(xCoord, yCoord, zCoord, description))
-  }
 }
 
 object Describable {
@@ -124,5 +122,4 @@ object Describable {
   })
 
   def getSerializer(f: Field) = fieldSerializerMappings.get(f)
-
 }

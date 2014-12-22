@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.util
 
 import cpw.mods.fml.client.registry.{ClientRegistry, ISimpleBlockRenderingHandler, RenderingRegistry}
@@ -30,7 +29,7 @@ import de.mineformers.core.client.renderer.TileRenderer
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
-import net.minecraftforge.client.{MinecraftForgeClient, IItemRenderer}
+import net.minecraftforge.client.{IItemRenderer, MinecraftForgeClient}
 
 /**
  * RenderingProxy
@@ -48,7 +47,7 @@ trait RenderingProxy {
   def createSimpleRenderer: ISimpleBlockRenderingHandler = null
 
   @SideOnly(Side.CLIENT)
-  def registerRenderers(block: Block with Rendering, tileClass: Class[_ <: TileEntity]): Unit = {
+  def registerRenderers(block: Block with BlockRendering, tileClass: Class[_ <: TileEntity]): Unit = {
     val itemRenderer = createItemRenderer
     if (itemRenderer != null)
       MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(block), itemRenderer)

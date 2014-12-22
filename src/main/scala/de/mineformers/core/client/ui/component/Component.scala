@@ -21,19 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.shape2d.{Size, Rectangle, Point}
-import de.mineformers.core.client.ui.util.{MouseEvent, ComponentEvent, MouseButton}
-import de.mineformers.core.reaction.Publisher
-import net.minecraft.client.Minecraft
-import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.component.container.Panel
 import cpw.mods.fml.client.FMLClientHandler
-import de.mineformers.core.util.renderer.GuiUtils
+import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.component.container.Panel
+import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
-import ComponentEvent.ComponentClicked
+import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
+import de.mineformers.core.client.ui.util.{ComponentEvent, MouseButton, MouseEvent}
+import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.util.renderer.GuiUtils
+import net.minecraft.client.Minecraft
 
 /**
  * Component
@@ -84,7 +83,6 @@ trait Component extends Publisher {
   def local(p: Point) = p - screen
 
   var skin: Skin
-
   lazy val mc: Minecraft = FMLClientHandler.instance.getClient
   val utils = GuiUtils
   var position = Point(0, 0)
@@ -104,7 +102,6 @@ trait Component extends Publisher {
 
   trait Skin {
     val utils = GuiUtils
-
     val component = Component.this
 
     protected def drawBackground(mousePos: Point): Unit = {

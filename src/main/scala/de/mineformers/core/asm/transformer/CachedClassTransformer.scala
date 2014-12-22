@@ -23,12 +23,13 @@
  */
 package de.mineformers.core.asm.transformer
 
+import de.mineformers.core.asm.util.ClassInfo
 import net.minecraft.launchwrapper.IClassTransformer
-import collection.mutable
+import org.objectweb.asm.ClassWriter._
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.{ClassReader, ClassWriter}
-import org.objectweb.asm.ClassWriter._
-import de.mineformers.core.asm.util.ClassInfo
+
+import scala.collection.mutable
 
 /**
  * CachedClassTransformer
@@ -37,7 +38,6 @@ import de.mineformers.core.asm.util.ClassInfo
  */
 trait CachedClassTransformer extends IClassTransformer {
   protected val transformers = mutable.ArrayBuffer[ClassTransformer]()
-
   init()
 
   /**

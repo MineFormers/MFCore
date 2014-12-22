@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.layout
 
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.Component
-import scala.collection.mutable
-import de.mineformers.core.client.shape2d.{Size, Point}
 import de.mineformers.core.client.ui.component.container.Panel
+
+import scala.collection.mutable
 
 /**
  * LayoutManager

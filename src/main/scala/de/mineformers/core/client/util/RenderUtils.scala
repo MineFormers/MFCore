@@ -21,21 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.util
-
-import java.util.Random
 
 import cpw.mods.fml.client.FMLClientHandler
 import cpw.mods.fml.relauncher.ReflectionHelper
-import de.mineformers.core.util.MathUtils
+import de.mineformers.core.client.renderer.shape.Vertex
 import de.mineformers.core.util.world.{Vector2, Vector3}
 import net.minecraft.client.Minecraft
-import net.minecraft.client.particle.{EntityFX, EffectRenderer}
-import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper, EntityRenderer, Tessellator}
-import net.minecraft.util.{ResourceLocation, MathHelper, Timer}
+import net.minecraft.client.particle.{EffectRenderer, EntityFX}
+import net.minecraft.client.renderer.{EntityRenderer, OpenGlHelper, RenderHelper, Tessellator}
+import net.minecraft.entity.Entity
+import net.minecraft.util.{MathHelper, ResourceLocation, Timer}
 import net.minecraftforge.common.util.ForgeDirection
 import org.lwjgl.opengl.GL11
+import org.lwjgl.opengl.GL11._
+
+import scala.util.Random
 
 /**
  * RenderUtils
@@ -49,22 +50,31 @@ object RenderUtils {
     mc.getTextureManager.bindTexture(path)
   }
 
+  def applyColor(color: Color): Unit = {
+    GL11.glColor4f(color.r, color.g, color.b, color.a)
+  }
+
   implicit def vec3ToVertex(vec: Vector3): Vertex = Vertex(vec)
 
-  def rotateFacing(): Unit = {
-    val camera = Minecraft.getMinecraft.renderViewEntity
-    val yaw = camera.prevRotationYaw + (camera.rotationYaw - camera.prevRotationYaw) * partialTicks
-    val pitch = camera.prevRotationPitch + (camera.rotationPitch - camera.prevRotationPitch) * partialTicks
+  def rotate(vec: Vector3): Unit = {
+    glRotated(vec.x, 1, 0, 0)
+    glRotated(vec.y, 0, 1, 0)
+    glRotated(vec.z, 0, 0, 1)
+  }
+
+  def rotateFacing(entity: Entity = Minecraft.getMinecraft.renderViewEntity, axis: Vector3 = Vector3(1, 1, 1)): Unit = {
+    val yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks
+    val pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks
     val roll = prevCamRoll + (camRoll - prevCamRoll) * partialTicks
-    GL11.glRotatef(-(yaw + 180), 0, 1, 0)
-    GL11.glRotatef(-pitch, 1, 0, 0)
-    GL11.glRotatef(-roll, 0, 0, 1)
+    glRotated(-(yaw + 180) * axis.y, 0, 1, 0)
+    glRotated(-pitch * axis.x, 1, 0, 0)
+    glRotated(-roll * axis.z, 0, 0, 1)
   }
 
   def drawCircle(x: Double, y: Double, z: Double, radius: Double, vertices: Int, filled: Boolean = true): Unit = {
     if (!filled)
-      GL11.glLineWidth(10)
-    drawVertices(if (filled) GL11.GL_TRIANGLE_FAN else GL11.GL_LINE_LOOP, (0 until vertices) map {
+      glLineWidth(10)
+    drawVertices(if (filled) GL_TRIANGLE_FAN else GL_LINE_LOOP, (0 until vertices) map {
       i =>
         val theta = i * 2 * math.Pi / vertices.toFloat
         // angle to ith vertex, in radians not degrees.
@@ -75,7 +85,17 @@ object RenderUtils {
     } reverse)
   }
 
-  import ForgeDirection._
+  def createCircle(x: Double, y: Double, z: Double, radius: Double, vertices: Int) = (0 until vertices) map {
+    i =>
+      val theta = i * 2 * math.Pi / vertices.toFloat
+      // angle to ith vertex, in radians not degrees.
+      // use i+0.5 if you want the polygon rotated like a stop sign.
+      val xOff = radius * math.cos(theta)
+      val zOff = radius * math.sin(theta)
+      Vertex(Vector3(x + xOff, y + zOff, z))
+  } reverse
+
+  import net.minecraftforge.common.util.ForgeDirection._
 
   def drawCuboid(x: Double, y: Double, z: Double, width: Double, height: Double, length: Double, uvs: Map[ForgeDirection, (Vector2, Vector2)] = Map.empty[ForgeDirection, (Vector2, Vector2)]): Unit = {
     val defaultUVs = (Vector2(0, 0), Vector2(1, 1))
@@ -141,66 +161,66 @@ object RenderUtils {
   final val beamTexture = new ResourceLocation("textures/entity/beacon_beam.png")
 
   def drawBeaconBeam(x: Double, y: Double, z: Double): Unit = {
-   // GL11.glDisable(GL11.GL_TEXTURE_2D)
+    // GL11.glDisable(GL11.GL_TEXTURE_2D)
     val heightFactor = 1F
-    GL11.glPushMatrix()
+    glPushMatrix()
     this.bindTexture(beamTexture)
-    GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F)
-    GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F)
-    GL11.glTranslatef(0.5F, 0.5F, 0.5F)
-    GL11.glRotated(2880.0 * (System.currentTimeMillis() & 0x3FFFL) / 0x3FFFL, 0, 1, 0)
-    GL11.glTranslatef(-0.33F / 2, 0F, -0.33F / 2)
-    GL11.glDisable(GL11.GL_LIGHTING)
-    GL11.glDisable(GL11.GL_BLEND)
-    GL11.glDisable(GL11.GL_CULL_FACE)
-    GL11.glDepthMask(true)
+    glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, 10497.0F)
+    glTexParameterf(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, 10497.0F)
+    glTranslatef(0.5F, 0.5F, 0.5F)
+    glRotated(2880.0 * (System.currentTimeMillis() & 0x3FFFL) / 0x3FFFL, 0, 1, 0)
+    glTranslatef(-0.33F / 2, 0F, -0.33F / 2)
+    glDisable(GL11.GL_LIGHTING)
+    glDisable(GL11.GL_BLEND)
+    glDisable(GL11.GL_CULL_FACE)
+    glDepthMask(true)
     OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ONE, GL11.GL_ZERO)
-    GL11.glColor4f(1F, 1, 0.2F, 0.125F)
+    glColor4f(1F, 1, 0.2F, 0.125F)
     val width = 0.33
     val f2 = mc.theWorld.getTotalWorldTime + partialTicks
     val f3 = -f2 * 0.2F - MathHelper.floor_float(-f2 * 0.1F)
     val vMin = -1 + f3
     val faces = (Vector2(0, (256.0F * heightFactor) * (0.5D / 0.2) + vMin), Vector2(1, vMin))
     drawCuboid(x, y, z, width, 256, width, Map(EAST -> faces, WEST -> faces, NORTH -> faces, SOUTH -> faces))
-    GL11.glEnable(GL11.GL_BLEND)
+    glEnable(GL11.GL_BLEND)
     OpenGlHelper.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO)
-    GL11.glEnable(GL11.GL_CULL_FACE)
-    GL11.glDepthMask(false)
-    GL11.glTranslatef(0.33F / 2, 0F, 0.33F / 2)
-    GL11.glTranslatef(-0.3F, 0F, -0.3F)
+    glEnable(GL11.GL_CULL_FACE)
+    glDepthMask(false)
+    glTranslatef(0.33F / 2, 0F, 0.33F / 2)
+    glTranslatef(-0.3F, 0F, -0.3F)
     drawCuboid(x, y, z, 0.6, 256, 0.6, Map(EAST -> faces, WEST -> faces, NORTH -> faces, SOUTH -> faces))
-    GL11.glDepthMask(true)
-    GL11.glEnable(GL11.GL_LIGHTING)
-    GL11.glPopMatrix()
+    glDepthMask(true)
+    glEnable(GL11.GL_LIGHTING)
+    glPopMatrix()
   }
 
-  def drawBeams(speed: Float, colorGenerator: Random => Color = random => Color.fromHSV(1, 0, random.nextFloat())): Unit = {
-    val random: Random = new Random(432L)
-    GL11.glShadeModel(GL11.GL_SMOOTH)
-    GL11.glEnable(GL11.GL_BLEND)
-    GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    GL11.glDisable(GL11.GL_ALPHA_TEST)
-    GL11.glEnable(GL11.GL_CULL_FACE)
-    GL11.glDepthMask(false)
+  def drawBeams(speed: Float, colorGenerator: Random => Color = random => Color.fromHSV(1, 0, random.nextFloat()), random: Random = new Random(432L)): Unit = {
+    glShadeModel(GL11.GL_SMOOTH)
+    glEnable(GL11.GL_BLEND)
+    glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
+    glDisable(GL11.GL_ALPHA_TEST)
+    glEnable(GL11.GL_CULL_FACE)
+    glDepthMask(false)
     RenderHelper.disableStandardItemLighting()
     val step: Float = (Minecraft.getSystemTime % 720000L) / 36000.0F
-    val lengthFactor: Float = (step / 0.2F) + 10
 
     // Beams rendering
-    GL11.glPushMatrix()
-    GL11.glRotated(720.0 * (System.currentTimeMillis() & 0x3FFFL) / 0x3FFFL, 0, 1, 0)
+    glPushMatrix()
+    glRotated(720.0 * (System.currentTimeMillis() & 0x3FFFL) / 0x3FFFL * speed, 0, 1, 0)
     val tessellator = Tessellator.instance
     val scale = 1 / 150F
     for (i <- 0 until 12) {
-      GL11.glRotatef(random.nextFloat * 360.0F, 1.0F, 0.0F, 0.0F)
-      GL11.glRotatef(random.nextFloat * 360.0F, 0.0F, 1.0F, 0.0F)
-      GL11.glRotatef(random.nextFloat * 360.0F, 0.0F, 0.0F, 1.0F)
-      GL11.glRotatef(random.nextFloat * 360.0F, 1.0F, 0.0F, 0.0F)
-      GL11.glRotatef(random.nextFloat * 360.0F, 0.0F, 1.0F, 0.0F)
-      GL11.glRotatef(random.nextFloat * 360.0F + step * speed * 2 * 90.0F, 0.0F, 0.0F, 1.0F)
-      tessellator.startDrawing(6)
-      val length: Float = (clampedRandom(random) * 20.0F + 5.0F + lengthFactor * 10.0F) * scale
-      val horOff: Float = (clampedRandom(random) * 2.0F + 1.0F + lengthFactor * 2.0F) * scale
+      glRotatef(random.nextFloat * 360.0F, 1.0F, 0.0F, 0.0F)
+      glRotatef(random.nextFloat * 360.0F, 0.0F, 1.0F, 0.0F)
+      glRotatef(random.nextFloat * 360.0F, 0.0F, 0.0F, 1.0F)
+      glRotatef(random.nextFloat * 360.0F, 1.0F, 0.0F, 0.0F)
+      glRotatef(random.nextFloat * 360.0F, 0.0F, 1.0F, 0.0F)
+      glRotatef(random.nextFloat * 360.0F, 0.0F, 0.0F, 1.0F)
+      glRotatef(step * 2 * 90.0F, 0, 0, 1)
+      tessellator.startDrawing(GL_TRIANGLE_FAN)
+      val length = (360 - random.nextInt(20) + 10) * scale
+      val horOff = (80 - random.nextInt(10) + 5) * scale
+
       val color = colorGenerator(random).integer
       tessellator.setColorRGBA_I(color, 127)
       tessellator.addVertex(0.0D, 0.0D, 0.0D)
@@ -211,17 +231,15 @@ object RenderUtils {
       tessellator.addVertex(-0.866D * horOff, length, -0.5F * horOff)
       tessellator.draw()
     }
-    GL11.glPopMatrix()
+    glPopMatrix()
 
-    GL11.glDepthMask(true)
-    GL11.glDisable(GL11.GL_CULL_FACE)
-    GL11.glDisable(GL11.GL_BLEND)
-    GL11.glShadeModel(GL11.GL_FLAT)
-    GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
+    glDepthMask(true)
+    glDisable(GL11.GL_CULL_FACE)
+    glDisable(GL11.GL_BLEND)
+    glShadeModel(GL11.GL_FLAT)
+    glColor4f(1.0F, 1.0F, 1.0F, 1.0F)
     RenderHelper.enableStandardItemLighting()
   }
-
-  private def clampedRandom(random: Random): Float = MathUtils.scale(random.nextFloat(), 0, 1, 0, 0.45).toFloat + 0.4F
 
   def partialTicks: Float = {
     timerField.setAccessible(true)

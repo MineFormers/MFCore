@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.skin.drawable
 
-import de.mineformers.core.client.shape2d.{Size, Point}
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.util.RenderUtils
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.renderer.texture.TextureMap

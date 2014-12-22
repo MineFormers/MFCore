@@ -21,8 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util
+
+import scala.math._
 
 /**
  * MathUtils
@@ -38,14 +39,11 @@ object MathUtils {
   }
 
   def pulsate(time: Double, start: Double, change: Double, duration: Double): Double = {
-    if (time < duration / 2)
-      easeInOut(time, start, change, duration / 2)
-    else
-      easeInOut(time - duration / 2, start + change, -change, duration / 2)
+    abs(start + change * sin(2 * Pi * time * (1 / (duration * 2))))
   }
 
   def scale(valueIn: Double, baseMin: Double, baseMax: Double, limitMin: Double, limitMax: Double): Double =
     ((limitMax - limitMin) * (valueIn - baseMin) / (baseMax - baseMin)) + limitMin
 
-  def wrapAround(value: Int, max: Int, min: Int = 0) = if(value > max) min else value
+  def wrapAround(value: Int, max: Int, min: Int = 0) = if (value > max) min else value
 }

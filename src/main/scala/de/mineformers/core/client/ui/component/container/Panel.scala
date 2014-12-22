@@ -21,14 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.container
 
+import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.shape2d.{Rectangle, Size, Point}
-import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.layout.{LayoutManager, Constraints}
 import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.layout.{Constraints, LayoutManager}
+import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.ScissorRegion
 import de.mineformers.core.reaction.Publisher
 import org.lwjgl.opengl.GL11

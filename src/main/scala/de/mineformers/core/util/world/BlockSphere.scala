@@ -21,15 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util.world
 
 import net.minecraft.world.World
 
-import scalaxy.loops._
-
 import scala.language.postfixOps
-
 import scala.util.control.Breaks
 
 /**
@@ -199,7 +195,7 @@ case class BlockSphere(center: BlockPos, radius: Double, var operation: (BlockPo
   }
 
   def walk(): Boolean = {
-    if(i < blocks.length) {
+    if (i < blocks.length) {
       val pos = blocks(i)
       if (pos != null) {
         i += 1

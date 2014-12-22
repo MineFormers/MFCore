@@ -21,44 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.util
 
-import de.mineformers.core.util.world.{Vector2, Vector3}
-import net.minecraft.client.renderer.Tessellator
+import cpw.mods.fml.relauncher.{Side, SideOnly}
+import net.minecraft.block.Block
 
 /**
- * Vertex
+ * BlockRendering
  *
  * @author PaleoCrafter
  */
-object Vertex {
-  def apply(pos: Vector3): Vertex = this(pos, null, null)
+trait BlockRendering {
+  this: Block =>
+  lazy val proxy = createProxy
+  var renderType = -1
 
-  def apply(pos: Vector3, uv: Vector2): Vertex = this(pos, uv, null)
-}
+  @SideOnly(Side.CLIENT)
+  protected def createProxy: RenderingProxy
 
-case class Vertex(pos: Vector3, uv: Vector2, color: Color) {
-  def x = pos.x
+  override def getRenderType: Int = renderType
 
-  def y = pos.y
+  override def renderAsNormalBlock(): Boolean = false
 
-  def z = pos.z
-
-  def u = if (hasUV) uv.x else -1D
-
-  def v = if (hasUV) uv.y else -1D
-
-  def hasUV = uv != null
-
-  def isColored = color != null
-
-  def addToTessellator(tessellator: Tessellator): Unit = {
-    if (isColored)
-      tessellator.setColorRGBA_F(color.r, color.g, color.b, color.a)
-    if (hasUV)
-      tessellator.addVertexWithUV(x, y, z, u, v)
-    else
-      tessellator.addVertex(x, y, z)
-  }
+  override def isOpaqueCube: Boolean = false
 }

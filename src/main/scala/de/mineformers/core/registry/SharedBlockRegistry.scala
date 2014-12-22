@@ -23,17 +23,18 @@
  */
 package de.mineformers.core.registry
 
-import cpw.mods.fml.common.{LoaderState, Loader}
-import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.client.util.Rendering
-import net.minecraft.item.ItemBlock
 import cpw.mods.fml.common.registry.GameRegistry
-import net.minecraft.block.Block
-import de.mineformers.core.block.{TileProvider, MetaBlock}
+import cpw.mods.fml.common.{Loader, LoaderState}
+import cpw.mods.fml.relauncher.{Side, SideOnly}
+import de.mineformers.core.block.{MetaBlock, TileProvider}
+import de.mineformers.core.client.util.BlockRendering
 import de.mineformers.core.item.ItemBlockMeta
-import net.minecraft.tileentity.TileEntity
-import scala.language.existentials
 import de.mineformers.core.util.Log
+import net.minecraft.block.Block
+import net.minecraft.item.ItemBlock
+import net.minecraft.tileentity.TileEntity
+
+import scala.language.existentials
 
 /**
  * BlockEntry representing a block in the registry's map
@@ -50,7 +51,6 @@ case class BlockEntry(block: Block, itemBlock: Class[_ <: ItemBlock] = classOf[I
  * @author PaleoCrafter
  */
 object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
-
   /**
    * Helper method
    * @param key the key to register the block with
@@ -59,6 +59,19 @@ object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
    * @param cstrArgs the constructor arguments for the ItemBlock
    */
   def add(key: String, block: Block, itemBlock: Class[_ <: ItemBlock] = classOf[ItemBlock], cstrArgs: Array[Object] = Array[Object]()): Unit = this.add(key, BlockEntry(block, itemBlock, cstrArgs))
+
+  @SideOnly(Side.CLIENT)
+  def registerRenderers(): Unit = {
+    this foreach {
+      e =>
+        val block = e._2.block
+        block match {
+          case rendering: BlockRendering with TileProvider[_] => rendering.proxy.registerRenderers(rendering, rendering.tileClass.asInstanceOf[Class[_ <: TileEntity]])
+          case rendering: BlockRendering => rendering.proxy.registerRenderers(rendering, null)
+          case _ =>
+        }
+    }
+  }
 
   /**
    * Registers the given entry to the GameRegistry
@@ -83,19 +96,6 @@ object SharedBlockRegistry extends SharedRegistry[String, BlockEntry] {
       }
     } else {
       Log.error("A mod was trying to register a block outside the pre init phase")
-    }
-  }
-
-  @SideOnly(Side.CLIENT)
-  def registerRenderers(): Unit = {
-    this foreach {
-      e =>
-        val block = e._2.block
-        block match {
-          case rendering: Rendering with TileProvider[_] => rendering.proxy.registerRenderers(rendering, rendering.tileClass.asInstanceOf[Class[_ <: TileEntity]])
-          case rendering: Rendering => rendering.proxy.registerRenderers(rendering, null)
-          case _ =>
-        }
     }
   }
 }

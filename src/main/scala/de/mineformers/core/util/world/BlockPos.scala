@@ -23,11 +23,13 @@
  */
 package de.mineformers.core.util.world
 
-import scala.collection.mutable
-import com.google.common.base.Objects
 import java.lang.{Integer => JInt}
+
+import com.google.common.base.Objects
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.{AxisAlignedBB, Vec3}
+
+import scala.collection.mutable
 
 /**
  * BlockPos
@@ -37,7 +39,6 @@ import net.minecraft.util.{AxisAlignedBB, Vec3}
  */
 object BlockPos {
   private val cache = mutable.WeakHashMap[(Int, Int, Int), BlockPos]()
-
   val Zero = BlockPos(0, 0, 0)
   val One = BlockPos(1, 1, 1)
 

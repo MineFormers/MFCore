@@ -21,12 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.tileentity
 
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.util.world.{Vector3, BlockPos}
+import de.mineformers.core.util.world.{BlockPos, Vector3}
 import net.minecraft.tileentity.TileEntity
+
+import scala.util.Random
 
 /**
  * MFTile
@@ -34,34 +35,8 @@ import net.minecraft.tileentity.TileEntity
  * @author PaleoCrafter
  */
 class MFTile extends TileEntity {
-  def world = worldObj
-
-  def pos = BlockPos(x, y, z)
-
-  def vecPos = Vector3(x, y, z)
-
-  def x = xCoord
-
-  def y = yCoord
-
-  def z = zCoord
-
-  def init(): Unit = ()
-
-  @SideOnly(Side.CLIENT)
-  def updateClient(): Unit = ()
-
-  def updateServer(): Unit = ()
-
-  def destroy(): Unit = {
-    worldObj.setBlockToAir(x, y, z)
-  }
-
-  def update(): Unit = {
-    markDirty()
-    world.markBlockForUpdate(x, y, z)
-    world.notifyBlockChange(x, y, z, blockType)
-  }
+  private var initialized = false
+  lazy val random = new Random(pos.hashCode)
 
   final override def updateEntity(): Unit = {
     if (!initialized) {
@@ -74,5 +49,32 @@ class MFTile extends TileEntity {
       updateServer()
   }
 
-  private var initialized = false
+  def init(): Unit = ()
+
+  @SideOnly(Side.CLIENT)
+  def updateClient(): Unit = ()
+
+  def updateServer(): Unit = ()
+
+  def pos = BlockPos(x, y, z)
+
+  def vecPos = Vector3(x, y, z)
+
+  def destroy(): Unit = {
+    worldObj.setBlockToAir(x, y, z)
+  }
+
+  def x = xCoord
+
+  def y = yCoord
+
+  def z = zCoord
+
+  def update(): Unit = {
+    markDirty()
+    world.markBlockForUpdate(x, y, z)
+    world.notifyBlockChange(x, y, z, blockType)
+  }
+
+  def world = worldObj
 }

@@ -21,16 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.skin.drawable
 
-import de.mineformers.core.client.shape2d.{Size, Rectangle, Point}
-import de.mineformers.core.client.util.RenderUtils
-import de.mineformers.core.util.renderer.GuiUtils
-import de.mineformers.core.client.ui.skin.drawable.DynamicTexture.{Side, Corner}
-import de.mineformers.core.util.ResourceUtils.Resource
-import de.mineformers.core.client.ui.skin.DrawableDeserializer
 import com.google.gson.JsonObject
+import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.skin.DrawableDeserializer
+import de.mineformers.core.client.ui.skin.drawable.DynamicTexture.{Corner, Side}
+import de.mineformers.core.client.util.RenderUtils
+import de.mineformers.core.util.ResourceUtils.Resource
+import de.mineformers.core.util.renderer.GuiUtils
 
 /**
  * DynamicTexture
@@ -82,7 +81,6 @@ object DynamicTexture {
 }
 
 class DynamicTexture(_texture: Resource, textureWidth: Int, textureHeight: Int, private var corners: Array[Rectangle], private var sides: Array[Rectangle], private var inner: Rectangle) extends DrawableTexture {
-
   this.texture = _texture
   this.textureSize = Size(textureWidth, textureHeight)
 
@@ -91,7 +89,6 @@ class DynamicTexture(_texture: Resource, textureWidth: Int, textureHeight: Int, 
   def this(texture: Resource, textureWidth: Int = 16, textureHeight: Int = 16, topLeft: Rectangle, top: Rectangle, inner: Rectangle) = this(texture, textureWidth, textureHeight, Array(topLeft, topLeft.translate(topLeft.width + top.width, 0), topLeft.translate(topLeft.width + top.width, topLeft.height + top.width), topLeft.translate(0, topLeft.height + top.width)), Array(top, top.translate(top.width, topLeft.height).resize(top.size.invert), top.translate(0, top.width + top.height), top.translate(-topLeft.width, top.height).resize(top.size.invert)), inner)
 
   def this(topLeft: Rectangle, top: Rectangle, inner: Rectangle) = this(null, 0, 0, topLeft, top, inner)
-
 
   override def init(): Unit = {
     if (inner.width == 0) {

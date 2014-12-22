@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.structure
 
+import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.block.Block
+
 import scala.collection.mutable
 
 /**
@@ -37,9 +37,10 @@ import scala.collection.mutable
 class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty[Layer]) {
   private val entities = mutable.ListBuffer.empty[NBTTagCompound]
 
-  def addLayer(layer: Layer): Unit = {
-    if (layer == null) throw new IllegalArgumentException("Layer may not be null")
-    layers append layer
+  def setLayer(y: Int, layer: Layer): Unit = {
+    for (y1 <- getHeight until (y + 1))
+      addLayer(new Layer(getWidth, getLength))
+    replaceLayer(y, layer)
   }
 
   def replaceLayer(y: Int, layer: Layer): Unit = {
@@ -47,34 +48,12 @@ class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty
     layers(y) = layer
   }
 
-  def setLayer(y: Int, layer: Layer): Unit = {
-    for (y1 <- getHeight until (y + 1))
-      addLayer(new Layer(getWidth, getLength))
-    replaceLayer(y, layer)
-  }
-
-  def getBlock(x: Int, y: Int, z: Int): BlockInfo = {
-    val layer: Layer = getLayer(y)
-    if (layer == null) return null
-    layer.get(x, z)
-  }
-
-  def setBlock(x: Int, y: Int, z: Int, block: Block, metadata: Int, tile: NBTTagCompound): Unit = {
-    getLayer(y).set(x, z, block, metadata, tile)
-  }
-
   def getLayer(y: Int): Layer = {
     if (y >= getHeight || y < 0) return null
     layers(y)
   }
 
-  def addEntity(tag: NBTTagCompound): Unit = {
-    entities append tag
-  }
-
-  def clear(): Unit = {
-    layers.clear()
-  }
+  def getHeight: Int = layers.size
 
   def getWidth: Int = {
     var widest: Int = 0
@@ -88,7 +67,17 @@ class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty
     longest
   }
 
-  def getHeight: Int = layers.size
+  def setBlock(x: Int, y: Int, z: Int, block: Block, metadata: Int, tile: NBTTagCompound): Unit = {
+    getLayer(y).set(x, z, block, metadata, tile)
+  }
+
+  def addEntity(tag: NBTTagCompound): Unit = {
+    entities append tag
+  }
+
+  def clear(): Unit = {
+    layers.clear()
+  }
 
   def update(world: StructureWorld): Unit = {
     for (y <- 0 until getHeight; x <- 0 until getWidth; z <- 0 until getLength) {
@@ -96,6 +85,12 @@ class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty
       if (info != null)
         info.update(world, y)
     }
+  }
+
+  def getBlock(x: Int, y: Int, z: Int): BlockInfo = {
+    val layer: Layer = getLayer(y)
+    if (layer == null) return null
+    layer.get(x, z)
   }
 
   def blockTypes: Seq[BlockEntry] = for {
@@ -118,6 +113,11 @@ class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty
     val struct: Structure = new Structure
     for (layer <- layers) struct.addLayer(layer.copy)
     struct
+  }
+
+  def addLayer(layer: Layer): Unit = {
+    if (layer == null) throw new IllegalArgumentException("Layer may not be null")
+    layers append layer
   }
 
   override def toString: String = "Structure=" + layers.toString

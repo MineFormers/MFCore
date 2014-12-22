@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.shape2d
 
-import scala.collection.mutable
 import de.mineformers.core.client.shape2d.Point.Coordinates
+
+import scala.collection.mutable
 
 /**
  * Point
@@ -34,9 +34,7 @@ import de.mineformers.core.client.shape2d.Point.Coordinates
  */
 object Point {
   private val cache = new mutable.WeakHashMap[Coordinates, Point]
-
   type Coordinates = (Int, Int)
-
   val Zero = Point(0, 0)
   val One = Point(1, 1)
 
@@ -70,7 +68,7 @@ class Point private(p: Coordinates) {
 
   def -(p: Coordinates): Point = this - Point(p)
 
-  def -(s: Size): Point= this - Point(s.width, s.height)
+  def -(s: Size): Point = this - Point(s.width, s.height)
 
   def -(p: Point): Point = this + -p
 

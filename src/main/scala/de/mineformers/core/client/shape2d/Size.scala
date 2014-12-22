@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.shape2d
 
-import scala.collection.mutable
 import de.mineformers.core.client.shape2d.Size.Dimensions
+
+import scala.collection.mutable
 
 /**
  * Size
@@ -34,7 +34,6 @@ import de.mineformers.core.client.shape2d.Size.Dimensions
  */
 object Size {
   private val cache = new mutable.WeakHashMap[Dimensions, Size]
-
   type Dimensions = (Int, Int)
 
   /**

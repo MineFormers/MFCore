@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.structure
 
-import cpw.mods.fml.relauncher.{SideOnly, Side}
+import cpw.mods.fml.relauncher.{Side, SideOnly}
 import de.mineformers.core.client.renderer.StructureChunkRenderer
 import de.mineformers.core.util.world.BlockPos
 import net.minecraft.block.Block
@@ -35,11 +34,11 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{MathHelper, AxisAlignedBB}
+import net.minecraft.util.{AxisAlignedBB, MathHelper}
+import net.minecraft.world._
 import net.minecraft.world.biome.BiomeGenBase
 import net.minecraft.world.chunk.IChunkProvider
 import net.minecraft.world.storage.SaveHandlerMP
-import net.minecraft.world._
 import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.mutable
@@ -68,27 +67,9 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
       }
     }
   }
-
   val localWorldAccess: StructureWorldAccess = if (side.isClient) new StructureWorldAccessClient(this) else null
-
   if (localWorldAccess != null)
     worldAccesses.asInstanceOf[java.util.List[IWorldAccess]].add(localWorldAccess)
-
-  def update(): Unit = {
-    import scala.collection.JavaConversions._
-    for (a <- worldAccesses) {
-      a match {
-        case s: StructureWorldAccess =>
-          s.update()
-        case _ =>
-      }
-    }
-  }
-
-  override def getBlock(x: Int, y: Int, z: Int): Block = {
-    val info = structure.getBlock(x, y, z)
-    if (info != null) info.getBlock else Blocks.air
-  }
 
   override def getBlockMetadata(x: Int, y: Int, z: Int): Int = {
     val info = structure.getBlock(x, y, z)
@@ -107,6 +88,11 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
       true
     else
       default
+  }
+
+  override def getBlock(x: Int, y: Int, z: Int): Block = {
+    val info = structure.getBlock(x, y, z)
+    if (info != null) info.getBlock else Blocks.air
   }
 
   override def isAirBlock(x: Int, y: Int, z: Int): Boolean = {
@@ -166,6 +152,23 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
     tiles.clear()
   }
 
+  def checkChunks(pos: BlockPos): Unit = {
+    if (pos.sharesChunk(bounds)) {
+      update()
+    }
+  }
+
+  def update(): Unit = {
+    import scala.collection.JavaConversions._
+    for (a <- worldAccesses) {
+      a match {
+        case s: StructureWorldAccess =>
+          s.update()
+        case _ =>
+      }
+    }
+  }
+
   def bounds = AxisAlignedBB.getBoundingBox(pos.x, pos.y, pos.z, pos.x + width, pos.y + height, pos.z + length)
 
   def width = structure.getWidth
@@ -173,12 +176,6 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
   def length = structure.getLength
 
   def height = structure.getHeight
-
-  def checkChunks(pos: BlockPos): Unit = {
-    if (pos.sharesChunk(bounds)) {
-      update()
-    }
-  }
 
   override def tick(): Unit = {
     structure.update(this)
@@ -277,6 +274,8 @@ class StructureWorldAccessClient(world: StructureWorld) extends StructureWorldAc
     }
   }
 
+  override def markBlockForRenderUpdate(x: Int, y: Int, z: Int): Unit = markBlockForUpdate(x, y, z)
+
   override def markBlockForUpdate(x: Int, y: Int, z: Int): Unit = {
     for (render <- chunkRenderers) {
       if (BlockPos(x, y, z).containedBy(render.bounds)) {
@@ -284,8 +283,6 @@ class StructureWorldAccessClient(world: StructureWorld) extends StructureWorldAc
       }
     }
   }
-
-  override def markBlockForRenderUpdate(x: Int, y: Int, z: Int): Unit = markBlockForUpdate(x, y, z)
 
   def createRenderChunkList(): List[StructureChunkRenderer] = {
     val width = (world.width - 1) / 16 + 1

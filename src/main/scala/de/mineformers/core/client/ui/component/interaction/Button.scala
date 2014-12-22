@@ -21,13 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.interaction
 
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.TextComponent
-import de.mineformers.core.client.shape2d.{Size, Point}
-import de.mineformers.core.client.ui.util.{ComponentEvent, MouseButton, Font}
-import ComponentEvent.{ButtonPressed, ComponentClicked}
+import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ComponentClicked}
+import de.mineformers.core.client.ui.util.{ComponentEvent, Font, MouseButton}
 
 /**
  * Button

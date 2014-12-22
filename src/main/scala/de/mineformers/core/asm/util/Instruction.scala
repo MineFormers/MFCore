@@ -23,11 +23,11 @@
  *  * THE SOFTWARE.
  *
  */
-
 package de.mineformers.core.asm.util
 
+import org.objectweb.asm.tree._
 import org.objectweb.asm.{Label, Opcodes, tree}
-import tree._
+
 import scala.language.implicitConversions
 
 abstract sealed class Instruction[+A <: AbstractInsnNode](opcode: Int) {
@@ -46,13 +46,13 @@ object Instruction {
   implicit def insList2seq[A <: Instruction[_]](insnList: InsnList): Seq[A] = {
     val builder = Seq.newBuilder[A]
     val iterator = insnList.iterator
-    import Conversions.asm2any
+    import de.mineformers.core.asm.util.Instruction.Conversions.asm2any
     while (iterator.hasNext)
       builder += asm2any(iterator.next()).asInstanceOf[A]
     builder.result()
   }
 
-  import Opcodes._
+  import org.objectweb.asm.Opcodes._
 
   val legalSimpleOpcodes = Seq(NOP, ACONST_NULL, ICONST_M1, ICONST_0, ICONST_1, ICONST_2, ICONST_3, ICONST_4, ICONST_5, LCONST_0, LCONST_1, FCONST_0, FCONST_1, FCONST_2, DCONST_0, DCONST_1, IALOAD, LALOAD, FALOAD, DALOAD, AALOAD, BALOAD, CALOAD, SALOAD, IASTORE, LASTORE, FASTORE, DASTORE, AASTORE, BASTORE, CASTORE, SASTORE, POP, POP2, DUP, DUP_X1, DUP_X2, DUP2, DUP2_X1, DUP2_X2, SWAP, IADD, LADD, FADD, DADD, ISUB, LSUB, FSUB, DSUB, IMUL, LMUL, FMUL, DMUL, IDIV, LDIV, FDIV, DDIV, IREM, LREM, FREM, DREM, INEG, LNEG, FNEG, DNEG, ISHL, LSHL, ISHR, LSHR, IUSHR, LUSHR, IAND, LAND, IOR, LOR, IXOR, LXOR, I2L, I2F, I2D, L2I, L2F, L2D, F2I, F2L, F2D, D2I, D2L, D2F, I2B, I2C, I2S, LCMP, FCMPL, FCMPG, DCMPL, DCMPG, IRETURN, LRETURN, FRETURN, DRETURN, ARETURN, RETURN, ARRAYLENGTH, ATHROW, MONITORENTER, MONITOREXIT)
   val legalVarOpcodes = Seq(ILOAD, LLOAD, FLOAD, DLOAD, ALOAD, ISTORE, LSTORE, FSTORE, DSTORE, ASTORE, RET)
@@ -64,7 +64,6 @@ object Instruction {
 
   case class Simple(opcode: Int) extends Instruction[InsnNode](opcode) {
     require(legalSimpleOpcodes contains opcode)
-
     override lazy val asm: InsnNode = new InsnNode(opcode)
   }
 
@@ -80,37 +79,31 @@ object Instruction {
 
   case class Var(opcode: Int, variable: Int) extends Instruction[VarInsnNode](opcode) {
     require(legalVarOpcodes contains opcode)
-
     override lazy val asm: VarInsnNode = new VarInsnNode(opcode, variable)
   }
 
   case class IntOp(opcode: Int, operand: Int) extends Instruction[IntInsnNode](opcode) {
     require(legalIntOpcodes contains opcode)
-
     override lazy val asm: IntInsnNode = new IntInsnNode(opcode, operand)
   }
 
   case class FieldOp(opcode: Int, owner: String, name: String, desc: String) extends Instruction[FieldInsnNode](opcode) {
     require(legalFieldOpcodes contains opcode)
-
     override lazy val asm: FieldInsnNode = new FieldInsnNode(opcode, owner, name, desc)
   }
 
   case class MethodOp(opcode: Int, owner: String, name: String, desc: String) extends Instruction[MethodInsnNode](opcode) {
     require(legalMethodOpcodes contains opcode)
-
     override lazy val asm: MethodInsnNode = new MethodInsnNode(opcode, owner, name, desc)
   }
 
   case class Jump(opcode: Int, label: LabelOp) extends Instruction[JumpInsnNode](opcode) {
     require(legalJumpOpcodes contains opcode)
-
     override lazy val asm: JumpInsnNode = new JumpInsnNode(opcode, label.asm)
   }
 
   case class TypeOp(opcode: Int, desc: String) extends Instruction[TypeInsnNode](opcode) {
     require(legalTypeOpcodes contains opcode)
-
     override lazy val asm: TypeInsnNode = new TypeInsnNode(opcode, desc)
   }
 
@@ -133,7 +126,6 @@ object Instruction {
     private val asmLabels = labels map {
       _.asm
     }
-
     override lazy val asm: TableSwitchInsnNode = new TableSwitchInsnNode(min, max, default.asm, asmLabels: _*)
   }
 
@@ -141,7 +133,6 @@ object Instruction {
     private val asmLabels = labels map {
       _.asm
     }
-
     override lazy val asm: LookupSwitchInsnNode = new LookupSwitchInsnNode(default.asm, keys.toArray, asmLabels.toArray)
   }
 

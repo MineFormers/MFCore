@@ -25,8 +25,8 @@ package de.mineformers.core.item
 
 import cpw.mods.fml.common.Loader
 import de.mineformers.core.mod.MFMod
-import net.minecraft.item.Item
 import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.item.Item
 
 /**
  * BaseItem
@@ -37,7 +37,6 @@ import net.minecraft.creativetab.CreativeTabs
  * @author PaleoCrafter
  */
 class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
-
   def this(name: String, tab: CreativeTabs) = this(name, name, tab)
 
   this.setUnlocalizedName({
@@ -57,5 +56,4 @@ class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
       case _ => mod.getModId.toLowerCase + ":" + texture
     }
   })
-
 }

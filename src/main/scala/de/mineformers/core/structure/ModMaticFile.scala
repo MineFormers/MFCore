@@ -21,20 +21,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.structure
 
-import de.mineformers.core.util.Log
-import net.minecraft.util.ResourceLocation
-import net.minecraft.nbt.{NBTTagString, NBTTagList, NBTTagCompound, CompressedStreamTools}
-import de.mineformers.core.util.ResourceUtils._
 import java.io.IOException
-import net.minecraftforge.common.util.Constants.NBT._
-import net.minecraft.block.Block
+import java.nio.{ByteBuffer, ByteOrder, ShortBuffer}
+
+import de.mineformers.core.util.Log
+import de.mineformers.core.util.ResourceUtils._
 import de.mineformers.core.util.world.BlockPos
-import java.nio.{ByteOrder, ByteBuffer, ShortBuffer}
-import scala.collection.immutable.HashMap
+import net.minecraft.block.Block
 import net.minecraft.init.Blocks
+import net.minecraft.nbt.{CompressedStreamTools, NBTTagCompound, NBTTagList, NBTTagString}
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.common.util.Constants.NBT._
+
+import scala.collection.immutable.HashMap
 import scala.collection.mutable
 
 /**
@@ -128,7 +129,7 @@ object ModMaticFile {
         for (z <- 0 until length - layer.length)
           writeBlock(y, tiles, typeStrings, buf, types, null)
       }
-      for(x <- 0 until width - layer.width; z <- 0 until length)
+      for (x <- 0 until width - layer.width; z <- 0 until length)
         writeBlock(y, tiles, typeStrings, buf, types, null)
       y += 1
     }

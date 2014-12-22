@@ -21,11 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.mod
 
 import cpw.mods.fml.common.Mod.EventHandler
-import cpw.mods.fml.common.event.{FMLPostInitializationEvent, FMLInitializationEvent, FMLPreInitializationEvent}
+import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import de.mineformers.core.util.ResourceUtils.Resource
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.ItemStack
@@ -35,9 +34,7 @@ trait MFMod {
   val ModId: String
   val ModName: String
   val ResourcePath: String = ModId.toLowerCase
-
   lazy val CreativeTab: CreativeTabs = new MFCreativeTab(ModName, tabItem)
-
   val Log: Logger = LogManager.getLogger(ModId)
 
   def apply(resource: String) = Resource(ResourcePath, resource)
@@ -58,5 +55,4 @@ trait MFMod {
 
   @EventHandler
   def postInit(event: FMLPostInitializationEvent): Unit
-
 }

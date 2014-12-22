@@ -21,23 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.network
 
+import java.lang.{Boolean => JBoolean, Byte => JByte, Double => JDouble, Float => JFloat, Long => JLong, Short => JShort}
+
+import cpw.mods.fml.common.network.ByteBufUtils
 import cpw.mods.fml.common.network.simpleimpl.IMessage
+import cpw.mods.fml.relauncher.Side
 import de.mineformers.core.network.serializer.TileDescriptionSerializer
 import de.mineformers.core.tileentity.TileDescription
 import io.netty.buffer.ByteBuf
+import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.network.{NetHandlerPlayServer, INetHandler}
-import cpw.mods.fml.common.network.ByteBufUtils
+import net.minecraft.network.{INetHandler, NetHandlerPlayServer}
 import net.minecraftforge.common.util.ForgeDirection
+
 import scala.collection.immutable.HashMap
-import cpw.mods.fml.relauncher.Side
-import net.minecraft.client.network.NetHandlerPlayClient
 import scala.language.existentials
-import java.lang.{Byte => JByte, Short => JShort, Long => JLong, Boolean => JBoolean, Double => JDouble, Float => JFloat}
 
 /**
  * Message
@@ -77,14 +78,12 @@ class Message extends IMessage {
   }
 
   val fields = this.getClass.getDeclaredFields.sortBy(_.getName)
-
   var _serializers: Map[String, Message.Serializer[Any]] = null
 }
 
 object Message {
   type NetReaction = PartialFunction[(Message, Message.Context), Message]
   private var serializers = HashMap.empty[Class[_], Serializer[Any]]
-
   addSerializer(classOf[String], new Serializer[String] {
     override def serialize0(target: String, buffer: ByteBuf): Unit = ByteBufUtils.writeUTF8String(buffer, target)
 

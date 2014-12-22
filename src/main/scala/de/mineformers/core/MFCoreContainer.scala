@@ -23,19 +23,21 @@
  */
 package de.mineformers.core
 
-import cpw.mods.fml.common.{LoadController, ModMetadata, DummyModContainer}
-import com.google.common.collect.ImmutableList
-import com.google.common.eventbus.{Subscribe, EventBus}
-import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
 import java.io.File
+
+import com.google.common.collect.ImmutableList
+import com.google.common.eventbus.{EventBus, Subscribe}
 import cpw.mods.fml.client.{FMLFileResourcePack, FMLFolderResourcePack}
+import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
+import cpw.mods.fml.common.{DummyModContainer, LoadController, ModMetadata}
 import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.network.{TileDescriptionMessage, MFNetworkWrapper}
-import de.mineformers.core.registry.SharedBlockRegistry
-import de.mineformers.core.tileentity.{TileDescription, Describable}
-import net.minecraft.client.Minecraft
-import de.mineformers.core.client.ui.skin.{TextureLoader, GuiMetadataSectionDeserializer, GuiMetadataSection}
+import de.mineformers.core.block.TestBlock
+import de.mineformers.core.client.ui.skin.{GuiMetadataSection, GuiMetadataSectionDeserializer, TextureLoader}
+import de.mineformers.core.network.{MFNetworkWrapper, TileDescriptionMessage}
+import de.mineformers.core.registry.{SharedBlockRegistry, SharedItemRegistry}
+import de.mineformers.core.tileentity.Describable
 import de.mineformers.core.util.renderer.GuiUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.SimpleReloadableResourceManager
 
 /**
@@ -70,6 +72,7 @@ class MFCoreContainer extends DummyModContainer(new ModMetadata) {
   def preInit(event: FMLPreInitializationEvent): Unit = {
     MFCore.net = new MFNetworkWrapper("MFCore")
     MFCore.net.register[TileDescriptionMessage]()
+    SharedBlockRegistry.add("test123", new TestBlock)
     Proxy.preInit(event)
     Proxy.getClass.getDeclaredMethods
   }
@@ -117,5 +120,6 @@ object Proxy {
   @SideOnly(Side.CLIENT)
   def clientInit(): Unit = {
     SharedBlockRegistry.registerRenderers()
+    SharedItemRegistry.registerRenderers()
   }
 }

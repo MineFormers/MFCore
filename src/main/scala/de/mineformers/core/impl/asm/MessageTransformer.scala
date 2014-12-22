@@ -21,20 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.impl.asm
 
 import de.mineformers.core.asm.transformer.ClassTransformer
-import de.mineformers.core.asm.util.Hierarchy
-import de.mineformers.core.asm.util.Instruction
-import Instruction._
-import Hierarchy.{Field, Method}
-import Hierarchy.Conversions._
-import org.objectweb.asm.tree._
-import de.mineformers.core.asm.util.ClassInfo
+import de.mineformers.core.asm.util.Hierarchy.Conversions._
+import de.mineformers.core.asm.util.Hierarchy.{Field, Method}
+import de.mineformers.core.asm.util.{ClassInfo, Hierarchy, Instruction}
+import de.mineformers.core.asm.util.Instruction._
+import de.mineformers.core.network.Message
 import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.Type
-import de.mineformers.core.network.Message
+import org.objectweb.asm.tree._
 
 /**
  * MessageTransformer

@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.ui.util.{MouseEvent, MouseButton}
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 
 /**
  * Focusable

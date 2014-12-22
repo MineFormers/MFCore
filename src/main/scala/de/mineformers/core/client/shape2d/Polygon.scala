@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.shape2d
 
+import de.mineformers.core.client.shape2d.Polygon.{Corner, Edge, Edges}
+
 import scala.collection.mutable
-import de.mineformers.core.client.shape2d.Polygon.{Edge, Corner, Edges}
 
 /**
  * Polygon
@@ -34,7 +34,6 @@ import de.mineformers.core.client.shape2d.Polygon.{Edge, Corner, Edges}
  */
 object Polygon {
   private val cache = new mutable.HashMap[Edges, Polygon]
-
   type Edges = Seq[Edge]
 
   /**
@@ -51,7 +50,6 @@ object Polygon {
   }
 
   case class Edge(p1: Point, p2: Point) {
-
   }
 
 }
@@ -62,7 +60,6 @@ class Polygon(val edges: Edges) extends Shape[Polygon] {
   def nPoints = nEdges
 
   lazy val points: Seq[Point] = edges.map(_.p1)
-
   lazy val corners: Seq[Corner] = edges.sliding(2).map({ case Seq(e1, e2) => Corner(e1, e2)}).toSeq :+ Corner(edges(0), edges.last)
 
   override def intersect(r: Rectangle): Option[Polygon] = None
@@ -100,5 +97,4 @@ class Polygon(val edges: Edges) extends Shape[Polygon] {
       Rectangle(boundsMinX, boundsMinY, boundsMaxX, boundsMaxY)
     }
   }
-
 }

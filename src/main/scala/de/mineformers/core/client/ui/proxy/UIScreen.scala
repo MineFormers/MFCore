@@ -21,16 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
-import net.minecraft.client.gui.GuiScreen
-import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.shape2d.Point
-import org.lwjgl.input.Mouse
-import de.mineformers.core.util.renderer.GuiUtils
+import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.ui.component.decoration.Tooltip
+import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
+import de.mineformers.core.util.renderer.GuiUtils
+import net.minecraft.client.gui.GuiScreen
+import org.lwjgl.input.Mouse
 
 /**
  * UIScreen
@@ -90,7 +89,7 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
     frame.skin.draw(p)
     tooltip.screen = p + Point(5, 5)
     val text = frame.deepTooltip(p)
-    if(text != null) {
+    if (text != null) {
       tooltip.text = text
       tooltip.skin.draw(p)
     }

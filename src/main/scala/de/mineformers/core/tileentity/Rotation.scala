@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.tileentity
 
 import net.minecraft.tileentity.TileEntity
@@ -34,7 +33,6 @@ import net.minecraftforge.common.util.ForgeDirection
  */
 trait Rotation {
   this: TileEntity =>
-
   @Describing
   var rotation = ForgeDirection.SOUTH
 }

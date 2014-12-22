@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.asm.transformer
 
-import org.objectweb.asm.tree.ClassNode
 import de.mineformers.core.asm.util.ClassInfo
+import org.objectweb.asm.tree.ClassNode
 
 /**
  * ClassTransformer
@@ -32,7 +32,6 @@ import de.mineformers.core.asm.util.ClassInfo
  * @author PaleoCrafter
  */
 trait ClassTransformer {
-
   /**
    * Transform the given [[ClassNode]]
    * @param clazz the class to transform
@@ -48,5 +47,4 @@ trait ClassTransformer {
    * @return true, if the transformer needs to edit it
    */
   def transforms(className: String): Boolean
-
 }

@@ -21,21 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.structure
 
+import de.mineformers.core.util.Implicits._
 import net.minecraft.block.Block
-import net.minecraft.entity.{EntityList, Entity}
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.{Entity, EntityList}
 import net.minecraft.init.Blocks
-import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.nbt.NBTTagDouble
-import net.minecraft.nbt.NBTTagList
+import net.minecraft.nbt.{NBTTagCompound, NBTTagDouble, NBTTagList}
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.AxisAlignedBB
 import net.minecraft.world.World
 import net.minecraftforge.common.util.Constants
-import net.minecraft.util.AxisAlignedBB
-import de.mineformers.core.util.Implicits._
-import net.minecraft.entity.player.EntityPlayer
 
 /**
  * StructureHelper

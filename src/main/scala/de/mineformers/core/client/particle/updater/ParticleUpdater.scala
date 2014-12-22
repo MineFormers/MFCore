@@ -21,14 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.particle.updater
 
+import de.mineformers.core.client.particle.ParticleFX
 import de.mineformers.core.client.util.RenderUtils
+import net.minecraft.client.particle.EntityFX
 import net.minecraft.client.renderer.Tessellator
 import org.lwjgl.opengl.GL11
-import net.minecraft.client.particle.EntityFX
-import de.mineformers.core.client.particle.ParticleFX
 
 /**
  * ParticleUpdater
@@ -36,7 +35,6 @@ import de.mineformers.core.client.particle.ParticleFX
  * @author PaleoCrafter
  */
 trait ParticleUpdater {
-
   def update(particle: ParticleFX): Unit
 
   def render(tessellator: Tessellator, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float, fx: ParticleFX) {
@@ -78,6 +76,4 @@ trait ParticleUpdater {
 
     GL11.glPopMatrix()
   }
-
-
 }

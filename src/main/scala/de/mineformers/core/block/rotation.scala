@@ -21,22 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.block
 
 import cpw.mods.fml.relauncher.SideOnly
 import de.mineformers.core.block.Rotatable.Side
 import de.mineformers.core.tileentity.Rotation
-import net.minecraft.block.{BlockPistonBase, Block}
+import de.mineformers.core.util.Implicits.RichWorld
+import de.mineformers.core.util.world.Vector3
+import net.minecraft.block.{Block, BlockPistonBase}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{IIcon, MathHelper}
+import net.minecraft.util.{AxisAlignedBB, IIcon, MathHelper}
 import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.common.util.ForgeDirection
-import de.mineformers.core.util.Implicits.RichWorld
 
 /**
  * Rotatable
@@ -45,14 +45,13 @@ import de.mineformers.core.util.Implicits.RichWorld
  */
 trait Rotatable {
   this: Block =>
-
   def hasSingleIcon = false
 
   def canRotate(world: World, x: Int, y: Int, z: Int, axis: ForgeDirection): Boolean = true
 
   def setRotation(world: World, x: Int, y: Int, z: Int, rotation: ForgeDirection): Boolean
 
-  def getRotation(world: World, x: Int, y: Int, z: Int): ForgeDirection
+  def getRotation(world: IBlockAccess, x: Int, y: Int, z: Int): ForgeDirection
 
   @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def getIcon(world: World, x: Int, y: Int, z: Int, side: Rotatable.Side): IIcon = getIcon(world.getBlockMetadata(x, y, z), side)
@@ -90,11 +89,44 @@ trait Rotatable {
   @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   def defaultIcon: String = null
 
+  def getBoundingBox(world: IBlockAccess, x: Int, y: Int, z: Int): AxisAlignedBB = AxisAlignedBB.getBoundingBox(0, 0, 0, 1, 1, 1)
+
+  def getRotatedBoundingBox(world: IBlockAccess, x: Int, y: Int, z: Int) = rotateBox(world, x, y, z, getBoundingBox(world, x, y, z), getRotation(world, x, y, z))
+
+  def rotateBox(world: IBlockAccess, x: Int, y: Int, z: Int, box: AxisAlignedBB, rotation: ForgeDirection): AxisAlignedBB = {
+    import net.minecraftforge.common.util.ForgeDirection._
+    val min = rotation match {
+      case UP => Vector3(box.minX, box.minY, box.minZ)
+      case DOWN => Vector3(1 - box.maxX, 1 - box.maxY, 1 - box.maxZ)
+      case SOUTH => Vector3(box.minX, box.minZ, box.minY)
+      case NORTH => Vector3(1 - box.maxX, 1 - box.maxZ, 1 - box.maxY)
+      case EAST => Vector3(box.minY, box.minX, box.minZ)
+      case WEST => Vector3(1 - box.maxY, 1 - box.maxX, 1 - box.maxZ)
+      case _ => Vector3(0, 0, 0)
+    }
+    val max = rotation match {
+      case UP => Vector3(box.maxX, box.maxY, box.maxZ)
+      case DOWN => Vector3(1 - box.minX, 1 - box.minY, 1 - box.minZ)
+      case SOUTH => Vector3(box.maxX, box.maxZ, box.maxY)
+      case NORTH => Vector3(1 - box.minX, 1 - box.minZ, 1 - box.minY)
+      case EAST => Vector3(box.maxY, box.maxX, box.maxZ)
+      case WEST => Vector3(1 - box.minY, 1 - box.minX, 1 - box.minZ)
+      case _ => Vector3(1, 1, 1)
+    }
+    AxisAlignedBB.getBoundingBox(min.x, min.y, min.z, max.x, max.y, max.z)
+  }
+
+  override def setBlockBoundsBasedOnState(world: IBlockAccess, x: Int, y: Int, z: Int): Unit = {
+    val box = getRotatedBoundingBox(world, x, y, z)
+    setBlockBounds(box.minX.toFloat, box.minY.toFloat, box.minZ.toFloat, box.maxX.toFloat, box.maxY.toFloat, box.maxZ.toFloat)
+  }
+
+  override def getCollisionBoundingBoxFromPool(world: World, x: Int, y: Int, z: Int): AxisAlignedBB = getRotatedBoundingBox(world, x, y, z).offset(x, y, z)
+
   protected val icons = collection.mutable.Map.empty[String, IIcon]
 }
 
 object Rotatable {
-
   type Side = Side.ValueLike[Any]
 
   object Side extends Enumeration {
@@ -104,13 +136,12 @@ object Rotatable {
     val Bottom: SideLike = Value(3)
     val Left: SideLike = Value(4)
     val Right: SideLike = Value(5)
-
     val Sides: SidesLike = Seq(Top.value, Bottom.value, Left.value, Right.value)
     val VerticalSides: SidesLike = Seq(Top.value, Bottom.value)
     val HorizontalSides: SidesLike = Seq(Left.value, Right.value)
     val Mantle: SidesLike = Sides.value :+ Back.value
 
-    import ForgeDirection._
+    import net.minecraftforge.common.util.ForgeDirection._
 
     def fromDirection(dir: ForgeDirection) = dir match {
       case UP => Top
@@ -144,7 +175,7 @@ object Rotatable {
 trait Rotatable4D extends Rotatable {
   this: Block =>
 
-  import ForgeDirection._
+  import net.minecraftforge.common.util.ForgeDirection._
 
   override def rotateBlock(world: World, x: Int, y: Int, z: Int, axis: ForgeDirection): Boolean = axis match {
     case UP | DOWN =>
@@ -169,7 +200,7 @@ trait Rotatable4D extends Rotatable {
   @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIconSide(side: ForgeDirection, rotation: ForgeDirection): Rotatable.Side = {
     val opposite = rotation.getOpposite
-    import Rotatable.Side._
+    import de.mineformers.core.block.Rotatable.Side._
     side match {
       case `rotation` => Front
       case `opposite` => Back
@@ -181,7 +212,7 @@ trait Rotatable4D extends Rotatable {
 
   @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIcon(meta: Int, side: Side): IIcon = {
-    import Rotatable.Side._
+    import de.mineformers.core.block.Rotatable.Side._
     side match {
       case Front => icons("front")
       case Back => icons("back")
@@ -197,7 +228,6 @@ trait Rotatable4D extends Rotatable {
 
 trait Rotatable6D extends Rotatable {
   this: Block =>
-
   override def rotateBlock(world: World, x: Int, y: Int, z: Int, axis: ForgeDirection): Boolean = this.setRotation(world, x, y, z, axis)
 
   override def onBlockPlacedBy(world: World, x: Int, y: Int, z: Int, entity: EntityLivingBase, stack: ItemStack): Unit = {
@@ -210,7 +240,7 @@ trait Rotatable6D extends Rotatable {
   @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIconSide(side: ForgeDirection, rotation: ForgeDirection): Rotatable.Side = {
     val opposite = rotation.getOpposite
-    import Rotatable.Side._
+    import de.mineformers.core.block.Rotatable.Side._
     side match {
       case `rotation` => Front
       case `opposite` => Back
@@ -220,7 +250,7 @@ trait Rotatable6D extends Rotatable {
 
   @SideOnly(cpw.mods.fml.relauncher.Side.CLIENT)
   override def getIcon(meta: Int, side: Side): IIcon = {
-    import Rotatable.Side._
+    import de.mineformers.core.block.Rotatable.Side._
     side match {
       case Front => icons("front")
       case Back => icons("back")
@@ -234,7 +264,6 @@ trait Rotatable6D extends Rotatable {
 
 trait MetaRotation {
   this: Block with Rotatable =>
-
   override def setRotation(world: World, x: Int, y: Int, z: Int, rotation: ForgeDirection): Boolean = {
     if (canRotate(world, x, y, z, rotation)) {
       world.setBlockMetadataWithNotify(x, y, z, rotation.ordinal(), 2)
@@ -242,7 +271,7 @@ trait MetaRotation {
     } else {
       ForgeDirection.VALID_DIRECTIONS find {
         d =>
-          world.isSideSolid(x + d.offsetX, y + d.offsetY, z + d.offsetZ, d.getOpposite)
+          canRotate(world, x, y, z, d)
       } match {
         case Some(d) =>
           setRotation(world, x, y, z, d)
@@ -251,12 +280,11 @@ trait MetaRotation {
     }
   }
 
-  override def getRotation(world: World, x: Int, y: Int, z: Int): ForgeDirection = ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z))
+  override def getRotation(world: IBlockAccess, x: Int, y: Int, z: Int): ForgeDirection = ForgeDirection.getOrientation(world.getBlockMetadata(x, y, z))
 }
 
 trait TileRotation {
   this: Block with TileProvider[_ <: TileEntity with Rotation] with Rotatable =>
-
   override def setRotation(world: World, x: Int, y: Int, z: Int, rotation: ForgeDirection): Boolean = {
     if (canRotate(world, x, y, z, rotation)) {
       world.getTileEntity(x, y, z).asInstanceOf[Rotation].rotation = rotation
@@ -268,5 +296,5 @@ trait TileRotation {
     }
   }
 
-  override def getRotation(world: World, x: Int, y: Int, z: Int): ForgeDirection = world.getTileEntity(x, y, z).asInstanceOf[Rotation].rotation
+  override def getRotation(world: IBlockAccess, x: Int, y: Int, z: Int): ForgeDirection = world.getTileEntity(x, y, z).asInstanceOf[Rotation].rotation
 }

@@ -23,9 +23,9 @@
  */
 package de.mineformers.core.item
 
-import net.minecraft.util.IIcon
 import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.item.ItemStack
+import net.minecraft.util.IIcon
 
 /**
  * SubItem
@@ -33,7 +33,6 @@ import net.minecraft.item.ItemStack
  * @author PaleoCrafter
  */
 trait SubItem {
-
   /**
    * @return the unlocalized name for this SubItem
    */
@@ -64,5 +63,4 @@ trait SubItem {
   def registerIcons(register: IIconRegister): Unit = register.registerIcon(texture)
 
   protected var icon: IIcon = null
-
 }

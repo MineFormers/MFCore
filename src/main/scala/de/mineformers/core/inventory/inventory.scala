@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.inventory
 
 import cpw.mods.fml.relauncher.ReflectionHelper
@@ -86,12 +85,6 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
     else
       content(slot)
 
-  override def setInventorySlotContents(slot: Int, stack: ItemStack): Unit =
-    if (slot >= 0 && slot < getSizeInventory) {
-      content(slot) = stack
-      markDirty()
-    }
-
   override def decrStackSize(slot: Int, count: Int): ItemStack =
     this(slot) match {
       case Some(stack) =>
@@ -112,13 +105,19 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
       case _ => null
     }
 
+  override def setInventorySlotContents(slot: Int, stack: ItemStack): Unit =
+    if (slot >= 0 && slot < getSizeInventory) {
+      content(slot) = stack
+      markDirty()
+    }
+
+  override def markDirty(): Unit = publish(InventoryChanged(this))
+
   override def getStackInSlotOnClosing(slot: Int): ItemStack = {
     val stack = getStackInSlot(slot)
     setInventorySlotContents(slot, null)
     stack
   }
-
-  override def markDirty(): Unit = publish(InventoryChanged(this))
 
   override def getInventoryStackLimit: Int = 64
 
@@ -158,11 +157,11 @@ object InventoryHolder {
   trait Sided extends InventoryHolder with ISidedInventory {
     val accessibleSlots: Map[ForgeDirection, Array[Int]]
 
-    override def getAccessibleSlotsFromSide(side: Int): Array[Int] = accessibleSlots.getOrElse(ForgeDirection.getOrientation(side), Array.empty[Int])
-
     override def canInsertItem(slot: Int, stack: ItemStack, side: Int): Boolean = getAccessibleSlotsFromSide(side).contains(slot) && isItemValidForSlot(slot, stack)
 
     override def canExtractItem(slot: Int, stack: ItemStack, side: Int): Boolean = getAccessibleSlotsFromSide(side).contains(slot) && isItemValidForSlot(slot, stack)
+
+    override def getAccessibleSlotsFromSide(side: Int): Array[Int] = accessibleSlots.getOrElse(ForgeDirection.getOrientation(side), Array.empty[Int])
   }
 
 }

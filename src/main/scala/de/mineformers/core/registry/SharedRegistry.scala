@@ -34,7 +34,6 @@ import scala.collection.{GenSet, mutable}
  * @tparam V the value type
  */
 trait SharedRegistry[K, V] extends mutable.Iterable[(K, V)] {
-
   private val mappings: mutable.Map[K, V] = mutable.HashMap[K, V]()
 
   /**
@@ -125,5 +124,4 @@ trait SharedRegistry[K, V] extends mutable.Iterable[(K, V)] {
    * @return an iterator for all the values
    */
   def values: Iterable[V] = mappings.values
-
 }

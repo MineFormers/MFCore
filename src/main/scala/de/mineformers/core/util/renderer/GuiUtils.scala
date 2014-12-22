@@ -21,25 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util.renderer
 
-import net.minecraft.client.Minecraft
+import java.io.IOException
+import javax.imageio.ImageIO
+
+import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.client.ui.util.Font
 import de.mineformers.core.client.util.RenderUtils._
-import org.lwjgl.util.Color
-import org.lwjgl.opengl.GL11
+import de.mineformers.core.util.ResourceUtils.Resource
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.entity.RenderItem
-import net.minecraft.util.{IIcon, ResourceLocation}
 import net.minecraft.item.ItemStack
+import net.minecraft.util.{IIcon, ResourceLocation}
+import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
-import de.mineformers.core.client.ui.util.Font
-import de.mineformers.core.client.shape2d.Size
-import de.mineformers.core.util.ResourceUtils.Resource
-import javax.imageio.ImageIO
-import java.io.IOException
-import net.minecraft.client.gui.ScaledResolution
+import org.lwjgl.util.Color
 
 /**
  * GuiUtils

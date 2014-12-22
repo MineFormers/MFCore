@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.mod
 
-import de.mineformers.core.registry.{SharedItemRegistry, SharedBlockRegistry}
+import de.mineformers.core.registry.{SharedBlockRegistry, SharedItemRegistry}
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 

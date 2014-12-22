@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.structure
+
+import net.minecraft.block.Block
+import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.world.World
+import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.mutable
 import scala.util.control.Breaks
-import net.minecraft.world.World
-import net.minecraft.block.Block
-import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * configurable
@@ -83,11 +83,6 @@ class StructureBuilder {
       StructureBuilder.this.layer(pattern: _*)
     }
 
-    def layer(required: Boolean, min: Int, max: Int, pattern: String*): LayerBuilder = {
-      buildLayer()
-      StructureBuilder.this.layer(required, min, max, pattern: _*)
-    }
-
     private[StructureBuilder] def buildLayer(): Unit = {
       val width = pattern.foldLeft("")((a: String, b: String) => if (b.length > a.length) b else a).length
       val length = pattern.length
@@ -108,6 +103,11 @@ class StructureBuilder {
       }
 
       layers append layer
+    }
+
+    def layer(required: Boolean, min: Int, max: Int, pattern: String*): LayerBuilder = {
+      buildLayer()
+      StructureBuilder.this.layer(required, min, max, pattern: _*)
     }
 
     class InfoBuilder(c: Char) {
@@ -134,7 +134,7 @@ class StructureConfiguration(possibleLayers: Seq[ConfigurableLayer]) {
 
   def build(): Structure = {
     val structure = new Structure
-    import Breaks._
+    import scala.util.control.Breaks._
     for (y <- 0 until possibleLayers.length) {
       breakable {
         val confLayer = possibleLayers(y)
@@ -156,14 +156,14 @@ class StructureConfiguration(possibleLayers: Seq[ConfigurableLayer]) {
 class ConfigurableLayer(width: Int, length: Int, val required: Boolean = false, val min: Int = 0, val max: Int = -1) extends Layer(width, length) {
   def this(l: Layer) = {
     this(l.width, l.length)
-    for(x <- l.blocks; b <- x)
+    for (x <- l.blocks; b <- x)
       set(b)
   }
 }
 
 class MultiBlockInfo(_x: Int, _z: Int, var blocks: Seq[BlockEntry]) extends BlockInfo(_x, _z) {
-  private var i = 0
   var delay = 200
+  private var i = 0
   private var last: Long = 0
 
   override def update(world: StructureWorld, y: Int): Unit = {

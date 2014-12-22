@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.inventory.slot
 
 import net.minecraft.inventory.{IInventory, Slot}
@@ -32,11 +31,11 @@ import net.minecraft.inventory.{IInventory, Slot}
  * @author PaleoCrafter
  */
 class BaseSlot(inventory: IInventory, id: Int, x: Int, y: Int) extends Slot(inventory, id, x, y) {
+  var change: Slot => Unit = _
+
   override def onSlotChanged(): Unit = {
     super.onSlotChanged()
     if (change != null)
       change(this)
   }
-
-  var change: Slot => Unit = _
 }

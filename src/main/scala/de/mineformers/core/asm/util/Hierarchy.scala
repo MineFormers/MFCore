@@ -48,13 +48,13 @@
  *  * THE SOFTWARE.
  *
  */
-
 package de.mineformers.core.asm.util
 
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree._
-import scala.language.implicitConversions
+
 import scala.collection.mutable
+import scala.language.implicitConversions
 
 /**
  * Hierarchy
@@ -85,9 +85,8 @@ object Hierarchy {
 
   case class Method(access: Int, name: String, desc: String, signature: String = null, exceptions: Traversable[String] = null) extends Hierarchy[MethodNode] {
     val instructions = mutable.Buffer.empty[Instruction[AbstractInsnNode]]
-
     override lazy val asm: MethodNode = {
-      val node = new MethodNode(access, name, desc, signature, if(exceptions != null) exceptions.toArray else null)
+      val node = new MethodNode(access, name, desc, signature, if (exceptions != null) exceptions.toArray else null)
       node.instructions = Instruction.seq2insList(instructions)
       node
     }

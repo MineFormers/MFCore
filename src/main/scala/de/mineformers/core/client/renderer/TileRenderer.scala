@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.renderer
 
+import de.mineformers.core.util.world.Vector3
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import org.lwjgl.opengl.GL11
@@ -34,9 +34,13 @@ import org.lwjgl.opengl.GL11
  * @author PaleoCrafter
  */
 abstract class TileRenderer[T <: TileEntity] extends TileEntitySpecialRenderer {
+  protected val renderer = new Renderer
+
   def render(tile: T, x: Double, y: Double, z: Double, partialTicks: Float)
 
   override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+    renderer.context.pos = Vector3(x, y, z)
+    renderer.context.block = RenderContext.Block(tile.getWorldObj, tile.xCoord, tile.yCoord, tile.zCoord)
     GL11.glPushMatrix()
     GL11.glTranslated(x, y, z)
     render(tile.asInstanceOf[T], x, y, z, partialTicks)

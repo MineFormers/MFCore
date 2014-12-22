@@ -29,8 +29,6 @@ package de.mineformers.core.lib
  * @author PaleoCrafter
  */
 object Reference {
-
   final val ModID = "mfcore"
   final val ModName = "MineFormers Core"
-
 }

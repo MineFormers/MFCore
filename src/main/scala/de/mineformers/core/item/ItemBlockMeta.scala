@@ -23,9 +23,9 @@
  */
 package de.mineformers.core.item
 
-import net.minecraft.item.{ItemStack, ItemBlock}
-import net.minecraft.block.Block
 import de.mineformers.core.block.MetaBlock
+import net.minecraft.block.Block
+import net.minecraft.item.{ItemBlock, ItemStack}
 
 /**
  * ItemBlockMeta

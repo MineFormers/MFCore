@@ -21,52 +21,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.block
 
-import net.minecraft.block.material.Material
-import net.minecraft.creativetab.CreativeTabs
-import cpw.mods.fml.relauncher.{SideOnly, Side}
-import net.minecraft.util.IIcon
-import net.minecraft.client.renderer.texture.IIconRegister
-import net.minecraft.world.World
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.client.Minecraft
-import de.mineformers.core.client.ui.component.container.{ScrollPanel, Frame}
-import de.mineformers.core.client.ui.component.decoration.Label
+import cpw.mods.fml.relauncher.{Side, SideOnly}
 import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.container.{Frame, ScrollPanel}
+import de.mineformers.core.client.ui.component.decoration.Label
+import de.mineformers.core.client.ui.component.interaction.{Button, TextBox}
+import de.mineformers.core.client.util.MultiPass
 import de.mineformers.core.util.world.RichWorld._
-import de.mineformers.core.client.ui.component.interaction.{TextBox, Button}
-import java.text.DecimalFormat
-import java.util.Locale
+import net.minecraft.block.material.Material
+import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.texture.IIconRegister
+import net.minecraft.creativetab.CreativeTabs
+import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.util.IIcon
+import net.minecraft.world.{IBlockAccess, World}
+import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * TestBlock
  *
  * @author PaleoCrafter
  */
-class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, Material.rock) {
-  @SideOnly(Side.CLIENT) private var field_149994_N: IIcon = null
-
-  var pass = 0
-
-  override def canRenderInPass(pass: Int): Boolean = {
-    this.pass = pass
-    true
-  }
-
-  override def getRenderBlockPass: Int = 1
+class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, Material.rock) with MultiPass {
+  @SideOnly(Side.CLIENT) private var overlay: IIcon = null
 
   override def registerBlockIcons(p_149651_1_ : IIconRegister): Unit = {
     super.registerBlockIcons(p_149651_1_)
-    field_149994_N = p_149651_1_.registerIcon("grass_side_overlay")
+    overlay = p_149651_1_.registerIcon("stone")
   }
 
-  override def getIcon(p_149691_1_ : Int, p_149691_2_ : Int): IIcon = {
-    if (pass == 0)
-      blockIcon
-    else
-      field_149994_N
+  override def getIcon(side: ForgeDirection, meta: Int, pass: Int): IIcon = {
+    if (pass == 0) blockIcon
+    else overlay
+  }
+
+  override def getMixedBrightnessForBlock(access: IBlockAccess, x: Int, y: Int, z: Int): Int = {
+    if(renderPass == 0)
+      super.getMixedBrightnessForBlock(access, x, y, z)
+    else {
+      println(access.getLightBrightnessForSkyBlocks(x, y, z, 15))
+      15728880
+    }
   }
 
   override def onBlockActivated(world: World, x: Int, y: Int, z: Int, side: EntityPlayer, player: Int, p_149727_7_ : Float, p_149727_8_ : Float, p_149727_9_ : Float): Boolean = {

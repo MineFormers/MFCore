@@ -21,18 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.interaction
 
+import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.shape2d.{Rectangle, Size, Point}
-import de.mineformers.core.client.ui.util.{MouseEvent, MouseButton}
-import de.mineformers.core.client.ui.skin.TextureManager
-import de.mineformers.core.client.ui.proxy.Context
+import de.mineformers.core.client.ui.component.container.ScrollPanel
 import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation._
+import de.mineformers.core.client.ui.proxy.Context
+import de.mineformers.core.client.ui.skin.TextureManager
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
 import net.minecraft.client.gui.GuiScreen
-import de.mineformers.core.client.ui.component.container.ScrollPanel
 
 /**
  * ScrollBar
@@ -49,7 +48,6 @@ class ScrollBar(length: Int, orientation: Int) extends Component {
   }
 
   override def update(mousePos: Point): Unit = {
-
   }
 
   def scroll(dir: Int): Unit = {

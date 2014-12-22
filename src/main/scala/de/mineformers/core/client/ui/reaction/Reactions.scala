@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.reaction
 
-import scala.collection.mutable.{ListBuffer, Buffer}
+import scala.collection.mutable.{Buffer, ListBuffer}
 
 object Reactions {
 
@@ -34,11 +33,13 @@ object Reactions {
     def isDefinedAt(e: Event) = parts.exists(_ isDefinedAt e)
 
     def +=(r: Reaction): this.type = {
-      parts += r; this
+      parts += r;
+      this
     }
 
     def -=(r: Reaction): this.type = {
-      parts -= r; this
+      parts -= r;
+      this
     }
 
     def apply(e: Event) {

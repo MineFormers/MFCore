@@ -21,20 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.skin
 
-import net.minecraft.client.resources.{IResourceManager, IResourceManagerReloadListener}
-import de.mineformers.core.util.ResourceUtils.Resource
 import de.mineformers.core.util.ResourceUtils
-import cpw.mods.fml.common.Loader
+import de.mineformers.core.util.ResourceUtils.Resource
+import net.minecraft.client.resources.{IResourceManager, IResourceManagerReloadListener}
 
 /**
  * SkinLoader
  *
  * @author PaleoCrafter
  */
-class TextureLoader extends IResourceManagerReloadListener {
+class
+TextureLoader extends IResourceManagerReloadListener {
   override def onResourceManagerReload(manager: IResourceManager): Unit = {
     import scala.collection.JavaConversions._
     TextureManager.reset()

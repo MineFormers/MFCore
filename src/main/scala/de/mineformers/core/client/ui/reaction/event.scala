@@ -21,14 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.reaction
 
 import de.mineformers.core.client.shape2d.Point
 import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.ui.util.MouseButton.MouseButton
-import de.mineformers.core.client.ui.util.MouseButton
 import de.mineformers.core.client.ui.component.interaction.Button
+import de.mineformers.core.client.ui.util.MouseButton
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 
 /**
  * Event
@@ -58,17 +57,13 @@ class ComponentEvent(c: Component) extends Event
 object MouseEvent {
 
   case class Click(p: Point, buttonCode: Int) extends MouseEvent(p) {
-
     def button = MouseButton(buttonCode)
-
   }
 
   case class Move(p: Point, lastPos: Point) extends MouseEvent(p)
 
   case class Drag(p: Point, lastPos: Point, lastButtonCode: Int, timeSinceClick: Long) extends MouseEvent(p) {
-
     def lastButton = MouseButton(lastButtonCode)
-
   }
 
   case class Scroll(p: Point, direction: Int) extends MouseEvent(p)

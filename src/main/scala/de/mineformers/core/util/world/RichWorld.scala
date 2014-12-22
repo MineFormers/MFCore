@@ -21,13 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util.world
 
-import net.minecraft.world.World
-import scala.collection.mutable
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.world.World
+
+import scala.collection.mutable
 
 /**
  * RichWorld

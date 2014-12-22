@@ -1,11 +1,9 @@
 package de.mineformers.core.client.renderer
 
 import de.mineformers.core.structure.StructureWorld
-import de.mineformers.core.util.MathUtils
 import de.mineformers.core.util.renderer.ShaderSystem
 import de.mineformers.core.util.world.Vector3
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.client.renderer.culling.Frustrum
 import net.minecraft.entity.Entity
 import org.lwjgl.opengl.GL11

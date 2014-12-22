@@ -23,8 +23,11 @@
  */
 package de.mineformers.core.registry
 
-import net.minecraft.item.Item
 import cpw.mods.fml.common.registry.GameRegistry
+import cpw.mods.fml.relauncher.{Side, SideOnly}
+import de.mineformers.core.client.util.ItemRendering
+import net.minecraft.item.Item
+import net.minecraftforge.client.MinecraftForgeClient
 
 /**
  * ItemEntry representing an item in the registry's map
@@ -40,11 +43,25 @@ case class ItemEntry(item: Item, modId: String = null)
  * @author PaleoCrafter
  */
 object SharedItemRegistry extends SharedRegistry[String, Item] {
+  @SideOnly(Side.CLIENT)
+  def registerRenderers(): Unit = {
+    this foreach {
+      e =>
+        val item = e._2
+        item match {
+          case r: ItemRendering =>
+            MinecraftForgeClient.registerItemRenderer(item, r.createRenderer)
+          case _ =>
+        }
+    }
+  }
 
   /**
    * Registers the given item
    * @param key the mapping's key
    * @param value the mapping's value
    */
-  override protected def put(key: String, value: Item): Unit = GameRegistry.registerItem(value, key)
+  override protected def put(key: String, value: Item): Unit = {
+    GameRegistry.registerItem(value, key)
+  }
 }

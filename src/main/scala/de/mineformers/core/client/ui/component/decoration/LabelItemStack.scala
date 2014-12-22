@@ -21,14 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.decoration
 
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.Component
-import de.mineformers.core.client.shape2d.{Size, Point}
-import net.minecraft.item.ItemStack
-import org.lwjgl.opengl.{GL12, GL11}
 import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
+import net.minecraft.item.ItemStack
+import org.lwjgl.opengl.{GL11, GL12}
 
 /**
  * ItemStack

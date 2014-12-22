@@ -34,7 +34,6 @@ import net.minecraft.world.World
  */
 trait TileProvider[T <: TileEntity] {
   this: Block =>
-
   /**
    * @param meta check if there is a TE for the given metadata
    * @return true, if the supplied teClass is not null (by default)

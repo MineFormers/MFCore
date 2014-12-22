@@ -21,13 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.skin
 
 import de.mineformers.core.client.shape2d.Rectangle
 import de.mineformers.core.client.util.RenderUtils
-import org.lwjgl.opengl.GL11._
 import de.mineformers.core.util.renderer.GuiUtils
+import org.lwjgl.opengl.GL11._
 
 /**
  * ScissorRegion

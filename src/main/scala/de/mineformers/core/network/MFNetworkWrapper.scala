@@ -21,20 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.network
 
+import com.google.common.collect.Maps
 import cpw.mods.fml.common.network.simpleimpl.SimpleIndexedCodec
-import cpw.mods.fml.relauncher.Side
 import cpw.mods.fml.common.network.{FMLOutboundHandler, NetworkRegistry}
+import cpw.mods.fml.relauncher.Side
 import de.mineformers.core.network.Message.NetReaction
-import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext, SimpleChannelInboundHandler}
-import net.minecraft.network.{Packet, INetHandler}
-import org.apache.logging.log4j.Level
 import de.mineformers.core.util.Log
+import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext, SimpleChannelInboundHandler}
 import net.minecraft.entity.player.EntityPlayerMP
+import net.minecraft.network.{INetHandler, Packet}
+import org.apache.logging.log4j.Level
 
+import scala.collection.mutable.ListBuffer
 import scala.reflect.ClassTag
+import scala.util.control.Breaks
 
 /**
  * MFCodec
@@ -42,6 +44,20 @@ import scala.reflect.ClassTag
  * @author PaleoCrafter
  */
 class MFNetworkWrapper(channelName: String) {
+  private val packetCodec = new SimpleIndexedCodec
+  private val channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec)
+  private val handlers = {
+    val result = Maps.newEnumMap[Side, PartialFunctionChannelHandler](classOf[Side])
+    for (side <- Side.values) {
+      val handler = new PartialFunctionChannelHandler(side)
+      result.put(side, handler)
+      val channel = channels.get(side)
+      channel.pipeline.addAfter(channel.findChannelHandlerNameForType(classOf[SimpleIndexedCodec]), handler.toString, handler)
+    }
+    result
+  }
+  private var lastDiscriminator: Byte = 0
+
   def register[M <: Message]()(implicit ev: ClassTag[M]): Unit = {
     packetCodec.addDiscriminator(lastDiscriminator, ev.runtimeClass.asInstanceOf[Class[M]])
     lastDiscriminator = (lastDiscriminator + 1).toByte
@@ -54,25 +70,7 @@ class MFNetworkWrapper(channelName: String) {
   }
 
   def addHandler(reaction: NetReaction, side: Side): Unit = {
-    val channel = channels.get(side)
-    val handler = new PartialFunctionChannelHandler(reaction, side)
-    channel.pipeline.addAfter(channel.findChannelHandlerNameForType(classOf[SimpleIndexedCodec]), reaction.toString(), handler)
-  }
-
-  class PartialFunctionChannelHandler(reaction: NetReaction, side: Side) extends SimpleChannelInboundHandler[Message](classOf[Message]) {
-    override def channelRead0(ctx: ChannelHandlerContext, msg: Message): Unit = {
-      val iNetHandler: INetHandler = ctx.attr(NetworkRegistry.NET_HANDLER).get
-      val context: Message.Context = new Message.Context(iNetHandler, side)
-      val result = reaction.applyOrElse((msg, context), null)
-      if (result != null) {
-        ctx.writeAndFlush(result).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
-      }
-    }
-
-    override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
-      Log.log(Level.ERROR, "FunctionChannelHandler exception", cause)
-      super.exceptionCaught(ctx, cause)
-    }
+    handlers.get(side).addReaction(reaction)
   }
 
   /**
@@ -145,7 +143,33 @@ class MFNetworkWrapper(channelName: String) {
     channels.get(Side.CLIENT).writeAndFlush(message).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
   }
 
-  private val packetCodec = new SimpleIndexedCodec
-  private val channels = NetworkRegistry.INSTANCE.newChannel(channelName, packetCodec)
-  private var lastDiscriminator: Byte = 0
+  class PartialFunctionChannelHandler(side: Side) extends SimpleChannelInboundHandler[Message](classOf[Message]) {
+    private val handlers = ListBuffer.empty[NetReaction]
+
+    def addReaction(reaction: NetReaction): Unit = {
+      handlers += reaction
+    }
+
+    override def channelRead0(ctx: ChannelHandlerContext, msg: Message): Unit = {
+      val iNetHandler: INetHandler = ctx.attr(NetworkRegistry.NET_HANDLER).get
+      val context: Message.Context = new Message.Context(iNetHandler, side)
+      val param = (msg, context)
+      var result: Message = null
+      Breaks.breakable {
+        for (handler <- handlers) {
+          if (handler.isDefinedAt(param)) {
+            result = handler(param)
+          }
+        }
+      }
+      if (result != null) {
+        ctx.writeAndFlush(result).addListener(ChannelFutureListener.FIRE_EXCEPTION_ON_FAILURE)
+      }
+    }
+
+    override def exceptionCaught(ctx: ChannelHandlerContext, cause: Throwable) {
+      Log.log(Level.ERROR, "FunctionChannelHandler exception", cause)
+      super.exceptionCaught(ctx, cause)
+    }
+  }
 }

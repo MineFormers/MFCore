@@ -21,12 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util.renderer
 
-import org.lwjgl.opengl.GL11.GL_TRUE
-import org.lwjgl.opengl.GL11.glGetInteger
+import org.lwjgl.opengl.GL11.{GL_TRUE, glGetInteger}
 import org.lwjgl.opengl.GL20._
+
 import scala.collection.mutable
 
 /**

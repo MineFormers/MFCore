@@ -21,10 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.skin.drawable
 
-import de.mineformers.core.client.shape2d.{Size, Point}
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.util.renderer.GuiUtils
 
 /**
@@ -33,15 +32,11 @@ import de.mineformers.core.util.renderer.GuiUtils
  * @author PaleoCrafter
  */
 trait Drawable {
-
-  def init(): Unit = {
-
-  }
-
   val utils = GuiUtils
-
-  def draw(mousePos: Point, pos: Point, z: Int)
-
   var size: Size = Size(0, 0)
 
+  def init(): Unit = {
+  }
+
+  def draw(mousePos: Point, pos: Point, z: Int)
 }

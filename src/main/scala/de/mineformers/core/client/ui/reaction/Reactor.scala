@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.reaction
 
 /**
@@ -34,11 +33,13 @@ trait Reactor {
    * All reactions of this reactor.
    */
   val reactions: Reactions = new Reactions.Impl
+
   /**
    * Listen to the given publisher as long as <code>deafTo</code> isn't called for
    * them.
    */
   def listenTo(ps: Publisher*) = for (p <- ps) p.subscribe(reactions)
+
   /**
    * Installed reaction won't receive events from the given publisher anylonger.
    */

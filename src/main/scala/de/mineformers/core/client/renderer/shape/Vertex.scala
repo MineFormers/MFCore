@@ -21,44 +21,44 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package de.mineformers.core.client.renderer.shape
 
-package de.mineformers.core.block;
-
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
-import net.minecraft.util.IIcon;
-
-import java.util.HashMap;
+import de.mineformers.core.client.util.Color
+import de.mineformers.core.util.world.{Vector2, Vector3}
+import net.minecraft.client.renderer.Tessellator
 
 /**
- * IconsHolder
- * Only to be used by Rotation
+ * Vertex
  *
  * @author PaleoCrafter
  */
-class IconsHolder
-{
-    @SideOnly(Side.CLIENT)
-    private HashMap<String, IIcon> icons;
+object Vertex {
+  def apply(pos: Vector3): Vertex = this(pos, null, null)
 
-    @SideOnly(Side.CLIENT)
-    public IIcon apply(String key) {
-        return getIcon(key);
-    }
+  def apply(pos: Vector3, uv: Vector2): Vertex = this(pos, uv, null)
+}
 
-    @SideOnly(Side.CLIENT)
-    public IIcon getIcon(String key)
-    {
-        if(icons == null)
-            icons = new HashMap<>();
-        return icons.get(key);
-    }
+case class Vertex(pos: Vector3, uv: Vector2, color: Color) {
+  def x = pos.x
 
-    @SideOnly(Side.CLIENT)
-    public void setIcon(String key, IIcon icon)
-    {
-        if(icons == null)
-            icons = new HashMap<>();
-        icons.put(key, icon);
-    }
+  def y = pos.y
+
+  def z = pos.z
+
+  def u = if (hasUV) uv.x else -1D
+
+  def v = if (hasUV) uv.y else -1D
+
+  def hasUV = uv != null
+
+  def isColored = color != null
+
+  def addToTessellator(tessellator: Tessellator): Unit = {
+    if (isColored)
+      tessellator.setColorRGBA_F(color.r, color.g, color.b, color.a)
+    if (hasUV)
+      tessellator.addVertexWithUV(x, y, z, u, v)
+    else
+      tessellator.addVertex(x, y, z)
+  }
 }

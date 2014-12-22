@@ -21,11 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation.Orientation
 import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation.Orientation
 
 /**
  * NavigationButton
@@ -41,7 +40,6 @@ object NavigationButton {
 
   object Orientation extends Enumeration {
     type Orientation = OrientationVal
-
     final val Left = Value("navigationLeft", vertical = false)
     final val Right = Value("navigationRight", vertical = false)
     final val Up = Value("navigationUp", vertical = true)

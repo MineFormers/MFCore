@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.container
 
 import de.mineformers.core.client.shape2d.{Point, Size}
@@ -31,9 +30,9 @@ import de.mineformers.core.client.ui.component.container.Tab.Orientation
 import de.mineformers.core.client.ui.component.container.Tab.Orientation.Orientation
 import de.mineformers.core.client.ui.layout.StackLayout
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.util.{MouseEvent, ComponentEvent, MouseButton}
-import ComponentEvent.ComponentClicked
 import de.mineformers.core.client.ui.skin.drawable.Drawable
+import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
+import de.mineformers.core.client.ui.util.{ComponentEvent, MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
 
 import scala.collection.mutable
@@ -128,7 +127,7 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
 
     class TabSkin extends Skin {
       override protected def drawForeground(mousePos: Point): Unit = {
-        icon.draw(mousePos, screen + Point(6 + (if(orientation.vertical) 2 else 0), 6 + (if(!orientation.vertical) 2 else 0)), zIndex)
+        icon.draw(mousePos, screen + Point(6 + (if (orientation.vertical) 2 else 0), 6 + (if (!orientation.vertical) 2 else 0)), zIndex)
       }
     }
 
@@ -147,7 +146,6 @@ object Tab {
 
   object Orientation extends Enumeration {
     type Orientation = OrientationVal
-
     final val Left = Value("tabLeft", vertical = true)
     final val Right = Value("tabRight", vertical = true)
     final val Top = Value("tabTop", vertical = false)

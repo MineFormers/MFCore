@@ -21,11 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.decoration
 
-import de.mineformers.core.client.ui.component.TextComponent
 import de.mineformers.core.client.shape2d.Point
+import de.mineformers.core.client.ui.component.TextComponent
 import de.mineformers.core.client.ui.util.Font
 
 /**
@@ -35,7 +34,6 @@ import de.mineformers.core.client.ui.util.Font
  */
 class Label(private var _text: String) extends TextComponent {
   private var _font: Font = Font.DefaultDark
-
   size = font.size(_text)
 
   override def font_=(font: Font): Unit = {
@@ -53,6 +51,5 @@ class Label(private var _text: String) extends TextComponent {
   override def text = _text
 
   override def update(mousePos: Point): Unit = {
-
   }
 }

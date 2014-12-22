@@ -21,19 +21,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.mod
 
 import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.item.{ItemStack, Item}
+import net.minecraft.item.{Item, ItemStack}
 
 /**
  * MFCreativeTab
  *
  * @author PaleoCrafter
  */
-class MFCreativeTab(name: String, iconStack: ItemStack) extends CreativeTabs(name) {
+class MFCreativeTab(name: String, iconStack: => ItemStack) extends CreativeTabs(name) {
+  lazy val stack = iconStack
+
   override def getTabIconItem: Item = null
 
-  override def getIconItemStack: ItemStack = iconStack
+  override def getIconItemStack: ItemStack = stack
 }

@@ -21,12 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.decoration
 
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.TextComponent
 import de.mineformers.core.client.ui.util.Font
-import de.mineformers.core.client.shape2d.{Size, Point}
 
 /**
  * Tooltip
@@ -35,6 +34,7 @@ import de.mineformers.core.client.shape2d.{Size, Point}
  */
 class Tooltip(private var _text: String, var font: Font = Font.Default) extends TextComponent {
   zIndex = 100
+
   override def text: String = _text
 
   override def text_=(text: String): Unit = {

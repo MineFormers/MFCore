@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.util
 
 /**
@@ -30,26 +29,11 @@ package de.mineformers.core.client.util
  * @author PaleoCrafter
  */
 object Color {
+  def black(alpha: Float) = this(0, 0, 0, alpha)
+
   def fromHSV(hue: Float, saturation: Float, value: Float): Color = fromHSV(hue, saturation, value, 1)
 
-  def fromHSV(hue: Float, saturation: Float, value: Float, alpha: Float): Color = {
-    if (saturation == 0)
-      return Color(value, value, value, alpha)
-
-    val h = (hue - math.floor(hue).toFloat) * 6.0f
-    val f = h - math.floor(hue).toFloat
-    val p = value * (1 - saturation)
-    val q = value * (1 - f * saturation)
-    val t = value * (1 - (1 - f) * saturation)
-    h match {
-      case 0 => Color(value, t, p, alpha)
-      case 1 => Color(q, value, p, alpha)
-      case 2 => Color(p, value, t, alpha)
-      case 3 => Color(p, q, value, alpha)
-      case 4 => Color(t, p, value, alpha)
-      case 5 => Color(value, p, q, alpha)
-    }
-  }
+  def fromHSV(hue: Float, saturation: Float, value: Float, alpha: Float): Color = apply(java.awt.Color.HSBtoRGB(hue, saturation, value), alpha)
 
   def apply(hex: Int): Color = {
     val r = ((hex >> 16) & 0xFF) / 255F

@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.layout
 
-import de.mineformers.core.client.shape2d.{Size, Point}
-import de.mineformers.core.client.ui.component.container.Panel
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.client.ui.component.container.Panel
+
 import scala.util.control.Breaks
 
 /**
@@ -41,16 +41,16 @@ class StackLayout(var gap: Int = 2, var horizontal: Boolean = false, var cached:
     if (this(component) != null && cached)
       this(component).pos
     else {
-      var pos = Point(if(!horizontal) component.x else 0, if(!horizontal) 0 else component.y)
+      var pos = Point(if (!horizontal) component.x else 0, if (!horizontal) 0 else component.y)
       val iterator = panel.content.iterator.buffered
-      import Breaks._
+      import scala.util.control.Breaks._
       breakable(while (iterator.hasNext) {
         val current = iterator.next()
         if (current eq component)
           break()
         if (iterator.head eq component) {
           val p = if (cached) this(current).pos else positionFor(panel, current)
-          pos = p + Point(if(horizontal) current.width + gap else component.x, if(horizontal) component.y - current.y else current.height + gap)
+          pos = p + Point(if (horizontal) current.width + gap else component.x, if (horizontal) component.y - current.y else current.height + gap)
         }
       })
       if (cached)

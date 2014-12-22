@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.shape2d
 
 /**
@@ -30,7 +29,6 @@ package de.mineformers.core.client.shape2d
  * @author PaleoCrafter
  */
 trait Shape[A <: Shape[A]] {
-
   def intersects(r: Rectangle): Boolean = (this & r) != None
 
   def &(r: Rectangle): Option[A] = intersect(r)
@@ -44,5 +42,4 @@ trait Shape[A <: Shape[A]] {
   def translate(p: Point): A
 
   def bounds: Rectangle
-
 }

@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.interaction
 
 import java.text.DecimalFormat
@@ -261,15 +260,12 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
   }
 
   override def gainFocus(): Unit = {
-
   }
 
   override def loseFocus(): Unit = {
-
   }
 
   override def update(mousePos: Point): Unit = {
-
   }
 
   reactions += {
@@ -355,7 +351,6 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
         }
       }
   }
-
   var maxTextLength = 32
 
   class TextBoxSkin extends TextSkin {
@@ -398,7 +393,6 @@ object TextBox {
   final val Copy: Char = 3
   final val Paste: Char = 22
   final val Cut: Char = 24
-
   final val IntegerFormatter = (old: String, s: String) => s.replaceAll("[^0-9]", "")
 
   class NumberFormatter(format: DecimalFormat) extends ((String, String) => String) {

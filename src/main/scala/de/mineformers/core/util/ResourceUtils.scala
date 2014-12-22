@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util
 
-import net.minecraft.client.Minecraft
-import net.minecraft.util.ResourceLocation
-import net.minecraft.client.resources.data.IMetadataSection
-import java.util.jar.JarFile
-import java.net.URLDecoder
 import java.io.File
+import java.net.URLDecoder
+import java.util.jar.JarFile
+
+import net.minecraft.client.Minecraft
+import net.minecraft.client.resources.data.IMetadataSection
+import net.minecraft.util.{IIcon, ResourceLocation}
 
 /**
  * ResourceUtils
@@ -37,10 +37,9 @@ import java.io.File
  * @author PaleoCrafter
  */
 object ResourceUtils {
+  implicit def resourceToResourceLocation(res: Resource): ResourceLocation = res.location
 
-  implicit def resourceToResourceLocation(res: Resource):ResourceLocation = res.location
-
-  implicit def locationToResource(res: ResourceLocation):Resource = Resource(res)
+  implicit def locationToResource(res: ResourceLocation): Resource = Resource(res)
 
   def findAllInFolder(folder: Resource): List[Resource] = {
     val path = folder.toJarResource
@@ -82,6 +81,15 @@ object ResourceUtils {
     def apply(path: String) = new Resource(path)
 
     def apply(domain: String, path: String) = new Resource(domain, path)
+
+    def apply(icon: IIcon, isItem: Boolean = false) = {
+      val pathFormat = "%s:textures/" + (if (isItem) "items" else "blocks") + "/%s.png"
+      val name = icon.getIconName
+      val colonIndex = name.indexOf(":")
+      val modId = if (colonIndex != -1) name.substring(0, colonIndex) else "minecraft"
+      val texture = if (colonIndex != -1) name.substring(colonIndex + 1) else name
+      new Resource(pathFormat.format(modId, texture))
+    }
   }
 
   case class Resource(location: ResourceLocation) {

@@ -21,16 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.util
 
-import scala.collection.mutable
-import net.minecraft.client.gui.FontRenderer
-import de.mineformers.core.client.util.RenderUtils.mc
-import net.minecraft.util.ResourceLocation
-import org.lwjgl.opengl.{GL12, GL11}
-import de.mineformers.core.util.renderer.GuiUtils
 import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.client.util.RenderUtils.mc
+import de.mineformers.core.util.renderer.GuiUtils
+import net.minecraft.client.gui.FontRenderer
+import net.minecraft.util.ResourceLocation
+import org.lwjgl.opengl.{GL11, GL12}
+
+import scala.collection.mutable
 
 /**
  * Font
@@ -39,7 +39,6 @@ import de.mineformers.core.client.shape2d.Size
  */
 object Font {
   private val renderers: mutable.HashMap[String, FontRenderer] = mutable.HashMap[String, FontRenderer]("default" -> mc.fontRenderer, "small" -> new FontRenderer(mc.gameSettings, new ResourceLocation("textures/font/ascii.png"), mc.renderEngine, false))
-
   val Default = Font("default")
   val DefaultShadow = Font("default", drawShadow = true)
   val DefaultDark = Font("default", 0x404040)
@@ -58,11 +57,9 @@ object Font {
   def rendererFor(id: String) = renderers.getOrElse(id, renderers("default"))
 
   def addRenderer(id: String, renderer: FontRenderer) = renderers + id -> renderer
-
 }
 
 class Font(name: String, var color: Int = 0xe0e0e0, var drawShadow: Boolean = false) {
-
   def draw(text: String, x: Int, y: Int): Unit = draw(text, x, y, 0, color)
 
   def draw(text: String, x: Int, y: Int, z: Int): Unit = draw(text, x, y, z, color)
@@ -100,5 +97,4 @@ class Font(name: String, var color: Int = 0xe0e0e0, var drawShadow: Boolean = fa
   def size(text: String): Size = Size(width(text), height(text))
 
   lazy val renderer = Font.rendererFor(name)
-
 }

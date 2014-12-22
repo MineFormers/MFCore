@@ -21,7 +21,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util
 
 import net.minecraft.block.Block
@@ -40,7 +39,6 @@ import scala.language.implicitConversions
  * @author PaleoCrafter
  */
 object Implicits {
-
   implicit def funcToRunnable(func: => Unit) = new Runnable {
     override def run(): Unit = func
   }

@@ -21,15 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
-import de.mineformers.core.client.shape2d.{Rectangle, Point, Size}
+import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.container.Frame.Anchor
-import de.mineformers.core.client.ui.skin.drawable.DynamicTexture
+import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
 import de.mineformers.core.reaction.Publisher
-import de.mineformers.core.util.ResourceUtils.Resource
 import net.minecraft.client.Minecraft
 
 /**

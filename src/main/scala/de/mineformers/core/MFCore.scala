@@ -23,14 +23,15 @@
  */
 package de.mineformers.core
 
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{TransformerExclusions, MCVersion}
-import de.mineformers.core.impl.asm.CoreClassTransformer
 import java.io.File
-import de.mineformers.core.util.Log
-import com.google.common.base.Throwables
 import java.net.URISyntaxException
+
+import com.google.common.base.Throwables
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{MCVersion, TransformerExclusions}
+import de.mineformers.core.impl.asm.CoreClassTransformer
 import de.mineformers.core.network.MFNetworkWrapper
+import de.mineformers.core.util.Log
 
 /**
  * MFCore

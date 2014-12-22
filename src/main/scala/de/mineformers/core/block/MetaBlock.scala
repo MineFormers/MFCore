@@ -23,17 +23,17 @@
  */
 package de.mineformers.core.block
 
-import net.minecraft.creativetab.CreativeTabs
-import net.minecraft.block.material.Material
-import net.minecraft.world.{World, IBlockAccess}
-import net.minecraft.util.{MovingObjectPosition, IIcon}
 import de.mineformers.core.util.world.{BlockPos, Vector3}
-import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.block.Block
+import net.minecraft.block.material.Material
 import net.minecraft.client.renderer.texture.IIconRegister
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.{IIcon, MovingObjectPosition}
+import net.minecraft.world.{IBlockAccess, World}
+import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * MetaBlock

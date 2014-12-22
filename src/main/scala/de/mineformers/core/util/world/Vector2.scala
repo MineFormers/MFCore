@@ -21,14 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
 package de.mineformers.core.util.world
+
+import java.lang.{Double => JDouble}
 
 import com.google.common.base.Objects
 
 import scala.collection.mutable
-
-import java.lang.{Double => JDouble}
 
 /**
  * Vector2
@@ -38,7 +37,6 @@ import java.lang.{Double => JDouble}
  */
 object Vector2 {
   private val cache = mutable.WeakHashMap[(Double, Double), Vector2]()
-
   val Zero = Vector2(0, 0)
   val One = Vector2(1, 1)
   val Center = Vector2(0.5D, 0.5D)

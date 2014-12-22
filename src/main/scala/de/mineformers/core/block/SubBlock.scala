@@ -23,15 +23,15 @@
  */
 package de.mineformers.core.block
 
-import net.minecraftforge.common.util.ForgeDirection
+import de.mineformers.core.util.world.{BlockPos, Vector3}
+import net.minecraft.block.Block
 import net.minecraft.client.renderer.texture.IIconRegister
-import net.minecraft.world.{IBlockAccess, World}
-import net.minecraft.tileentity.TileEntity
-import de.mineformers.core.util.world.{Vector3, BlockPos}
-import net.minecraft.util.IIcon
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
-import net.minecraft.block.Block
+import net.minecraft.tileentity.TileEntity
+import net.minecraft.util.IIcon
+import net.minecraft.world.{IBlockAccess, World}
+import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * SubBlock
