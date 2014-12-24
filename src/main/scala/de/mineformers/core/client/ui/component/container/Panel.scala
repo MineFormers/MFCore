@@ -72,6 +72,10 @@ class Panel extends Component {
     }
   }
 
+  def deafToNonChildren(ps: Publisher*): Unit = {
+    super.deafTo(ps: _*)
+  }
+
   def add(c: Component): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
 
   def add(c: Component, constraints: Constraints): Unit = {

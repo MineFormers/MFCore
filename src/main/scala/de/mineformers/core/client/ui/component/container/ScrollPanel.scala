@@ -46,7 +46,7 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
   override def init(channel: Publisher, context: Context): Unit = {
     this.listenTo(channel)
     super.init(this, context)
-    this.deafTo(this)
+    this.deafToNonChildren(this)
     this.channel = channel
     scrollBarHorizontal.parent = this
     scrollBarVertical.parent = this
@@ -107,7 +107,8 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
   }
 
   reactions += {
-    case e: Positioned => if (hovered(e.pos)) publish(e)
+    case e: Positioned =>
+      if (hovered(e.pos)) publish(e)
     case e: Event => publish(e)
   }
   private[component] var scrollBarHorizontal = new ScrollBar(size.width - (if (scrollVertical) 16 else 2), Orientation.Horizontal)

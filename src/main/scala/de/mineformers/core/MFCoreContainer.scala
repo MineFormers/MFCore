@@ -27,6 +27,7 @@ import java.io.File
 
 import com.google.common.collect.ImmutableList
 import com.google.common.eventbus.{EventBus, Subscribe}
+import de.mineformers.core.block.TestBlock
 import de.mineformers.core.client.ui.skin.{GuiMetadataSection, GuiMetadataSectionDeserializer, TextureLoader}
 import de.mineformers.core.network.{MFNetworkWrapper, TileDescriptionMessage}
 import de.mineformers.core.registry.{SharedBlockRegistry, SharedItemRegistry}
@@ -71,6 +72,7 @@ class MFCoreContainer extends DummyModContainer(new ModMetadata) {
   def preInit(event: FMLPreInitializationEvent): Unit = {
     MFCore.net = new MFNetworkWrapper("MFCore")
     MFCore.net.register[TileDescriptionMessage]()
+    SharedBlockRegistry.add("test", new TestBlock)
     Proxy.preInit(event)
     Proxy.getClass.getDeclaredMethods
   }

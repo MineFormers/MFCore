@@ -26,7 +26,7 @@ package de.mineformers.core.reaction
 import de.mineformers.core.reaction.Reactions.{Reaction, StronglyReferenced}
 
 import scala.collection.mutable
-import scala.ref.{Reference, ReferenceQueue, ReferenceWrapper}
+import scala.ref.{ReferenceWrapper, ReferenceQueue, Reference}
 
 /** <p>
   * Notifies registered reactions when an event is published. Publishers are
@@ -70,7 +70,7 @@ trait Publisher extends Reactor {
     for (l <- listeners) l(e)
   }
 
-  listenTo(this)
+  this.listenTo(this)
 }
 
 /**

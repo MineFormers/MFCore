@@ -27,8 +27,10 @@ import java.text.DecimalFormat
 
 import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.{Focusable, TextComponent}
+import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.util.ComponentEvent.ValueChanged
 import de.mineformers.core.client.ui.util._
+import de.mineformers.core.reaction.Publisher
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.ChatAllowedCharacters
 import org.lwjgl.opengl.GL11
@@ -65,6 +67,10 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
   this.size = initSize
   skin = new TextBoxSkin
   private var _textOff = Point(2, (size.height - font.height) / 2)
+
+  override def init(channel: Publisher, context: Context): Unit = {
+    super.init(channel, context)
+  }
 
   override def textOff = _textOff
 
