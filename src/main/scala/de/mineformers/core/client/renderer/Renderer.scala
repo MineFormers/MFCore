@@ -3,6 +3,7 @@ package de.mineformers.core.client.renderer
 import de.mineformers.core.client.renderer.RenderParams.RPBuilding
 import de.mineformers.core.client.renderer.shape.{Face, Shape, Vertex}
 import de.mineformers.core.client.util.Color
+import de.mineformers.core.util.Implicits.VBlockPos
 import de.mineformers.core.util.world.Vector3
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.entity.Entity
@@ -49,10 +50,10 @@ class Renderer {
     glPushMatrix()
     if (params != null)
       params(context)
-    val tessellator: Tessellator = Tessellator.instance
-    tessellator.startDrawing(params.mode)
+    val tessellator: Tessellator = Tessellator.getInstance()
+    tessellator.getWorldRenderer.startDrawing(params.mode)
     for (v <- vertices) {
-      v.addToTessellator(tessellator)
+      v.addToTessellator(tessellator.getWorldRenderer)
     }
     tessellator.draw()
     if (params != null)
@@ -64,7 +65,7 @@ class Renderer {
 object RenderContext {
 
   case class Block(world: World, x: Int, y: Int, z: Int) {
-    def tile[T <: TileEntity] = world.getTileEntity(x, y, z).asInstanceOf[T]
+    def tile[T <: TileEntity] = world.getTileEntity(new VBlockPos(x, y, z)).asInstanceOf[T]
   }
 
   case class Item(stack: ItemStack)

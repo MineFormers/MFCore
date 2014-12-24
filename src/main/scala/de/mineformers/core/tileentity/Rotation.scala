@@ -24,7 +24,7 @@
 package de.mineformers.core.tileentity
 
 import net.minecraft.tileentity.TileEntity
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
 
 /**
  * Rotation
@@ -34,5 +34,5 @@ import net.minecraftforge.common.util.ForgeDirection
 trait Rotation {
   this: TileEntity =>
   @Describing
-  var rotation = ForgeDirection.SOUTH
+  var rotation = EnumFacing.SOUTH
 }

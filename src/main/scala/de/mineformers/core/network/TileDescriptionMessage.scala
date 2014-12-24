@@ -24,10 +24,11 @@
 package de.mineformers.core.network
 
 import de.mineformers.core.tileentity.TileDescription
+import de.mineformers.core.util.world.BlockPos
 
 /**
  * TileDescriptionMessage
  *
  * @author PaleoCrafter
  */
-case class TileDescriptionMessage(x: Int, y: Int, z: Int, description: TileDescription) extends Message
+case class TileDescriptionMessage(pos: BlockPos, description: TileDescription) extends Message

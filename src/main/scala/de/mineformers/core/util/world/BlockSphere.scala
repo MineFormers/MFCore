@@ -171,14 +171,12 @@ case class BlockSphere(center: BlockPos, radius: Double, var operation: (BlockPo
   }.toBuffer
 
   def isAir(world: World): Boolean = {
-    blocks forall {
-      p => world.isAirBlock(p.x, p.y, p.z)
-    }
+    blocks forall (world.isAirBlock(_))
   }
 
   def noAir(world: World): BlockSphere = {
     blocks foreach {
-      p => if (p != null && world.isAirBlock(p.x, p.y, p.z))
+      p => if (p != null && world.isAirBlock(p))
         blocks -= p
     }
     this

@@ -26,7 +26,7 @@ package de.mineformers.core.client.particle.updater
 import de.mineformers.core.client.particle.ParticleFX
 import de.mineformers.core.client.util.RenderUtils
 import net.minecraft.client.particle.EntityFX
-import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.{WorldRenderer, Tessellator}
 import org.lwjgl.opengl.GL11
 
 /**
@@ -37,7 +37,7 @@ import org.lwjgl.opengl.GL11
 trait ParticleUpdater {
   def update(particle: ParticleFX): Unit
 
-  def render(tessellator: Tessellator, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float, fx: ParticleFX) {
+  def render(renderer: WorldRenderer, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float, fx: ParticleFX) {
     GL11.glPushMatrix()
 
     GL11.glDepthMask(false)
@@ -56,20 +56,20 @@ trait ParticleUpdater {
     val y = (fx.prevPosY + (fx.posY - fx.prevPosY) * partialTicks - EntityFX.interpPosY).toFloat
     val z = (fx.prevPosZ + (fx.posZ - fx.prevPosZ) * partialTicks - EntityFX.interpPosZ).toFloat
 
-    tessellator.startDrawingQuads()
-    tessellator.setBrightness(240)
+    renderer.startDrawingQuads()
+    renderer.setBrightness(240)
 
-    tessellator.setColorRGBA(fx.r, fx.g, fx.b, fx.alpha)
-    tessellator.addVertexWithUV(x - arX * fx.scale - arYZ * fx.scale, y
+    renderer.setColorRGBA(fx.r, fx.g, fx.b, fx.alpha)
+    renderer.addVertexWithUV(x - arX * fx.scale - arYZ * fx.scale, y
       - arXZ * fx.scale, z - arZ * fx.scale - arXY * fx.scale, maxU, maxV)
-    tessellator.addVertexWithUV(x - arX * fx.scale + arYZ * fx.scale, y
+    renderer.addVertexWithUV(x - arX * fx.scale + arYZ * fx.scale, y
       + arXZ * fx.scale, z - arZ * fx.scale + arXY * fx.scale, maxU, minV)
-    tessellator.addVertexWithUV(x + arX * fx.scale + arYZ * fx.scale, y
+    renderer.addVertexWithUV(x + arX * fx.scale + arYZ * fx.scale, y
       + arXZ * fx.scale, z + arZ * fx.scale + arXY * fx.scale, minU, minV)
-    tessellator.addVertexWithUV(x + arX * fx.scale - arYZ * fx.scale, y
+    renderer.addVertexWithUV(x + arX * fx.scale - arYZ * fx.scale, y
       - arXZ * fx.scale, z + arZ * fx.scale - arXY * fx.scale, minU, maxV)
 
-    tessellator.draw()
+    Tessellator.getInstance().draw()
 
     GL11.glDisable(GL11.GL_BLEND)
     GL11.glDepthMask(true)

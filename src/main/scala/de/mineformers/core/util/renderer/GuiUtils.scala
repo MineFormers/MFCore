@@ -35,7 +35,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.client.renderer.entity.RenderItem
 import net.minecraft.item.ItemStack
-import net.minecraft.util.{IIcon, ResourceLocation}
+import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
@@ -78,7 +78,7 @@ object GuiUtils {
 
   def rgbFromColor(color: Int): Color = new Color((0xFF0000 & color) >> 16, (0x00FF00 & color) >> 8, 0x0000FF & color)
 
-  def stringWidth(text: String): Int = mc.fontRenderer.getStringWidth(text)
+  def stringWidth(text: String): Int = mc.fontRendererObj.getStringWidth(text)
 
   def longestString(strings: String*): String = {
     var s: String = ""
@@ -101,9 +101,9 @@ object GuiUtils {
     GL11.glDisable(GL11.GL_DEPTH_TEST)
     GL11.glTranslatef(0, 0, z)
     var i = 0
-    val height = mc.fontRenderer.FONT_HEIGHT
+    val height = mc.fontRendererObj.FONT_HEIGHT
     for (line <- text.split("\\n").mkString("\\\\n").split("\\\\n")) {
-      mc.fontRenderer.drawString(line, x, y + i * (height + 1), color, drawShadow)
+      mc.fontRendererObj.drawString(line, x, y + i * (height + 1), color, drawShadow)
       i += 1
     }
     GL11.glTranslatef(0, 0, -z)
@@ -115,7 +115,7 @@ object GuiUtils {
     val splits: Array[String] = text.split("<br>")
     var i: Int = 0
     while (i < splits.length) {
-      mc.fontRenderer.drawString(splits(i), x, y + i * (mc.fontRenderer.FONT_HEIGHT + 1), color, drawShadow)
+      mc.fontRendererObj.drawString(splits(i), x, y + i * (mc.fontRendererObj.FONT_HEIGHT + 1), color, drawShadow)
       i += 1
     }
   }
@@ -174,12 +174,13 @@ object GuiUtils {
   def drawQuad(x: Int, y: Int, z: Int, width: Int, height: Int, u: Float, v: Float, uMax: Float, vMax: Float) {
     glEnable(GL_BLEND)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-    val tessellator: Tessellator = Tessellator.instance
-    tessellator.startDrawingQuads()
-    tessellator.addVertexWithUV(x, y + height, z, u, vMax)
-    tessellator.addVertexWithUV(x + width, y + height, z, uMax, vMax)
-    tessellator.addVertexWithUV(x + width, y, z, uMax, v)
-    tessellator.addVertexWithUV(x, y, z, u, v)
+    val tessellator: Tessellator = Tessellator.getInstance
+    val renderer = tessellator.getWorldRenderer
+    renderer.startDrawingQuads()
+    renderer.addVertexWithUV(x, y + height, z, u, vMax)
+    renderer.addVertexWithUV(x + width, y + height, z, uMax, vMax)
+    renderer.addVertexWithUV(x + width, y, z, uMax, v)
+    renderer.addVertexWithUV(x, y, z, u, v)
     tessellator.draw
     glDisable(GL_BLEND)
   }
@@ -216,13 +217,9 @@ object GuiUtils {
     shaders.deactivate()
   }
 
-  def drawIcon(icon: IIcon, x: Int, y: Int, z: Int, width: Int, height: Int) {
-    drawQuad(x, y, z, width, height, icon.getMinU, icon.getMinV, icon.getMaxU, icon.getMaxV)
-  }
-
   def drawItemStack(stack: ItemStack, x: Int, y: Int, customAmount: String = null) {
-    renderItem.renderItemAndEffectIntoGUI(mc.fontRenderer, mc.getTextureManager, stack, x, y)
-    renderItem.renderItemOverlayIntoGUI(mc.fontRenderer, mc.getTextureManager, stack, x, y, customAmount)
+    renderItem.renderItemAndEffectIntoGUI(stack, x, y)
+    renderItem.renderItemOverlayIntoGUI(mc.fontRendererObj, stack, x, y, customAmount)
   }
 
   private def shaders: ShaderSystem = {
@@ -243,7 +240,7 @@ object GuiUtils {
     }
   }
 
-  private final val renderItem: RenderItem = new RenderItem
+  private final lazy val renderItem = mc.getRenderItem
   private var _shaders: ShaderSystem = null
   private final val REPEAT_SHADER: String =
     """#version 120

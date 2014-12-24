@@ -25,7 +25,7 @@ package de.mineformers.core.client.renderer.shape
 
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.util.world.{Vector2, Vector3}
-import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
 
 /**
  * Vertex
@@ -53,12 +53,12 @@ case class Vertex(pos: Vector3, uv: Vector2, color: Color) {
 
   def isColored = color != null
 
-  def addToTessellator(tessellator: Tessellator): Unit = {
+  def addToTessellator(renderer: WorldRenderer): Unit = {
     if (isColored)
-      tessellator.setColorRGBA_F(color.r, color.g, color.b, color.a)
+      renderer.setColorRGBA_F(color.r, color.g, color.b, color.a)
     if (hasUV)
-      tessellator.addVertexWithUV(x, y, z, u, v)
+      renderer.addVertexWithUV(x, y, z, u, v)
     else
-      tessellator.addVertex(x, y, z)
+      renderer.addVertex(x, y, z)
   }
 }

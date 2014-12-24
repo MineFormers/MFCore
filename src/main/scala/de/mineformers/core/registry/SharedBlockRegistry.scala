@@ -23,9 +23,6 @@
  */
 package de.mineformers.core.registry
 
-import cpw.mods.fml.common.registry.GameRegistry
-import cpw.mods.fml.common.{Loader, LoaderState}
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import de.mineformers.core.block.{MetaBlock, TileProvider}
 import de.mineformers.core.client.util.BlockRendering
 import de.mineformers.core.item.ItemBlockMeta
@@ -33,6 +30,9 @@ import de.mineformers.core.util.Log
 import net.minecraft.block.Block
 import net.minecraft.item.ItemBlock
 import net.minecraft.tileentity.TileEntity
+import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.fml.common.{LoaderState, Loader}
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.language.existentials
 

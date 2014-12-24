@@ -23,11 +23,12 @@
  */
 package de.mineformers.core.structure
 
+import de.mineformers.core.util.world.BlockPos
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 import net.minecraft.world.World
-import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * Layer
@@ -124,7 +125,7 @@ abstract class BlockInfo(private var _x: Int, private var _z: Int) {
       null
   }
 
-  def rotate(world: World, y: Int, axis: ForgeDirection): Unit
+  def rotate(world: World, y: Int, axis: EnumFacing): Unit
 
   def copy: BlockInfo
 
@@ -142,8 +143,8 @@ class SimpleBlockInfo(private var block: Block, _x: Int, _z: Int, metadata: Byte
 
   def this(block: Block, x: Int, z: Int, metadata: Byte) = this(block, x, z, metadata, null)
 
-  override def rotate(world: World, y: Int, axis: ForgeDirection): Unit = {
-    block.rotateBlock(world, x, y, z, axis)
+  override def rotate(world: World, y: Int, axis: EnumFacing): Unit = {
+    block.rotateBlock(world, BlockPos(x, y, z), axis)
     entry = BlockEntry(block, metadata, tile)
   }
 

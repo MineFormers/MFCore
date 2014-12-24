@@ -23,13 +23,13 @@
  */
 package de.mineformers.core.structure
 
+import de.mineformers.core.util.world.BlockPos
 import net.minecraft.block.Block
 import net.minecraft.nbt.NBTTagCompound
+import net.minecraft.util.EnumFacing
 import net.minecraft.world.World
-import net.minecraftforge.common.util.ForgeDirection
 
 import scala.collection.mutable
-import scala.util.control.Breaks
 
 /**
  * configurable
@@ -174,12 +174,12 @@ class MultiBlockInfo(_x: Int, _z: Int, var blocks: Seq[BlockEntry]) extends Bloc
       else
         i = (i + 1) max 0 min (blocks.length - 1)
       last = time
-      world.markBlockForUpdate(x, y, z)
+      world.markBlockForUpdate(BlockPos(x, y, z))
     }
   }
 
-  override def rotate(world: World, y: Int, axis: ForgeDirection): Unit = {
-    getEntry.block.rotateBlock(world, x, y, z, axis)
+  override def rotate(world: World, y: Int, axis: EnumFacing): Unit = {
+    getEntry.block.rotateBlock(world, BlockPos(x, y, z), axis)
   }
 
   override def getEntry: BlockEntry = blocks(i)

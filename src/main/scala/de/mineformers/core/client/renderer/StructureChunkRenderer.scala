@@ -19,7 +19,7 @@ import org.lwjgl.opengl.GL11
  * @author PaleoCrafter
  */
 class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: Int, baseZ: Int) {
-  val bounds = AxisAlignedBB.getBoundingBox(baseX * ChunkWidth, baseY * ChunkHeight, baseZ * ChunkLength, (baseX + 1) * ChunkWidth, (baseY + 1) * ChunkHeight, (baseZ + 1) * ChunkLength)
+  val bounds = AxisAlignedBB.fromBounds(baseX * ChunkWidth, baseY * ChunkHeight, baseZ * ChunkLength, (baseX + 1) * ChunkWidth, (baseY + 1) * ChunkHeight, (baseZ + 1) * ChunkLength)
   val centered = BlockPos(((baseX + 0.5) * ChunkWidth).toInt, ((baseY + 0.5) * ChunkHeight).toInt, ((baseZ + 0.5) * ChunkLength).toInt)
   val glList = GL11.glGenLists(2)
   val mc = Minecraft.getMinecraft
@@ -56,24 +56,24 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
       this.mc.renderEngine.bindTexture(TextureMap.locationBlocksTexture)
       for (pass <- 0 until 2) {
         GL11.glNewList(glList + pass, GL11.GL_COMPILE)
-        val renderBlocks = structure.localWorldAccess.getRenderBlocks
+        //val renderBlocks = structure.localWorldAccess.getRenderBlocks
         val ambient = mc.gameSettings.ambientOcclusion
         mc.gameSettings.ambientOcclusion = 0
 
-        Tessellator.instance.startDrawingQuads()
+        Tessellator.getInstance().getWorldRenderer.startDrawingQuads()
         for (y <- minY until maxY; x <- minX until maxX; z <- minZ until maxZ) {
           try {
-            val block = structure.getBlock(x, y, z)
-            if (mc.theWorld.getBlock(pos.x + x, pos.y + y, pos.z + z) == Blocks.air || mc.theWorld.getBlock(pos.x + x, pos.y + y, pos.z + z) == null)
-              if (block != null && block.canRenderInPass(pass)) {
-                renderBlocks.renderBlockByRenderType(block, x, y, z)
+            val block = structure.getBlockState(BlockPos(x, y, z))
+            if (mc.theWorld.isAirBlock(pos + BlockPos(x, y, z)) || mc.theWorld.getBlockState(pos + BlockPos(x, y, z)) == null)
+              if (block != null && true) { // Can render in pass
+                //renderBlocks.renderBlockByRenderType(block, x, y, z)
               }
           } catch {
             case e: Exception =>
               Log.error("Failed to render block", e)
           }
         }
-        Tessellator.instance.draw()
+        Tessellator.getInstance().draw()
 
         mc.gameSettings.ambientOcclusion = ambient
         GL11.glEndList()
@@ -85,15 +85,15 @@ class StructureChunkRenderer(val structure: StructureWorld, baseX: Int, baseY: I
     ForgeHooksClient.setRenderPass(pass)
     try {
       for (tile <- tiles if tile.shouldRenderInPass(pass)) {
-        val x = tile.xCoord
-        val y = tile.yCoord
-        val z = tile.zCoord
+        val x = tile.getPos.getX
+        val y = tile.getPos.getY
+        val z = tile.getPos.getZ
         val pos = structure.pos
         val renderer = TileEntityRendererDispatcher.instance.getSpecialRenderer(tile)
-        if (mc.theWorld.getBlock(pos.x + x, pos.y + y, pos.z + z) == Blocks.air || mc.theWorld.getBlock(pos.x + x, pos.y + y, pos.z + z) == null)
+        if (mc.theWorld.isAirBlock(pos + BlockPos(x, y, z)) || mc.theWorld.getBlockState(pos + BlockPos(x, y, z)) == null)
           if (renderer != null) {
             try {
-              renderer.renderTileEntityAt(tile, x, y, z, 0)
+              renderer.renderTileEntityAt(tile, x, y, z, 0, -1)
               OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit)
               GL11.glDisable(GL11.GL_TEXTURE_2D)
               OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);

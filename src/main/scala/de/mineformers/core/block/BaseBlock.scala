@@ -23,11 +23,11 @@
  */
 package de.mineformers.core.block
 
-import cpw.mods.fml.common.Loader
 import de.mineformers.core.mod.MFMod
 import net.minecraft.block.Block
 import net.minecraft.block.material.Material
 import net.minecraft.creativetab.CreativeTabs
+import net.minecraftforge.fml.common.Loader
 
 /**
  * BaseBlock
@@ -41,7 +41,7 @@ import net.minecraft.creativetab.CreativeTabs
 class BaseBlock(name: String, texture: String, tab: CreativeTabs, material: Material) extends Block(material) {
   def this(name: String, tab: CreativeTabs, material: Material) = this(name, name, tab, material)
 
-  this.setBlockName({
+  this.setUnlocalizedName({
     val mod = Loader.instance().activeModContainer()
     mod.getMod match {
       case m: MFMod =>
@@ -50,12 +50,4 @@ class BaseBlock(name: String, texture: String, tab: CreativeTabs, material: Mate
     }
   })
   this.setCreativeTab(tab)
-  this.setBlockTextureName({
-    val mod = Loader.instance().activeModContainer()
-    mod.getMod match {
-      case m: MFMod =>
-        m.icon(texture)
-      case _ => mod.getModId.toLowerCase + ":" + texture
-    }
-  })
 }

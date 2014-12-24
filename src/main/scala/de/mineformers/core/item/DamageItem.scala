@@ -25,7 +25,6 @@ package de.mineformers.core.item
 
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.ItemStack
-import net.minecraft.util.IIcon
 
 /**
  * DamageItem
@@ -38,24 +37,6 @@ import net.minecraft.util.IIcon
 class DamageItem(baseName: String, tab: CreativeTabs, subItems: Array[SubItem]) extends BaseItem(baseName, tab) {
   this.setHasSubtypes(true)
   this.setMaxDamage(0)
-
-  override def requiresMultipleRenderPasses(): Boolean = true
-
-  /**
-   * @param stack the stack representing a [[SubItem]]
-   * @param pass the pass to render in
-   * @return the icon used for this pass and [[SubItem]]
-   */
-  override def getIcon(stack: ItemStack, pass: Int): IIcon = {
-    val dmg = stack.getItemDamage.max(0).min(subItems.length - 1)
-    subItems(dmg).getIcon(stack, pass)
-  }
-
-  /**
-   * @param metadata the damage value of the stack
-   * @return the render passes needed
-   */
-  override def getRenderPasses(metadata: Int): Int = 1
 
   /**
    * @param stack the stack representing the [[SubItem]]

@@ -38,7 +38,7 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 object Font {
-  private val renderers: mutable.HashMap[String, FontRenderer] = mutable.HashMap[String, FontRenderer]("default" -> mc.fontRenderer, "small" -> new FontRenderer(mc.gameSettings, new ResourceLocation("textures/font/ascii.png"), mc.renderEngine, false))
+  private val renderers: mutable.HashMap[String, FontRenderer] = mutable.HashMap[String, FontRenderer]("default" -> mc.fontRendererObj, "small" -> new FontRenderer(mc.gameSettings, new ResourceLocation("textures/font/ascii.png"), mc.renderEngine, false))
   val Default = Font("default")
   val DefaultShadow = Font("default", drawShadow = true)
   val DefaultDark = Font("default", 0x404040)

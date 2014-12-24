@@ -23,14 +23,18 @@
  */
 package de.mineformers.core.inventory
 
-import cpw.mods.fml.relauncher.ReflectionHelper
 import de.mineformers.core.reaction.{Event, Publisher}
 import de.mineformers.core.util.Log
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.inventory.{IInventory, ISidedInventory}
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.{NBTTagCompound, NBTTagList}
-import net.minecraftforge.common.util.{Constants, ForgeDirection}
+import net.minecraft.util.{ChatComponentText, EnumFacing, IChatComponent}
+import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fml.relauncher.ReflectionHelper
+
+import scala.language.dynamics
+import scala.languageFeature.dynamics
 
 /**
  * Inventory
@@ -75,6 +79,8 @@ object Inventory {
 }
 
 trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
+  private val fields = scala.collection.mutable.Map.empty[String, (Int, Int)]
+
   val content = Array.ofDim[ItemStack](getSizeInventory)
 
   def apply(slot: Int) = Option(getStackInSlot(slot))
@@ -125,13 +131,29 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
 
   override def isUseableByPlayer(player: EntityPlayer): Boolean = true
 
-  override def openInventory(): Unit = ()
+  override def openInventory(player: EntityPlayer): Unit = ()
 
-  override def closeInventory(): Unit = ()
+  override def closeInventory(player: EntityPlayer): Unit = ()
 
-  override def hasCustomInventoryName: Boolean = false
+  override def hasCustomName: Boolean = false
 
-  override def getInventoryName: String = ""
+  override def getName: String = ""
+
+  override def getDisplayName: IChatComponent = new ChatComponentText(getName)
+
+  override def clear(): Unit = for (i <- 0 until content.length) content(i) = null
+
+  override def getFieldCount: Int = fields.size
+
+  override def getField(id: Int): Int = fields.find(f => f._2._1 == id) match {
+    case Some((_, (_, value))) => value
+    case _ => 0
+  }
+
+  override def setField(id: Int, value: Int): Unit = fields.find(f => f._2._1 == id) match {
+    case Some((name, (_, _))) => fields.put(name, (id, value))
+    case _ =>
+  }
 
   def saveToNBT(tag: NBTTagCompound): Unit = {
     tag.setTag(Inventory.InventoryKey, Inventory.writeStackList(content))
@@ -142,6 +164,18 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
   }
 
   override def foreach[U](f: (ItemStack) => U): Unit = content foreach f
+
+  def selectDynamic(field: String): Int = if(fields.contains(field)) fields(field)._2 else throw new IllegalArgumentException("Field " + field + " doesn't exist")
+
+  def updateDynamic(field: String)(value: Int): Unit = {
+    if(fields.contains(field))
+      fields.put(field, (fields(field)._1, value))
+    else if(fields.nonEmpty)
+      fields.put(field, (fields.maxBy(f => f._2._1)._2._1 + 1, value))
+    else
+      fields.put(field, (0, value))
+  }
+
 }
 
 trait InventoryHolder extends Inventory {
@@ -155,13 +189,13 @@ trait InventoryHolder extends Inventory {
 object InventoryHolder {
 
   trait Sided extends InventoryHolder with ISidedInventory {
-    val accessibleSlots: Map[ForgeDirection, Array[Int]]
+    val accessibleSlots: Map[EnumFacing, Array[Int]]
 
-    override def canInsertItem(slot: Int, stack: ItemStack, side: Int): Boolean = getAccessibleSlotsFromSide(side).contains(slot) && isItemValidForSlot(slot, stack)
+    override def canInsertItem(slot: Int, stack: ItemStack, side: EnumFacing): Boolean = getSlotsForFace(side).contains(slot) && isItemValidForSlot(slot, stack)
 
-    override def canExtractItem(slot: Int, stack: ItemStack, side: Int): Boolean = getAccessibleSlotsFromSide(side).contains(slot) && isItemValidForSlot(slot, stack)
+    override def canExtractItem(slot: Int, stack: ItemStack, side: EnumFacing): Boolean = getSlotsForFace(side).contains(slot) && isItemValidForSlot(slot, stack)
 
-    override def getAccessibleSlotsFromSide(side: Int): Array[Int] = accessibleSlots.getOrElse(ForgeDirection.getOrientation(side), Array.empty[Int])
+    override def getSlotsForFace(side: EnumFacing): Array[Int] = accessibleSlots.getOrElse(side, Array.empty[Int])
   }
 
 }

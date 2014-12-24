@@ -23,7 +23,8 @@
  */
 package de.mineformers.core.structure
 
-import de.mineformers.core.util.Implicits._
+import de.mineformers.core.util.world.BlockPos
+import de.mineformers.core.util.world.RichWorld._
 import net.minecraft.block.Block
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.entity.{Entity, EntityList}
@@ -46,10 +47,11 @@ object StructureHelper {
       for (x1 <- 0 until structure.getWidth; z1 <- 0 until structure.getLength) {
         val info: BlockInfo = layer.get(x1, z1)
         if (info != null && (pasteAir || (info.getBlock ne Blocks.air))) {
-          world.setBlock(x + x1, y + y1, z + z1, info.getBlock, info.getMetadata, 2)
-          if (info.getTileEntity != null && world.getTileEntity(x + x1, y + y1, z + z1) != null) {
-            world.getTileEntity(x + x1, y + y1, z + z1).readFromNBT(info.getTranslatedTileEntity(x, y, z))
-            world.markBlockForUpdate(x + x1, y + y1, z + z1)
+          val pos = BlockPos(x + x1, y + y1, z + z1)
+          world.setBlockState(pos, info.getBlock.getStateFromMeta(info.getMetadata), 2)
+          if (info.getTileEntity != null && world.getTileEntity(pos) != null) {
+            world.getTileEntity(pos).readFromNBT(info.getTranslatedTileEntity(x, y, z))
+            world.markBlockForUpdate(pos)
           }
         }
       }
@@ -61,7 +63,7 @@ object StructureHelper {
         val pos: NBTTagList = newTag.getTagList("Pos", Constants.NBT.TAG_DOUBLE)
         val newPos: NBTTagList = new NBTTagList
         for (i <- 0 until pos.tagCount) {
-          newPos.appendTag(new NBTTagDouble(pos.func_150309_d(i) + posAdd(i)))
+          newPos.appendTag(new NBTTagDouble(pos.getDouble(i) + posAdd(i)))
         }
         newTag.setTag("Pos", newPos)
         val e: Entity = EntityList.createEntityFromNBT(newTag, world)
@@ -81,10 +83,11 @@ object StructureHelper {
     for (y <- minY to maxY) {
       val layer: Layer = new Layer((maxX - minX) + 1, (maxZ - minZ) + 1)
       for (x <- minX to maxX; z <- minZ to maxZ) {
-        if (world.getBlock(x, y, z) != null) {
-          val block: Block = world.getBlock(x, y, z)
-          val meta: Int = world.getBlockMetadata(x, y, z)
-          val tile: TileEntity = world.getTileEntity(x, y, z)
+        val pos = BlockPos(x, y, z)
+        if (world.getBlockState(pos) != null) {
+          val block: Block = world.getBlockState(pos).getBlock
+          val meta: Int = block.getMetaFromState(world.getBlockState(pos))
+          val tile: TileEntity = world.getTileEntity(pos)
           val tag: NBTTagCompound = if (tile != null) new NBTTagCompound else null
           if (tag != null) {
             tile.writeToNBT(tag)
@@ -111,7 +114,7 @@ object StructureHelper {
           val pos: NBTTagList = tag.getTagList("Pos", Constants.NBT.TAG_DOUBLE)
           val newPos: NBTTagList = new NBTTagList
           for (i <- 0 until pos.tagCount())
-            newPos.appendTag(new NBTTagDouble(pos.func_150309_d(i) - mins(i)))
+            newPos.appendTag(new NBTTagDouble(pos.getDouble(i) - mins(i)))
           tag.setTag("Pos", newPos)
         }
         structure.addEntity(tag)

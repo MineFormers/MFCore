@@ -23,17 +23,15 @@
  */
 package de.mineformers.core.block
 
-import de.mineformers.core.util.world.{BlockPos, Vector3}
-import net.minecraft.block.Block
+import de.mineformers.core.util.world.Vector3
 import net.minecraft.block.material.Material
-import net.minecraft.client.renderer.texture.IIconRegister
+import net.minecraft.block.state.{BlockState, IBlockState}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{IIcon, MovingObjectPosition}
-import net.minecraft.world.{IBlockAccess, World}
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.{EnumFacing, MovingObjectPosition, BlockPos => VBlockPos}
+import net.minecraft.world.World
 
 /**
  * MetaBlock
@@ -44,14 +42,18 @@ import net.minecraftforge.common.util.ForgeDirection
  * @param subBlocks a sequence of [[SubBlock]]s
  * @author PaleoCrafter
  */
-class MetaBlock(baseName: String, tab: CreativeTabs, material: Material, subBlocks: Seq[SubBlock]) extends BaseBlock(baseName, baseName, tab, material) {
+class MetaBlock(baseName: String, tab: CreativeTabs, material: Material, variantName: String, subBlocks: Seq[SubBlock]) extends BaseBlock(baseName, baseName, tab, material) {
+  final val property = new PropertySubBlock(variantName, subBlocks)
+
+  setDefaultState(blockState.getBaseState.withProperty(property, subBlocks.head))
+
   /**
    * Get the sub block for the corresponding meta.
    * Automatically limits the passed metadata to available values.
-   * @param meta the meta to get the sub block for
+   * @param state the state to get the sub block for
    * @return the sub block for the given meta
    */
-  def apply(meta: Int): SubBlock = subBlocks(meta max 0 min (subBlocks.length - 1))
+  def apply(state: IBlockState): SubBlock = state.getValue(property).asInstanceOf[SubBlock]
 
   /**
    * Add all the sub blocks to the creative tab
@@ -65,27 +67,24 @@ class MetaBlock(baseName: String, tab: CreativeTabs, material: Material, subBloc
   }
 
   /**
-   * @param meta the metadata of the block
+   * @param state the state of the block
    * @return by default, the value of meta
    */
-  override def damageDropped(meta: Int): Int = meta
+  override def damageDropped(state: IBlockState): Int = subBlocks.indexOf(this(state))
 
   /**
    * @param target the target
    * @param world the world the block is in
-   * @param x the block's x coordinate
-   * @param y the block's y coordinate
-   * @param z the block's z coordinate
+   * @param pos the block's position
    * @return an ItemStack representing the block with metadata
    */
-  override def getPickBlock(target: MovingObjectPosition, world: World, x: Int, y: Int, z: Int): ItemStack = new ItemStack(this, 1, world.getBlockMetadata(x, y, z))
+  override def getPickBlock(target: MovingObjectPosition, world: World, pos: VBlockPos): ItemStack = new ItemStack(this, 1, getMetaFromState(world.getBlockState(pos)))
 
   /**
    * Redirect the "event" to a SubBlock
    * @param world the world the block is in
-   * @param x the block's x coordinate
-   * @param y the block's y coordinate
-   * @param z the block's z coordinate
+   * @param pos the block's position
+   * @param state the block's state
    * @param player the player who activated the block
    * @param side the side the block was clicked on
    * @param hitX the x coordinate where the block was clicked (0..1)
@@ -93,62 +92,46 @@ class MetaBlock(baseName: String, tab: CreativeTabs, material: Material, subBloc
    * @param hitZ the z coordinate where the block was clicked (0..1)
    * @return true, if something was done here
    */
-  override def onBlockActivated(world: World, x: Int, y: Int, z: Int, player: EntityPlayer, side: Int, hitX: Float, hitY: Float, hitZ: Float): Boolean =
-    apply(world.getBlockMetadata(x, y, z)).onActivated(player, world, BlockPos(x, y, z), Vector3(hitX, hitY, hitZ), ForgeDirection.getOrientation(side))
+  override def onBlockActivated(world: World, pos: VBlockPos, state: IBlockState, player: EntityPlayer, side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean =
+    this(state).onActivated(player, world, pos, Vector3(hitX, hitY, hitZ), side)
 
   /**
    * Called whenever the block is broken, redirect to sub block.
    * @param world the world the block is in
-   * @param x the block's x coordinate
-   * @param y the block's y coordinate
-   * @param z the block's z coordinate
-   * @param block the block broken, usually <code>this</code>
-   * @param meta the block's metadata
+   * @param pos the block's position
+   * @param state the block's state
    */
-  override def breakBlock(world: World, x: Int, y: Int, z: Int, block: Block, meta: Int): Unit = {
-    super.breakBlock(world, x, y, z, block, meta)
-    apply(meta).onBreak(world, BlockPos(x, y, z), block)
+  override def breakBlock(world: World, pos: VBlockPos, state: IBlockState): Unit = {
+    super.breakBlock(world, pos, state)
+    apply(state).onBreak(world, pos)
   }
 
-  override def hasTileEntity(metadata: Int): Boolean = apply(metadata).hasTileEntity
+  override def hasTileEntity(state: IBlockState): Boolean = apply(state).hasTileEntity
 
-  override def createTileEntity(world: World, metadata: Int): TileEntity = apply(metadata).createTileEntity(world)
-
-  /**
-   * Register the SubBlocks' icons
-   * @param iconRegister the icon register to add the icons to
-   */
-  override def registerBlockIcons(iconRegister: IIconRegister): Unit =
-    subBlocks foreach (block => block.registerIcons(iconRegister))
+  override def createTileEntity(world: World, state: IBlockState): TileEntity = apply(state).createTileEntity(world)
 
   /**
-   * Get the icon for the according SubBlock
-   * @param world the world the block is in
-   * @param x the block's x coordinate
-   * @param y the block's y coordinate
-   * @param z the block's z coordinate
-   * @param side the side the icon is drawn on
-   * @return the icon for the given parameters
-   */
-  override def getIcon(world: IBlockAccess, x: Int, y: Int, z: Int, side: Int): IIcon =
-    apply(world.getBlockMetadata(x, y, z)).getIcon(world, BlockPos(x, y, z), ForgeDirection.getOrientation(side))
-
-  /**
-   * @param meta the metadata of the block
+   * @param state the state of the block
    * @return the unlocalized name for the according SubBlock
    */
-  def getUnlocalizedName(meta: Int): String =
-    "tile." + baseName + "." + apply(meta).name
+  def getUnlocalizedName(state: IBlockState): String =
+    "tile." + baseName + "." + apply(state).name
 
   /**
    * @param stack the stack representing the block with metadata
    * @return the unlocalized name for the according SubBlock
    */
   def getUnlocalizedName(stack: ItemStack): String =
-    "tile." + baseName + "." + apply(stack.getItemDamage).getName(stack)
+    "tile." + baseName + "." + apply(getStateFromMeta(stack.getItemDamage)).getName(stack)
 
   /**
    * @return the first SubBlock's unlocalized name
    */
-  override def getUnlocalizedName: String = getUnlocalizedName(0)
+  override def getUnlocalizedName: String = getUnlocalizedName(getDefaultState)
+
+  override def createBlockState(): BlockState = new BlockState(this, property)
+
+  override def getStateFromMeta(meta: Int): IBlockState = getDefaultState.withProperty(property, subBlocks(meta))
+
+  override def getMetaFromState(state: IBlockState): Int = subBlocks.indexOf(this(state))
 }

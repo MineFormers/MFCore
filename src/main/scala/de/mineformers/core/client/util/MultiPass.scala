@@ -24,9 +24,6 @@
 package de.mineformers.core.client.util
 
 import net.minecraft.block.Block
-import net.minecraft.util.IIcon
-import net.minecraft.world.IBlockAccess
-import net.minecraftforge.common.util.ForgeDirection
 
 /**
  * MultiPass
@@ -36,17 +33,4 @@ import net.minecraftforge.common.util.ForgeDirection
 trait MultiPass {
   this: Block =>
   var renderPass = 0
-
-  def getIcon(side: ForgeDirection, meta: Int, pass: Int): IIcon = getIcon(side.ordinal(), meta)
-
-  def getIcon(access: IBlockAccess, x: Int, y: Int, z: Int, side: ForgeDirection, pass: Int): IIcon = getIcon(side, access.getBlockMetadata(x, y, z), pass)
-
-  override def getIcon(access: IBlockAccess, x: Int, y: Int, z: Int, side: Int): IIcon = getIcon(access, x, y, z, ForgeDirection.getOrientation(side), renderPass)
-
-  override def canRenderInPass(pass: Int): Boolean = {
-    renderPass = pass
-    true
-  }
-
-  override def getRenderBlockPass: Int = 1
 }

@@ -23,16 +23,15 @@
  */
 package de.mineformers.core.client.util
 
-import cpw.mods.fml.client.FMLClientHandler
-import cpw.mods.fml.relauncher.ReflectionHelper
 import de.mineformers.core.client.renderer.shape.Vertex
 import de.mineformers.core.util.world.{Vector2, Vector3}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
-import net.minecraft.client.renderer.{EntityRenderer, OpenGlHelper, RenderHelper, Tessellator}
+import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper, Tessellator}
 import net.minecraft.entity.Entity
-import net.minecraft.util.{MathHelper, ResourceLocation, Timer}
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.{EnumFacing, MathHelper, ResourceLocation, Timer}
+import net.minecraftforge.fml.client.FMLClientHandler
+import net.minecraftforge.fml.relauncher.ReflectionHelper
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11._
 
@@ -62,10 +61,10 @@ object RenderUtils {
     glRotated(vec.z, 0, 0, 1)
   }
 
-  def rotateFacing(entity: Entity = Minecraft.getMinecraft.renderViewEntity, axis: Vector3 = Vector3(1, 1, 1)): Unit = {
+  def rotateFacing(entity: Entity = Minecraft.getMinecraft.getRenderViewEntity, axis: Vector3 = Vector3(1, 1, 1)): Unit = {
     val yaw = entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks
     val pitch = entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks
-    val roll = prevCamRoll + (camRoll - prevCamRoll) * partialTicks
+    val roll = 0
     glRotated(-(yaw + 180) * axis.y, 0, 1, 0)
     glRotated(-pitch * axis.x, 1, 0, 0)
     glRotated(-roll * axis.z, 0, 0, 1)
@@ -85,7 +84,7 @@ object RenderUtils {
     } reverse)
   }
 
-  def createCircle(x: Double, y: Double, z: Double, radius: Double, vertices: Int) = (0 until vertices) map {
+  def createCircle(x: Double, y: Double, z: Double, radius: Double, vertices: Int) = ((0 until vertices) map {
     i =>
       val theta = i * 2 * math.Pi / vertices.toFloat
       // angle to ith vertex, in radians not degrees.
@@ -93,11 +92,11 @@ object RenderUtils {
       val xOff = radius * math.cos(theta)
       val zOff = radius * math.sin(theta)
       Vertex(Vector3(x + xOff, y + zOff, z))
-  } reverse
+  }).reverse
 
-  import net.minecraftforge.common.util.ForgeDirection._
+  import net.minecraft.util.EnumFacing._
 
-  def drawCuboid(x: Double, y: Double, z: Double, width: Double, height: Double, length: Double, uvs: Map[ForgeDirection, (Vector2, Vector2)] = Map.empty[ForgeDirection, (Vector2, Vector2)]): Unit = {
+  def drawCuboid(x: Double, y: Double, z: Double, width: Double, height: Double, length: Double, uvs: Map[EnumFacing, (Vector2, Vector2)] = Map.empty[EnumFacing, (Vector2, Vector2)]): Unit = {
     val defaultUVs = (Vector2(0, 0), Vector2(1, 1))
     val upUVs = uvs.getOrElse(UP, defaultUVs)
     val downUVs = uvs.getOrElse(DOWN, defaultUVs)
@@ -113,7 +112,7 @@ object RenderUtils {
     drawQuad(x, y, z, length, height, NORTH, northUVs._1.x, northUVs._1.y, northUVs._2.x, northUVs._2.y)
   }
 
-  def drawQuad(x: Double, y: Double, z: Double, width: Double, length: Double, facing: ForgeDirection, uMin: Double = 0, vMin: Double = 0, uMax: Double = 1, vMax: Double = 1): Unit = {
+  def drawQuad(x: Double, y: Double, z: Double, width: Double, length: Double, facing: EnumFacing, uMin: Double = 0, vMin: Double = 0, uMax: Double = 1, vMax: Double = 1): Unit = {
     val vertices = facing match {
       case UP =>
         Seq(Vertex(Vector3(x, y, z), Vector2(uMin, vMin)),
@@ -150,10 +149,10 @@ object RenderUtils {
   }
 
   def drawVertices(mode: Int, vertices: Seq[Vertex]): Unit = {
-    val tessellator: Tessellator = Tessellator.instance
-    tessellator.startDrawing(mode)
+    val tessellator: Tessellator = Tessellator.getInstance()
+    tessellator.getWorldRenderer.startDrawing(mode)
     for (v <- vertices) {
-      v.addToTessellator(tessellator)
+      v.addToTessellator(tessellator.getWorldRenderer)
     }
     tessellator.draw()
   }
@@ -207,7 +206,8 @@ object RenderUtils {
     // Beams rendering
     glPushMatrix()
     glRotated(720.0 * (System.currentTimeMillis() & 0x3FFFL) / 0x3FFFL * speed, 0, 1, 0)
-    val tessellator = Tessellator.instance
+    val tessellator = Tessellator.getInstance()
+    val renderer = tessellator.getWorldRenderer
     val scale = 1 / 150F
     for (i <- 0 until 12) {
       glRotatef(random.nextFloat * 360.0F, 1.0F, 0.0F, 0.0F)
@@ -217,18 +217,18 @@ object RenderUtils {
       glRotatef(random.nextFloat * 360.0F, 0.0F, 1.0F, 0.0F)
       glRotatef(random.nextFloat * 360.0F, 0.0F, 0.0F, 1.0F)
       glRotatef(step * 2 * 90.0F, 0, 0, 1)
-      tessellator.startDrawing(GL_TRIANGLE_FAN)
+      renderer.startDrawing(GL_TRIANGLE_FAN)
       val length = (360 - random.nextInt(20) + 10) * scale
       val horOff = (80 - random.nextInt(10) + 5) * scale
 
       val color = colorGenerator(random).integer
-      tessellator.setColorRGBA_I(color, 127)
-      tessellator.addVertex(0.0D, 0.0D, 0.0D)
-      tessellator.setColorRGBA_I(color, 0)
-      tessellator.addVertex(-0.866D * horOff, length, -0.5F * horOff)
-      tessellator.addVertex(0.866D * horOff, length, -0.5F * horOff)
-      tessellator.addVertex(0.0D, length, 1.0F * horOff)
-      tessellator.addVertex(-0.866D * horOff, length, -0.5F * horOff)
+      renderer.setColorRGBA_I(color, 127)
+      renderer.addVertex(0.0D, 0.0D, 0.0D)
+      renderer.setColorRGBA_I(color, 0)
+      renderer.addVertex(-0.866D * horOff, length, -0.5F * horOff)
+      renderer.addVertex(0.866D * horOff, length, -0.5F * horOff)
+      renderer.addVertex(0.0D, length, 1.0F * horOff)
+      renderer.addVertex(-0.866D * horOff, length, -0.5F * horOff)
       tessellator.draw()
     }
     glPopMatrix()
@@ -246,16 +246,6 @@ object RenderUtils {
     timerField.get(Minecraft.getMinecraft).asInstanceOf[Timer].renderPartialTicks
   }
 
-  def camRoll: Float = {
-    rollField.setAccessible(true)
-    rollField.get(Minecraft.getMinecraft.entityRenderer).asInstanceOf[Float]
-  }
-
-  def prevCamRoll: Float = {
-    prevRollField.setAccessible(true)
-    prevRollField.get(Minecraft.getMinecraft.entityRenderer).asInstanceOf[Float]
-  }
-
   def particles: Array[Iterable[EntityFX]] = {
     particlesField.setAccessible(true)
     import scala.collection.JavaConversions.collectionAsScalaIterable
@@ -264,6 +254,4 @@ object RenderUtils {
 
   private val particlesField = ReflectionHelper.findField(classOf[EffectRenderer], "fxLayers", "field_78876_b")
   private val timerField = ReflectionHelper.findField(classOf[Minecraft], "timer", "field_71428_T")
-  private val rollField = ReflectionHelper.findField(classOf[EntityRenderer], "camRoll", "field_78495_O")
-  private val prevRollField = ReflectionHelper.findField(classOf[EntityRenderer], "prevCamRoll", "field_78505_P")
 }

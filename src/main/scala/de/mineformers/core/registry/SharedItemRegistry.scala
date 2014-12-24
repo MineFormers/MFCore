@@ -23,11 +23,11 @@
  */
 package de.mineformers.core.registry
 
-import cpw.mods.fml.common.registry.GameRegistry
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import de.mineformers.core.client.util.ItemRendering
 import net.minecraft.item.Item
 import net.minecraftforge.client.MinecraftForgeClient
+import net.minecraftforge.fml.common.registry.GameRegistry
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
  * ItemEntry representing an item in the registry's map

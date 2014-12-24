@@ -41,7 +41,7 @@ object ItemUtils {
   }
 
   def nbtEqual(compare: ItemStack, against: ItemStack): Boolean = {
-    (against.stackTagCompound == null && compare.stackTagCompound == null) || against.stackTagCompound.equals(compare.stackTagCompound)
+    (against.getTagCompound == null && compare.getTagCompound == null) || against.getTagCompound.equals(compare.getTagCompound)
   }
 
   final val MergeFullStack = -1

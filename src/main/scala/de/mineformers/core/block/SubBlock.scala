@@ -24,21 +24,18 @@
 package de.mineformers.core.block
 
 import de.mineformers.core.util.world.{BlockPos, Vector3}
-import net.minecraft.block.Block
-import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.IIcon
-import net.minecraft.world.{IBlockAccess, World}
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.{IStringSerializable, EnumFacing}
+import net.minecraft.world.World
 
 /**
  * SubBlock
  *
  * @author PaleoCrafter
  */
-trait SubBlock {
+trait SubBlock extends Comparable[SubBlock] with IStringSerializable {
   /**
    * @return the unlocalized name for this SubBlock
    */
@@ -56,20 +53,6 @@ trait SubBlock {
   def getName(stack: ItemStack) = name
 
   /**
-   * @param world the world the block is in
-   * @param pos the position of the block
-   * @param side the side the icon is drawn on
-   * @return the icon for the specified parameters
-   */
-  def getIcon(world: IBlockAccess, pos: BlockPos, side: ForgeDirection): IIcon = getIcon(side)
-
-  /**
-   * @param side the side the icon is drawn on
-   * @return the icon for the specified side
-   */
-  def getIcon(side: ForgeDirection): IIcon = icon
-
-  /**
    * Called whenever this SubBlock is activated
    * @param player the player who activated the block
    * @param world the world the block is in
@@ -78,22 +61,14 @@ trait SubBlock {
    * @param side the side the block was clicked on
    * @return true, if something was done
    */
-  def onActivated(player: EntityPlayer, world: World, pos: BlockPos, hitVec: Vector3, side: ForgeDirection): Boolean = false
+  def onActivated(player: EntityPlayer, world: World, pos: BlockPos, hitVec: Vector3, side: EnumFacing): Boolean = false
 
   /**
    * Called whenever this SubBlock is broken
    * @param world the world the block is in
    * @param pos the position of the block
-   * @param block the block destroyed
    */
-  def onBreak(world: World, pos: BlockPos, block: Block): Unit = ()
-
-  /**
-   * Register the icon(s) for this block
-   *
-   * @param register the icon register
-   */
-  def registerIcons(register: IIconRegister): Unit = register.registerIcon(texture)
+  def onBreak(world: World, pos: BlockPos): Unit = ()
 
   /**
    * @return true, if this SubBlock has a TE
@@ -107,5 +82,9 @@ trait SubBlock {
    */
   def createTileEntity(world: World): TileEntity = null
 
-  protected var icon: IIcon = null
+  override def compareTo(o: SubBlock): Int = {
+    o.name.compareTo(name)
+  }
+
+  override def getName: String = name
 }

@@ -23,16 +23,16 @@
  */
 package de.mineformers.core.client.ui.component
 
-import cpw.mods.fml.client.FMLClientHandler
 import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.component.container.Panel
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
 import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
-import de.mineformers.core.client.ui.util.{ComponentEvent, MouseButton, MouseEvent}
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.Minecraft
+import net.minecraftforge.fml.client.FMLClientHandler
 
 /**
  * Component

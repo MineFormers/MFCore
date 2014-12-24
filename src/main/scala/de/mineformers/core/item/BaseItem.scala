@@ -23,10 +23,10 @@
  */
 package de.mineformers.core.item
 
-import cpw.mods.fml.common.Loader
 import de.mineformers.core.mod.MFMod
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.Item
+import net.minecraftforge.fml.common.Loader
 
 /**
  * BaseItem
@@ -48,12 +48,12 @@ class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
     }
   })
   this.setCreativeTab(tab)
-  this.setTextureName({
-    val mod = Loader.instance().activeModContainer()
-    mod.getMod match {
-      case m: MFMod =>
-        m.icon(texture)
-      case _ => mod.getModId.toLowerCase + ":" + texture
-    }
-  })
+//  this.setTextureName({
+//    val mod = Loader.instance().activeModContainer()
+//    mod.getMod match {
+//      case m: MFMod =>
+//        m.icon(texture)
+//      case _ => mod.getModId.toLowerCase + ":" + texture
+//    }
+//  })
 }

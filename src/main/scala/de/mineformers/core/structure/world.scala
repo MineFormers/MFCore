@@ -23,23 +23,21 @@
  */
 package de.mineformers.core.structure
 
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import de.mineformers.core.client.renderer.StructureChunkRenderer
+import de.mineformers.core.util.Implicits.VBlockPos
 import de.mineformers.core.util.world.BlockPos
-import net.minecraft.block.Block
+import net.minecraft.block.state.IBlockState
 import net.minecraft.client.multiplayer.ChunkProviderClient
-import net.minecraft.client.renderer.RenderBlocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{AxisAlignedBB, MathHelper}
+import net.minecraft.util
+import net.minecraft.util.{AxisAlignedBB, EnumFacing, MathHelper}
 import net.minecraft.world._
-import net.minecraft.world.biome.BiomeGenBase
 import net.minecraft.world.chunk.IChunkProvider
-import net.minecraft.world.storage.SaveHandlerMP
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.world.storage.{SaveHandlerMP, WorldInfo}
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.collection.mutable
 
@@ -48,19 +46,17 @@ import scala.collection.mutable
  *
  * @author PaleoCrafter
  */
-class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) extends World(new SaveHandlerMP, "DRASH", null, StructureWorld.Settings, null) {
-  isRemote = side.isClient
+class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) extends World(new SaveHandlerMP, new WorldInfo(StructureWorld.Settings, "Structure"), null, null, side.isClient) {
+  import scala.collection.JavaConversions._
   val structure = _structure.copy
   val tiles = mutable.HashMap.empty[BlockPos, TileEntity]
   for (y <- 0 until structure.getHeight; layer = structure.getLayer(y); x <- 0 until layer.width; z <- 0 until layer.length) {
     val info = layer.get(x, z)
     if (info != null && info.getTileEntity != null) {
-      val tile = info.getBlock.createTileEntity(this, info.getMetadata)
+      val tile = info.getBlock.createTileEntity(this, info.getBlock.getStateFromMeta(info.getMetadata))
       if (tile != null) {
         tile.setWorldObj(this)
-        tile.xCoord = x
-        tile.yCoord = y
-        tile.zCoord = z
+        tile.setPos(new VBlockPos(x, y, z))
         tile.validate()
         tile.readFromNBT(info.getTileEntity)
         tiles.put(BlockPos(x, y, z), tile)
@@ -71,77 +67,44 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
   if (localWorldAccess != null)
     worldAccesses.asInstanceOf[java.util.List[IWorldAccess]].add(localWorldAccess)
 
-  override def getBlockMetadata(x: Int, y: Int, z: Int): Int = {
-    val info = structure.getBlock(x, y, z)
-    if (info != null) info.getMetadata else 0
+  override def getBlockState(pos: VBlockPos): IBlockState = {
+    val info = structure.getBlock(pos)
+    if (info != null) info.getBlock.getStateFromMeta(info.getMetadata) else null
   }
 
-  override def func_152379_p(): Int = 10
+  override def getTileEntity(pos: VBlockPos): TileEntity = tiles.getOrElse(pos, null)
 
-  override def getTileEntity(x: Int, y: Int, z: Int): TileEntity = tiles.getOrElse(BlockPos(x, y, z), null)
-
-  override def isBlockNormalCubeDefault(x: Int, y: Int, z: Int, default: Boolean): Boolean = {
-    val block = getBlock(x, y, z)
-    if (block == null)
-      false
-    else if (block.isNormalCube)
-      true
-    else
-      default
-  }
-
-  override def getBlock(x: Int, y: Int, z: Int): Block = {
-    val info = structure.getBlock(x, y, z)
-    if (info != null) info.getBlock else Blocks.air
-  }
-
-  override def isAirBlock(x: Int, y: Int, z: Int): Boolean = {
-    val block = getBlock(x, y, z)
+  override def isAirBlock(pos: VBlockPos): Boolean = {
+    val block = getBlockState(pos).getBlock
     if (block == null)
       true
     else
-      block.isAir(this, x, y, z)
+      block.isAir(this, pos)
   }
 
-  override def getBiomeGenForCoords(x: Int, z: Int): BiomeGenBase = BiomeGenBase.jungle
+  override def getRenderDistanceChunks: Int = 10
 
   override def extendedLevelsInChunkCache(): Boolean = false
 
-  override def blockExists(x: Int, y: Int, z: Int): Boolean = false
-
-  override def getSkyBlockTypeBrightness(par1EnumSkyBlock: EnumSkyBlock, par2: Int, par3: Int, par4: Int): Int = 15
-
-  override def getLightBrightness(par1: Int, par2: Int, par3: Int): Float = 1f
-
-  override def setBlock(x: Int, y: Int, z: Int, block: Block, meta: Int, flags: Int): Boolean = {
-    val info = structure.getBlock(x, y, z)
+  override def setBlockState(pos: VBlockPos, state: IBlockState, flags: Int): Boolean = {
+    val info = structure.getBlock(pos)
     if (info != null) {
-      info.setBlock(block)
-      info.setMetadata(meta)
-      markBlockForUpdate(x, y, z)
+      info.setBlock(state.getBlock)
+      info.setMetadata(state.getBlock.getMetaFromState(state))
+      markBlockForUpdate(pos)
       true
     } else false
   }
 
-  override def setBlockMetadataWithNotify(x: Int, y: Int, z: Int, metadata: Int, flag: Int): Boolean = {
-    val info = structure.getBlock(x, y, z)
-    if (info != null) {
-      info.setMetadata(metadata)
-      markBlockForUpdate(x, y, z)
-      true
-    } else false
-  }
-
-  override def isSideSolid(x: Int, y: Int, z: Int, side: ForgeDirection, default: Boolean): Boolean = {
-    val block = getBlock(x, y, z)
+  override def isSideSolid(pos: VBlockPos, side: EnumFacing, default: Boolean): Boolean = {
+    val block = getBlockState(pos).getBlock
     if (block == null)
       false
     else
-      block.isSideSolid(this, x, y, z, side)
+      block.isSideSolid(this, pos, side)
   }
 
   def dispose(): Unit = {
-    import scala.collection.JavaConversions._
     for (a <- worldAccesses) {
       a match {
         case s: StructureWorldAccess =>
@@ -159,7 +122,6 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
   }
 
   def update(): Unit = {
-    import scala.collection.JavaConversions._
     for (a <- worldAccesses) {
       a match {
         case s: StructureWorldAccess =>
@@ -169,7 +131,7 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
     }
   }
 
-  def bounds = AxisAlignedBB.getBoundingBox(pos.x, pos.y, pos.z, pos.x + width, pos.y + height, pos.z + length)
+  def bounds = AxisAlignedBB.fromBounds(pos.x, pos.y, pos.z, pos.x + width, pos.y + height, pos.z + length)
 
   def width = structure.getWidth
 
@@ -182,7 +144,7 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
   }
 
   def getTileTag(x: Int, y: Int, z: Int): NBTTagCompound = {
-    val info = structure.getBlock(x, y, z)
+    val info = structure.getBlock(BlockPos(x, y, z))
     if (info != null)
       info.getTileEntity
     else
@@ -191,9 +153,9 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
 
   def rotate(): Unit = {
     for (y <- 0 until height; x <- 0 until width; z <- 0 until length) {
-      val info = structure.getBlock(x, y, z)
+      val info = structure.getBlock(BlockPos(x, y, z))
       if (info != null)
-        info.rotate(this, y, ForgeDirection.UP)
+        info.rotate(this, y, EnumFacing.UP)
     }
   }
 
@@ -221,46 +183,19 @@ trait StructureWorldAccess extends IWorldAccess {
     for (x <- boundXLow to boundXUp;
          y <- boundYLow to boundYUp;
          z <- boundZLow to boundZUp) {
-      markBlockForRenderUpdate(x, y, z)
+      markBlockForUpdate(BlockPos(x, y, z))
     }
   }
 
-  override def playRecord(p_72702_1_ : String, p_72702_2_ : Int, p_72702_3_ : Int, p_72702_4_ : Int): Unit = ()
-
-  override def playAuxSFX(p_72706_1_ : EntityPlayer, p_72706_2_ : Int, p_72706_3_ : Int, p_72706_4_ : Int, p_72706_5_ : Int, p_72706_6_ : Int): Unit = ()
-
-  override def onEntityDestroy(p_72709_1_ : Entity): Unit = ()
-
-  override def destroyBlockPartially(p_147587_1_ : Int, p_147587_2_ : Int, p_147587_3_ : Int, p_147587_4_ : Int, p_147587_5_ : Int): Unit = ()
-
-  override def spawnParticle(p_72708_1_ : String, p_72708_2_ : Double, p_72708_4_ : Double, p_72708_6_ : Double, p_72708_8_ : Double, p_72708_10_ : Double, p_72708_12_ : Double): Unit = ()
-
-  override def playSound(p_72704_1_ : String, p_72704_2_ : Double, p_72704_4_ : Double, p_72704_6_ : Double, p_72704_8_ : Float, p_72704_9_ : Float): Unit = ()
-
-  override def broadcastSound(p_82746_1_ : Int, p_82746_2_ : Int, p_82746_3_ : Int, p_82746_4_ : Int, p_82746_5_ : Int): Unit = ()
-
-  override def playSoundToNearExcept(p_85102_1_ : EntityPlayer, p_85102_2_ : String, p_85102_3_ : Double, p_85102_5_ : Double, p_85102_7_ : Double, p_85102_9_ : Float, p_85102_10_ : Float): Unit = ()
-
-  override def onEntityCreate(p_72703_1_ : Entity): Unit = ()
-
-  override def onStaticEntitiesChanged(): Unit = ()
-
   @SideOnly(Side.CLIENT)
   def getChunkRenderers: List[StructureChunkRenderer] = null
-
-  @SideOnly(Side.CLIENT)
-  def getRenderBlocks: RenderBlocks = null
 }
 
 class StructureWorldAccessClient(world: StructureWorld) extends StructureWorldAccess {
-  val renderer = new RenderBlocks(world)
   var chunkRenderers = createRenderChunkList()
 
   @SideOnly(Side.CLIENT)
   override def getChunkRenderers: List[StructureChunkRenderer] = chunkRenderers
-
-  @SideOnly(Side.CLIENT)
-  override def getRenderBlocks: RenderBlocks = renderer
 
   override def update(): Unit = {
     for (render <- chunkRenderers) {
@@ -274,15 +209,31 @@ class StructureWorldAccessClient(world: StructureWorld) extends StructureWorldAc
     }
   }
 
-  override def markBlockForRenderUpdate(x: Int, y: Int, z: Int): Unit = markBlockForUpdate(x, y, z)
-
-  override def markBlockForUpdate(x: Int, y: Int, z: Int): Unit = {
-    for (render <- chunkRenderers) {
-      if (BlockPos(x, y, z).containedBy(render.bounds)) {
-        render.update = true
-      }
+  override def markBlockForUpdate(pos: VBlockPos): Unit = for (render <- chunkRenderers) {
+    if (BlockPos(pos).containedBy(render.bounds)) {
+      render.update = true
     }
   }
+
+  override def playRecord(recordName: String, blockPosIn: util.BlockPos): Unit = ()
+
+  override def onEntityAdded(entityIn: Entity): Unit = ()
+
+  override def spawnParticle(p_180442_1_ : Int, p_180442_2_ : Boolean, p_180442_3_ : Double, p_180442_5_ : Double, p_180442_7_ : Double, p_180442_9_ : Double, p_180442_11_ : Double, p_180442_13_ : Double, p_180442_15_ : Int*): Unit = ()
+
+  override def playSound(soundName: String, x: Double, y: Double, z: Double, volume: Float, pitch: Float): Unit = ()
+
+  override def onEntityRemoved(entityIn: Entity): Unit = ()
+
+  override def broadcastSound(p_180440_1_ : Int, p_180440_2_ : util.BlockPos, p_180440_3_ : Int): Unit = ()
+
+  override def playSoundToNearExcept(except: EntityPlayer, soundName: String, x: Double, y: Double, z: Double, volume: Float, pitch: Float): Unit = ()
+
+  override def playAusSFX(p_180439_1_ : EntityPlayer, p_180439_2_ : Int, blockPosIn: util.BlockPos, p_180439_4_ : Int): Unit = ()
+
+  override def sendBlockBreakProgress(breakerId: Int, pos: util.BlockPos, progress: Int): Unit = ()
+
+  override def notifyLightSet(pos: util.BlockPos): Unit = ()
 
   def createRenderChunkList(): List[StructureChunkRenderer] = {
     val width = (world.width - 1) / 16 + 1

@@ -27,18 +27,18 @@ import java.io.File
 import java.net.URISyntaxException
 
 import com.google.common.base.Throwables
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.{MCVersion, TransformerExclusions}
 import de.mineformers.core.impl.asm.CoreClassTransformer
 import de.mineformers.core.network.MFNetworkWrapper
 import de.mineformers.core.util.Log
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin
+import net.minecraftforge.fml.relauncher.IFMLLoadingPlugin.{MCVersion, TransformerExclusions}
 
 /**
  * MFCore
  *
  * @author PaleoCrafter
  */
-@MCVersion("1.7.10")
+@MCVersion("1.8")
 @IFMLLoadingPlugin.SortingIndex(1001)
 @TransformerExclusions(Array("de.mineformers.core.asm.", "de.mineformers.core.impl.asm.", "scala."))
 class MFCore extends IFMLLoadingPlugin {

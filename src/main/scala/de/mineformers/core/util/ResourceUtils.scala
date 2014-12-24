@@ -29,7 +29,7 @@ import java.util.jar.JarFile
 
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.data.IMetadataSection
-import net.minecraft.util.{IIcon, ResourceLocation}
+import net.minecraft.util.ResourceLocation
 
 /**
  * ResourceUtils
@@ -81,15 +81,6 @@ object ResourceUtils {
     def apply(path: String) = new Resource(path)
 
     def apply(domain: String, path: String) = new Resource(domain, path)
-
-    def apply(icon: IIcon, isItem: Boolean = false) = {
-      val pathFormat = "%s:textures/" + (if (isItem) "items" else "blocks") + "/%s.png"
-      val name = icon.getIconName
-      val colonIndex = name.indexOf(":")
-      val modId = if (colonIndex != -1) name.substring(0, colonIndex) else "minecraft"
-      val texture = if (colonIndex != -1) name.substring(colonIndex + 1) else name
-      new Resource(pathFormat.format(modId, texture))
-    }
   }
 
   case class Resource(location: ResourceLocation) {

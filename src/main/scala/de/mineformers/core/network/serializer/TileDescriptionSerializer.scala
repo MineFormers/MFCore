@@ -23,10 +23,10 @@
  */
 package de.mineformers.core.network.serializer
 
-import cpw.mods.fml.common.network.ByteBufUtils
 import de.mineformers.core.network.Message.Serializer
 import de.mineformers.core.tileentity.{Describable, TileDescription}
 import io.netty.buffer.ByteBuf
+import net.minecraftforge.fml.common.network.ByteBufUtils
 
 /**
  * TileDescriptionSerializer

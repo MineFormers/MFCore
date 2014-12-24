@@ -1,22 +1,18 @@
 package de.mineformers.core.asm.util;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import cpw.mods.fml.relauncher.ReflectionHelper;
 import net.minecraft.launchwrapper.Launch;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
-import sun.management.MethodInfo;
-import sun.reflect.FieldInfo;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static org.objectweb.asm.Opcodes.*;
 

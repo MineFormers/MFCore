@@ -108,7 +108,7 @@ object ModMaticFile {
       val block = if (info != null) info.getBlock else Blocks.air
       if (!types.contains(block)) {
         types.put(block, lastType)
-        typeStrings.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(block)))
+        typeStrings.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(block).asInstanceOf[String]))
         lastType = (lastType + 1).toShort
       }
     }
@@ -158,7 +158,7 @@ object ModMaticFile {
     }
     else {
       if (!types.contains(Blocks.air)) {
-        typeStrings.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(Blocks.air)))
+        typeStrings.appendTag(new NBTTagString(Block.blockRegistry.getNameForObject(Blocks.air).asInstanceOf[String]))
         types += Blocks.air -> types.size.asInstanceOf[Short]
       }
       writeBlock(0, tiles, typeStrings, buf, types, new SimpleBlockInfo(Blocks.air, 0, 0, 0))

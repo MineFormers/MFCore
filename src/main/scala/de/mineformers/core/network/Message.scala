@@ -25,17 +25,19 @@ package de.mineformers.core.network
 
 import java.lang.{Boolean => JBoolean, Byte => JByte, Double => JDouble, Float => JFloat, Long => JLong, Short => JShort}
 
-import cpw.mods.fml.common.network.ByteBufUtils
-import cpw.mods.fml.common.network.simpleimpl.IMessage
-import cpw.mods.fml.relauncher.Side
 import de.mineformers.core.network.serializer.TileDescriptionSerializer
 import de.mineformers.core.tileentity.TileDescription
+import de.mineformers.core.util.Implicits._
+import de.mineformers.core.util.world.BlockPos
 import io.netty.buffer.ByteBuf
 import net.minecraft.client.network.NetHandlerPlayClient
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.network.{INetHandler, NetHandlerPlayServer}
-import net.minecraftforge.common.util.ForgeDirection
+import net.minecraft.util.EnumFacing
+import net.minecraftforge.fml.common.network.ByteBufUtils
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage
+import net.minecraftforge.fml.relauncher.Side
 
 import scala.collection.immutable.HashMap
 import scala.language.existentials
@@ -150,10 +152,30 @@ object Message {
     override def deserialize0(buffer: ByteBuf): NBTTagCompound = ByteBufUtils.readTag(buffer)
   })
 
-  addSerializer(classOf[ForgeDirection], new Serializer[ForgeDirection] {
-    override def serialize0(target: ForgeDirection, buffer: ByteBuf): Unit = buffer.writeInt(target.ordinal())
+  addSerializer(classOf[EnumFacing], new Serializer[EnumFacing] {
+    override def serialize0(target: EnumFacing, buffer: ByteBuf): Unit = buffer.writeInt(target.ordinal())
 
-    override def deserialize0(buffer: ByteBuf): ForgeDirection = ForgeDirection.getOrientation(buffer.readInt())
+    override def deserialize0(buffer: ByteBuf): EnumFacing = EnumFacing.values()(buffer.readInt())
+  })
+
+  addSerializer(classOf[BlockPos], new Serializer[BlockPos] {
+    override def serialize0(target: BlockPos, buffer: ByteBuf): Unit = {
+      buffer.writeInt(target.x)
+      buffer.writeInt(target.y)
+      buffer.writeInt(target.z)
+    }
+
+    override def deserialize0(buffer: ByteBuf): BlockPos = BlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt())
+  })
+
+  addSerializer(classOf[VBlockPos], new Serializer[VBlockPos] {
+    override def serialize0(target: VBlockPos, buffer: ByteBuf): Unit = {
+      buffer.writeInt(target.getX)
+      buffer.writeInt(target.getY)
+      buffer.writeInt(target.getZ)
+    }
+
+    override def deserialize0(buffer: ByteBuf): VBlockPos = new VBlockPos(buffer.readInt(), buffer.readInt(), buffer.readInt())
   })
 
   addSerializer(classOf[TileDescription], new TileDescriptionSerializer)

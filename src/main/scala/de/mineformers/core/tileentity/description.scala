@@ -25,12 +25,13 @@ package de.mineformers.core.tileentity
 
 import java.lang.reflect.Field
 
-import cpw.mods.fml.relauncher.SideOnly
 import de.mineformers.core.MFCore
 import de.mineformers.core.network.Message.Serializer
 import de.mineformers.core.network.{Message, TileDescriptionMessage}
+import de.mineformers.core.util.world.BlockPos
 import io.netty.buffer.ByteBuf
 import net.minecraft.network.Packet
+import net.minecraftforge.fml.relauncher.SideOnly
 
 import scala.collection.mutable
 
@@ -89,7 +90,7 @@ trait Describable {
     if (description == null)
       return null
 
-    MFCore.net.getPacketFrom(new TileDescriptionMessage(xCoord, yCoord, zCoord, description))
+    MFCore.net.getPacketFrom(new TileDescriptionMessage(BlockPos.vanilla2custom(pos), description))
   }
 
   def description: TileDescription = {

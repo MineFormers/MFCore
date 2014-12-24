@@ -23,13 +23,13 @@
  */
 package de.mineformers.core.client.util
 
-import cpw.mods.fml.client.registry.{ClientRegistry, ISimpleBlockRenderingHandler, RenderingRegistry}
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import de.mineformers.core.client.renderer.TileRenderer
 import net.minecraft.block.Block
 import net.minecraft.item.Item
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.client.{IItemRenderer, MinecraftForgeClient}
+import net.minecraftforge.fml.client.registry.ClientRegistry
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
  * RenderingProxy
@@ -44,9 +44,6 @@ trait RenderingProxy {
   def createItemRenderer: IItemRenderer = null
 
   @SideOnly(Side.CLIENT)
-  def createSimpleRenderer: ISimpleBlockRenderingHandler = null
-
-  @SideOnly(Side.CLIENT)
   def registerRenderers(block: Block with BlockRendering, tileClass: Class[_ <: TileEntity]): Unit = {
     val itemRenderer = createItemRenderer
     if (itemRenderer != null)
@@ -54,10 +51,10 @@ trait RenderingProxy {
     val tileRenderer = createTileRenderer
     if (tileRenderer != null && tileClass != null)
       ClientRegistry.bindTileEntitySpecialRenderer(tileClass, tileRenderer)
-    val simpleRenderer = createSimpleRenderer
-    if (simpleRenderer != null) {
-      block.renderType = simpleRenderer.getRenderId
-      RenderingRegistry.registerBlockHandler(simpleRenderer.getRenderId, simpleRenderer)
-    }
+    //    val simpleRenderer = createSimpleRenderer
+    //    if (simpleRenderer != null) {
+    //      block.renderType = simpleRenderer.getRenderId
+    //      RenderingRegistry.registerBlockHandler(simpleRenderer.getRenderId, simpleRenderer)
+    //    }
   }
 }

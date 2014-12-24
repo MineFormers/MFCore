@@ -24,14 +24,14 @@
 package de.mineformers.core.network
 
 import com.google.common.collect.Maps
-import cpw.mods.fml.common.network.simpleimpl.SimpleIndexedCodec
-import cpw.mods.fml.common.network.{FMLOutboundHandler, NetworkRegistry}
-import cpw.mods.fml.relauncher.Side
 import de.mineformers.core.network.Message.NetReaction
 import de.mineformers.core.util.Log
 import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext, SimpleChannelInboundHandler}
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.network.{INetHandler, Packet}
+import net.minecraftforge.fml.common.network.{NetworkRegistry, FMLOutboundHandler}
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleIndexedCodec
+import net.minecraftforge.fml.relauncher.Side
 import org.apache.logging.log4j.Level
 
 import scala.collection.mutable.ListBuffer

@@ -27,11 +27,6 @@ import java.io.File
 
 import com.google.common.collect.ImmutableList
 import com.google.common.eventbus.{EventBus, Subscribe}
-import cpw.mods.fml.client.{FMLFileResourcePack, FMLFolderResourcePack}
-import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
-import cpw.mods.fml.common.{DummyModContainer, LoadController, ModMetadata}
-import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.block.TestBlock
 import de.mineformers.core.client.ui.skin.{GuiMetadataSection, GuiMetadataSectionDeserializer, TextureLoader}
 import de.mineformers.core.network.{MFNetworkWrapper, TileDescriptionMessage}
 import de.mineformers.core.registry.{SharedBlockRegistry, SharedItemRegistry}
@@ -39,6 +34,10 @@ import de.mineformers.core.tileentity.Describable
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.resources.SimpleReloadableResourceManager
+import net.minecraftforge.fml.client.{FMLFileResourcePack, FMLFolderResourcePack}
+import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}
+import net.minecraftforge.fml.common.{DummyModContainer, LoadController, ModMetadata}
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
  * MFCoreContainer
@@ -72,7 +71,6 @@ class MFCoreContainer extends DummyModContainer(new ModMetadata) {
   def preInit(event: FMLPreInitializationEvent): Unit = {
     MFCore.net = new MFNetworkWrapper("MFCore")
     MFCore.net.register[TileDescriptionMessage]()
-    SharedBlockRegistry.add("test123", new TestBlock)
     Proxy.preInit(event)
     Proxy.getClass.getDeclaredMethods
   }
@@ -102,8 +100,8 @@ object Proxy {
   @SideOnly(Side.CLIENT)
   def clientPreInit(): Unit = {
     MFCore.net.addHandler({
-      case (TileDescriptionMessage(x, y, z, desc), ctx) =>
-        val tile = Minecraft.getMinecraft.theWorld.getTileEntity(x, y, z)
+      case (TileDescriptionMessage(pos, desc), ctx) =>
+        val tile = Minecraft.getMinecraft.theWorld.getTileEntity(pos)
         tile match {
           case d: Describable =>
             desc.writeParent(d)

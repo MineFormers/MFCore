@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.client.util
 
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.block.Block
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
  * BlockRendering
@@ -40,8 +40,6 @@ trait BlockRendering {
   protected def createProxy: RenderingProxy
 
   override def getRenderType: Int = renderType
-
-  override def renderAsNormalBlock(): Boolean = false
 
   override def isOpaqueCube: Boolean = false
 }

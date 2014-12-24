@@ -1,8 +1,8 @@
 package de.mineformers.core.client.util
 
-import cpw.mods.fml.relauncher.{Side, SideOnly}
 import net.minecraft.item.Item
 import net.minecraftforge.client.IItemRenderer
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
  * ItemRendering

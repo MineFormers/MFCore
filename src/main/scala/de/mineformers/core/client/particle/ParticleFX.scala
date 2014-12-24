@@ -29,7 +29,8 @@ import de.mineformers.core.client.particle.updater.ParticleUpdater
 import de.mineformers.core.util.world.Vector3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
-import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.{WorldRenderer, Tessellator}
+import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
 
@@ -54,9 +55,9 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
     }
   }
 
-  override def renderParticle(tessellator: Tessellator, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float): Unit = {
-    tessellator.draw
-    updater.render(tessellator, partialTicks, arX, arXZ, arZ, arYZ, arXY, this)
+  override def renderParticle(renderer: WorldRenderer, entity: Entity, partialTicks: Float, arX: Float, arXZ: Float, arZ: Float, arYZ: Float, arXY: Float): Unit = {
+    Tessellator.getInstance().draw()
+    updater.render(renderer, partialTicks, arX, arXZ, arZ, arYZ, arXY, this)
     try {
       val particleTextures: Field = classOf[EffectRenderer].getField("particleTextures")
       particleTextures.setAccessible(true)
@@ -66,7 +67,7 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
       case e: Exception =>
         throw new RuntimeException("Error during particle texturing!", e)
     }
-    tessellator.startDrawingQuads()
+    renderer.startDrawingQuads()
   }
 
   def pos = Vector3(posX, posY, posZ)

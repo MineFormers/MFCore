@@ -27,7 +27,7 @@ import java.lang.{Integer => JInt}
 
 import com.google.common.base.Objects
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.{AxisAlignedBB, Vec3}
+import net.minecraft.util.{AxisAlignedBB, Vec3, BlockPos => VBlockPos}
 
 import scala.collection.mutable
 
@@ -38,11 +38,19 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 object BlockPos {
+  implicit def custom2vanilla(pos: BlockPos): VBlockPos = new VBlockPos(pos.x, pos.y, pos.z)
+
+  implicit def vanilla2custom(pos: VBlockPos): BlockPos = BlockPos(pos.getX, pos.getY, pos.getZ)
+
   private val cache = mutable.WeakHashMap[(Int, Int, Int), BlockPos]()
   val Zero = BlockPos(0, 0, 0)
   val One = BlockPos(1, 1, 1)
 
   def apply(tag: NBTTagCompound): BlockPos = apply(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z"))
+
+  def apply(vpos: VBlockPos): BlockPos = vpos
+
+  def apply(x: Int, z: Int): BlockPos = apply(x, 0, z)
 
   /**
    * Create a new [[BlockPos]] based on the given coordinates
@@ -254,7 +262,7 @@ class BlockPos private(coords: (Int, Int, Int)) extends Ordered[BlockPos] {
     if (x == 0) y == 0 || z == 0 else y == 0 && z == 0
   }
 
-  def toVec3 = Vec3.createVectorHelper(x, y, z)
+  def toVec3 = new Vec3(x, y, z)
 
   def toVector = Vector3(x, y, z)
 

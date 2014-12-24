@@ -151,12 +151,12 @@ public class SphereUtils
 
     private static void destroyBlock(World world, BlockPos pos)
     {
-        if (world.getBlock(pos.x(), pos.y(), pos.z()).getBlockHardness(world, pos.x(), pos.y(), pos.z()) >= 0)
-            world.setBlock(pos.x(), pos.y(), pos.z(), Blocks.air, 0, 2);
+        if (world.getBlockState(BlockPos.custom2vanilla(pos)).getBlock().getBlockHardness(world, BlockPos.custom2vanilla(pos)) >= 0)
+            world.setBlockState(BlockPos.custom2vanilla(pos), Blocks.air.getDefaultState(), 2);
     }
 
     private static void setBlock(World world, BlockPos pos, Block block)
     {
-        world.setBlock(pos.x(), pos.y(), pos.z(), block, 0, 2);
+        world.setBlockState(BlockPos.custom2vanilla(pos), block.getDefaultState(), 2);
     }
 }

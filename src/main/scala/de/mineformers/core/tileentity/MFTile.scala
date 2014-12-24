@@ -23,9 +23,10 @@
  */
 package de.mineformers.core.tileentity
 
-import cpw.mods.fml.relauncher.{Side, SideOnly}
-import de.mineformers.core.util.world.{BlockPos, Vector3}
+import de.mineformers.core.util.world.Vector3
+import net.minecraft.server.gui.IUpdatePlayerListBox
 import net.minecraft.tileentity.TileEntity
+import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.util.Random
 
@@ -34,11 +35,11 @@ import scala.util.Random
  *
  * @author PaleoCrafter
  */
-class MFTile extends TileEntity {
+class MFTile extends TileEntity with IUpdatePlayerListBox {
   private var initialized = false
   lazy val random = new Random(pos.hashCode)
 
-  final override def updateEntity(): Unit = {
+  final override def update(): Unit = {
     if (!initialized) {
       init()
       initialized = true
@@ -56,24 +57,22 @@ class MFTile extends TileEntity {
 
   def updateServer(): Unit = ()
 
-  def pos = BlockPos(x, y, z)
-
   def vecPos = Vector3(x, y, z)
 
   def destroy(): Unit = {
-    worldObj.setBlockToAir(x, y, z)
+    worldObj.setBlockToAir(pos)
   }
 
-  def x = xCoord
+  def x = pos.getX
 
-  def y = yCoord
+  def y = pos.getY
 
-  def z = zCoord
+  def z = pos.getZ
 
-  def update(): Unit = {
+  def updateState(): Unit = {
     markDirty()
-    world.markBlockForUpdate(x, y, z)
-    world.notifyBlockChange(x, y, z, blockType)
+    world.markBlockForUpdate(pos)
+    world.notifyBlockOfStateChange(pos, blockType)
   }
 
   def world = worldObj

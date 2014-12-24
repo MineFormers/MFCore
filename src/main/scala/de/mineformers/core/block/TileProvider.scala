@@ -23,7 +23,9 @@
  */
 package de.mineformers.core.block
 
+import de.mineformers.core.util.Implicits.VBlockPos
 import net.minecraft.block.Block
+import net.minecraft.block.state.IBlockState
 import net.minecraft.tileentity.TileEntity
 import net.minecraft.world.World
 
@@ -35,21 +37,21 @@ import net.minecraft.world.World
 trait TileProvider[T <: TileEntity] {
   this: Block =>
   /**
-   * @param meta check if there is a TE for the given metadata
+   * @param state check if there is a TE for the given state
    * @return true, if the supplied teClass is not null (by default)
    */
-  override def hasTileEntity(meta: Int): Boolean = true
+  override def hasTileEntity(state: IBlockState): Boolean = true
 
   /**
    * By default, creates a new TE from the teClass
    * @param world a world object
-   * @param meta the meta of the block to get the TE for
+   * @param state the state of the block to get the TE for
    * @return a TileEntity instance, if hasTileEntity returns true
    */
-  override def createTileEntity(world: World, meta: Int): TileEntity = tileClass.newInstance()
+  override def createTileEntity(world: World, state: IBlockState): TileEntity = tileClass.newInstance()
 
-  override def onBlockEventReceived(world: World, x: Int, y: Int, z: Int, eventId: Int, eventArgument: Int): Boolean = {
-    val tileentity: TileEntity = world.getTileEntity(x, y, z)
+  override def onBlockEventReceived(world: World, pos: VBlockPos, state: IBlockState, eventId: Int, eventArgument: Int): Boolean = {
+    val tileentity: TileEntity = world.getTileEntity(pos)
     if (tileentity != null) tileentity.receiveClientEvent(eventId, eventArgument) else false
   }
 

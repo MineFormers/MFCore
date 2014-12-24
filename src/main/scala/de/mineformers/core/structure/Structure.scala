@@ -23,6 +23,7 @@
  */
 package de.mineformers.core.structure
 
+import de.mineformers.core.util.world.BlockPos
 import net.minecraft.block.Block
 import net.minecraft.init.Blocks
 import net.minecraft.nbt.NBTTagCompound
@@ -81,16 +82,16 @@ class Structure(private val layers: mutable.Buffer[Layer] = mutable.Buffer.empty
 
   def update(world: StructureWorld): Unit = {
     for (y <- 0 until getHeight; x <- 0 until getWidth; z <- 0 until getLength) {
-      val info = getBlock(x, y, z)
+      val info = getBlock(BlockPos(x, y, z))
       if (info != null)
         info.update(world, y)
     }
   }
 
-  def getBlock(x: Int, y: Int, z: Int): BlockInfo = {
-    val layer: Layer = getLayer(y)
+  def getBlock(pos: BlockPos): BlockInfo = {
+    val layer: Layer = getLayer(pos.y)
     if (layer == null) return null
-    layer.get(x, z)
+    layer.get(pos.x, pos.z)
   }
 
   def blockTypes: Seq[BlockEntry] = for {

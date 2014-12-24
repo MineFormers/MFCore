@@ -38,9 +38,9 @@ abstract class TileRenderer[T <: TileEntity] extends TileEntitySpecialRenderer {
 
   def render(tile: T, x: Double, y: Double, z: Double, partialTicks: Float)
 
-  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float): Unit = {
+  override def renderTileEntityAt(tile: TileEntity, x: Double, y: Double, z: Double, partialTicks: Float, destroyProgress: Int): Unit = {
     renderer.context.pos = Vector3(x, y, z)
-    renderer.context.block = RenderContext.Block(tile.getWorldObj, tile.xCoord, tile.yCoord, tile.zCoord)
+    renderer.context.block = RenderContext.Block(tile.getWorld, tile.getPos.getX, tile.getPos.getY, tile.getPos.getZ)
     GL11.glPushMatrix()
     GL11.glTranslated(x, y, z)
     render(tile.asInstanceOf[T], x, y, z, partialTicks)

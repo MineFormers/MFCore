@@ -60,7 +60,7 @@ object Vector3 {
 
   def unapply(vec: Vector3): Option[(Double, Double, Double)] = Some((vec.x, vec.y, vec.z))
 
-  def fromEntityCenter(e: Entity) = Vector3(e.posX, e.posY - e.yOffset + e.height / 2.0F, e.posZ)
+  def fromEntityCenter(e: Entity) = Vector3(e.posX, e.posY - e.getYOffset + e.height / 2.0F, e.posZ)
 }
 
 /**

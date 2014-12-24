@@ -23,9 +23,7 @@
  */
 package de.mineformers.core.item
 
-import net.minecraft.client.renderer.texture.IIconRegister
 import net.minecraft.item.ItemStack
-import net.minecraft.util.IIcon
 
 /**
  * SubItem
@@ -48,19 +46,4 @@ trait SubItem {
    * @return the unlocalized name for the given stack, defaults to [[name]]
    */
   def getName(stack: ItemStack) = name
-
-  /**
-   * @param stack the stack to get the icon for
-   * @param pass the render pass to get the icon in
-   * @return
-   */
-  def getIcon(stack: ItemStack, pass: Int) = icon
-
-  /**
-   * Register icons for this SubItem
-   * @param register the icon register
-   */
-  def registerIcons(register: IIconRegister): Unit = register.registerIcon(texture)
-
-  protected var icon: IIcon = null
 }

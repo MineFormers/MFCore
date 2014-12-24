@@ -23,11 +23,11 @@
  */
 package de.mineformers.core.mod
 
-import cpw.mods.fml.common.Mod.EventHandler
-import cpw.mods.fml.common.event.{FMLInitializationEvent, FMLPostInitializationEvent, FMLPreInitializationEvent}
 import de.mineformers.core.util.ResourceUtils.Resource
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.Mod.EventHandler
+import net.minecraftforge.fml.common.event.{FMLPostInitializationEvent, FMLInitializationEvent, FMLPreInitializationEvent}
 import org.apache.logging.log4j.{LogManager, Logger}
 
 trait MFMod {

@@ -4,7 +4,7 @@ import de.mineformers.core.structure.StructureWorld
 import de.mineformers.core.util.renderer.ShaderSystem
 import de.mineformers.core.util.world.Vector3
 import net.minecraft.client.Minecraft
-import net.minecraft.client.renderer.culling.Frustrum
+import net.minecraft.client.renderer.culling.Frustum
 import net.minecraft.entity.Entity
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL20._
@@ -38,17 +38,17 @@ class StructureWorldRenderer() {
     val x = world.pos.x
     val y = world.pos.y
     val z = world.pos.z
-    val frustrum = new Frustrum()
-    val cam = Minecraft.getMinecraft.renderViewEntity
+    val frustum = new Frustum()
+    val cam = Minecraft.getMinecraft.getRenderViewEntity
     val camX: Double = cam.lastTickPosX + (cam.posX - cam.lastTickPosX) * partialTicks
     val camY: Double = cam.lastTickPosY + (cam.posY - cam.lastTickPosY) * partialTicks
     val camZ: Double = cam.lastTickPosZ + (cam.posZ - cam.lastTickPosZ) * partialTicks
-    frustrum.setPosition(camX, camY, camZ)
+    frustum.setPosition(camX, camY, camZ)
     val renderDistance = math.pow(Minecraft.getMinecraft.gameSettings.renderDistanceChunks * 16, 2)
-    if (frustrum.isBoundingBoxInFrustum(world.bounds) && Vector3.fromEntityCenter(cam).distanceSq(world.pos.toVector) < renderDistance) {
+    if (frustum.isBoundingBoxInFrustum(world.bounds) && Vector3.fromEntityCenter(cam).distanceSq(world.pos.toVector) < renderDistance) {
       GL11.glPushMatrix()
       GL11.glEnable(GL11.GL_BLEND)
-      translateToWorldCoords(Minecraft.getMinecraft.renderViewEntity, partialTicks)
+      translateToWorldCoords(Minecraft.getMinecraft.getRenderViewEntity, partialTicks)
       GL11.glTranslatef(x, y, z)
       GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
       GL11.glDisable(GL11.GL_ALPHA_TEST)
