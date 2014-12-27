@@ -24,6 +24,7 @@
 package de.mineformers.core.client.ui.component
 
 import de.mineformers.core.client.shape2d.Point
+import de.mineformers.core.client.ui.state.{Property, ComponentState}
 import de.mineformers.core.client.ui.util.Font
 
 /**
@@ -43,6 +44,8 @@ trait TextComponent extends Component {
   def textOff: Point = Point(0, 0)
 
   override var skin: Skin = new TextSkin
+
+  abstract override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(Property.Text, ""))
 
   class TextSkin extends Skin {
     def drawForeground(mousePos: Point): Unit = {

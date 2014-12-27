@@ -53,6 +53,10 @@ object MouseEvent {
     def button = MouseButton(buttonCode)
   }
 
+  case class DoubleClick(p: Point, buttonCode: Int) extends MouseEvent(p) {
+    def button = MouseButton(buttonCode)
+  }
+
   case class Move(p: Point, lastPos: Point) extends MouseEvent(p)
 
   case class Drag(p: Point, lastPos: Point, lastButtonCode: Int, timeSinceClick: Long) extends MouseEvent(p) {

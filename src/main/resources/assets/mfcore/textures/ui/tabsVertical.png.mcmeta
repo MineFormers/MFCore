@@ -16,7 +16,7 @@
                 }
             },
             {
-                "target": "tabLeft:disabled",
+                "target": "tabLeft[enabled=false]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -30,7 +30,7 @@
                 }
             },
             {
-                "target": "tabLeft:first",
+                "target": "tabLeft[first=true]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -58,7 +58,7 @@
                 }
             },
             {
-                "target": "tabRight:disabled",
+                "target": "tabRight[enabled=false]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -72,7 +72,7 @@
                 }
             },
             {
-                "target": "tabRight:first",
+                "target": "tabRight[first=true]",
                 "type": "static",
                 "uv": {
                     "start": [

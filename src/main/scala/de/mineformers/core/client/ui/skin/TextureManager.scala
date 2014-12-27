@@ -33,6 +33,7 @@ import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.resources.data.IMetadataSection
 
 import scala.collection.immutable.HashMap
+import scala.collection.mutable
 
 /**
  * TextureManager
@@ -41,29 +42,34 @@ import scala.collection.immutable.HashMap
  */
 object TextureManager {
   private var resources = HashMap.empty[String, Resource]
-  private var textures = HashMap.empty[String, DrawableTexture]
+  private val textures = new mutable.HashMap[String, List[TextureMapping]]
   private var deserializers = HashMap[String, DrawableDeserializer]("dynamic" -> new DynamicTexture.Deserializer(), "static" -> new StaticTexture.Deserializer())
 
-  def apply(comp: Component): Option[DrawableTexture] = apply(comp, if (comp.enabled) "enabled" else "disabled")
-
-  def apply(comp: Component, state: String): Option[DrawableTexture] = {
-    var drawable = apply(comp.identifier + ":" + comp.name + ":" + state)
-    if (drawable == None)
-      drawable = apply(comp.identifier + ":" + comp.name)
-    if (drawable == None)
-      drawable = apply(comp.identifier + ":" + state)
-    if (drawable == None)
-      drawable = apply(comp.identifier)
-    drawable
+  def apply(comp: Component): Option[DrawableTexture] = {
+    if (!textures.contains(comp.identifier))
+      apply(comp.identifier)
+    else {
+      val mappings = textures(comp.identifier)
+      mappings.find(_.selector.matches(comp)).map(_.texture)
+    }
   }
 
   def apply(id: String): Option[DrawableTexture] = {
     if (!textures.contains(id)) {
       if (resources.contains(id)) {
-        textures += id -> load(resources(id)).head
+        set(id, load(resources(id)).head)
       }
     }
-    textures.get(id)
+    textures.get(id).map(_.head.texture)
+  }
+
+  def apply(id: String, properties: Map[String, Any]): Option[DrawableTexture] = {
+    if (!textures.contains(id))
+      apply(id)
+    else {
+      val mappings = textures(id)
+      mappings.find(_.selector.matches(properties.map(p => (p._1, p._2.toString)))).map(_.texture)
+    }
   }
 
   def exists(identifier: String) = textures.contains(identifier)
@@ -71,16 +77,16 @@ object TextureManager {
   def loadWithTarget(resource: Resource): Unit = {
     val metaOption = resource.getMetadata("gui")
     if (metaOption.isDefined) {
+      import scala.collection.JavaConversions._
       val meta = metaOption.get.asInstanceOf[GuiMetadataSection]
       if (meta.map != null && !meta.map.isEmpty) {
-        import scala.collection.JavaConversions._
         for (entry <- meta.map.entrySet()) {
           val drawable = entry.getValue
           if (drawable != null) {
             drawable.texture = resource
             drawable.textureSize = GuiUtils.imageSize(resource)
             drawable.init()
-            textures += entry.getKey -> drawable
+            set(entry.getKey, drawable)
           }
         }
       }
@@ -90,10 +96,10 @@ object TextureManager {
   def load(resource: Resource): Seq[DrawableTexture] = {
     val metaOption = resource.getMetadata("gui")
     if (metaOption.isDefined) {
+      import scala.collection.JavaConversions._
       val meta = metaOption.get.asInstanceOf[GuiMetadataSection]
       if (meta.map != null && !meta.map.isEmpty) {
         var seq = Seq.empty[DrawableTexture]
-        import scala.collection.JavaConversions._
         for (entry <- meta.map.entrySet()) {
           val drawable = entry.getValue
           if (drawable != null) {
@@ -110,7 +116,7 @@ object TextureManager {
   }
 
   def reset(): Unit = {
-    textures = HashMap.empty[String, DrawableTexture]
+    textures.clear()
   }
 
   def addResource(id: String, resource: Resource): Unit = {
@@ -124,8 +130,14 @@ object TextureManager {
   def getDeserializer(id: String): DrawableDeserializer = deserializers(id)
 
   def set(id: String, texture: DrawableTexture): Unit = {
-    textures += id -> texture
+    val selector = SkinSelector(id)
+    if (!textures.contains(selector.id))
+      textures.put(selector.id, List())
+    textures.put(selector.id, (TextureMapping(selector, texture) :: textures(selector.id)).sortBy(_.selector.propertyCount).reverse)
   }
+
+  private case class TextureMapping(selector: SkinSelector, texture: DrawableTexture)
+
 }
 
 trait DrawableDeserializer {

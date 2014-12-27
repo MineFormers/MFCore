@@ -1,6 +1,6 @@
 {
     "gui": {
-        "target": "button:disabled",
+        "target": "button[enabled=false]",
         "type": "dynamic"
     }
 }

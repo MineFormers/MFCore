@@ -26,7 +26,7 @@ package de.mineformers.core.client.ui.proxy
 import de.mineformers.core.client.shape2d.Point
 import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.ui.component.decoration.Tooltip
-import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
+import de.mineformers.core.client.ui.util.{MouseButton, KeyEvent, MouseEvent}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.gui.GuiScreen
 import org.lwjgl.input.Mouse
@@ -43,9 +43,16 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
   }
 
   override def mouseClicked(x: Int, y: Int, button: Int): Unit = {
+    val currentTime = System.currentTimeMillis()
     if (focused != null)
-      focused.reactions.apply(MouseEvent.Click(Point(x, y), button))
+      focused.onClick(Point(x, y), MouseButton(button))
     publish(MouseEvent.Click(Point(x, y), button))
+
+    if (currentTime - lastClickTime <= 300) {
+      publish(MouseEvent.DoubleClick(Point(x, y), button))
+    }
+
+    lastClickTime = currentTime
   }
 
   override def mouseClickMove(x: Int, y: Int, lastButton: Int, timeSinceClick: Long): Unit = {
@@ -74,6 +81,7 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
       publish(MouseEvent.Scroll(pos, dWheel))
     }
     frame.update(pos)
+    frame.updateState(pos)
   }
 
   override def close(): Unit = {
@@ -96,6 +104,7 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
   }
 
   private val tooltip = new Tooltip("")
+  private var lastClickTime = 0L
   private var lastMousePosition = Point(0, 0)
   private var lastDragPosition = Point(0, 0)
 }

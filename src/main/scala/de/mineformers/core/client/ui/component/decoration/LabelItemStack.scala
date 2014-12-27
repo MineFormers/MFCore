@@ -25,6 +25,7 @@ package de.mineformers.core.client.ui.component.decoration
 
 import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.client.ui.state.ComponentState
 import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper}
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.{GL11, GL12}
@@ -36,6 +37,8 @@ import org.lwjgl.opengl.{GL11, GL12}
  */
 class LabelItemStack(val stacks: Array[ItemStack], drawSlot: Boolean = true, val addAmount: Int = -1) extends Component {
   def this(stack: ItemStack) = this(Array(stack))
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   var i = 0
   this.tooltip = stacks(i).getDisplayName

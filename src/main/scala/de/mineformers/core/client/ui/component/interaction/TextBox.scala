@@ -26,8 +26,9 @@ package de.mineformers.core.client.ui.component.interaction
 import java.text.DecimalFormat
 
 import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{Focusable, TextComponent}
+import de.mineformers.core.client.ui.component.{Component, Focusable, TextComponent}
 import de.mineformers.core.client.ui.proxy.Context
+import de.mineformers.core.client.ui.state.{ComponentState, Property}
 import de.mineformers.core.client.ui.util.ComponentEvent.ValueChanged
 import de.mineformers.core.client.ui.util._
 import de.mineformers.core.reaction.Publisher
@@ -40,7 +41,7 @@ import org.lwjgl.opengl.GL11
  *
  * @author PaleoCrafter
  */
-class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLightShadow) extends TextComponent with Focusable {
+class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLightShadow) extends Component with TextComponent with Focusable {
   /**
    * Current text of this <code>UITextField</code>
    */
@@ -67,6 +68,10 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
   this.size = initSize
   skin = new TextBoxSkin
   private var _textOff = Point(2, (size.height - font.height) / 2)
+  private var lastDoubleClick = 0L
+  private var doubleClickCount = 0
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   override def init(channel: Publisher, context: Context): Unit = {
     super.init(channel, context)
@@ -91,11 +96,11 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
    * @return position
    */
   private def cursorPositionFromX(x: Int): Int = {
-    var pos: Int = 0
+    var pos: Int = charOffset
     var width: Int = 0
     for (i <- charOffset until sb.length) {
       val w: Int = font.charWidth(sb.charAt(i))
-      if (width + (w.asInstanceOf[Float] / 2) > x) return pos
+      if (width + (w.toFloat / 2) > x) return pos
       width += w
       pos += 1
     }
@@ -123,15 +128,16 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
   }
 
   /**
-   * @return the text of this <code>UITextField</code>.
+   * @return the text of this `TextBox`.
    */
   def text: String = sb.mkString
 
   /**
-   * Sets the text of this <code>UITextField</code> and place the cursor at the end.
+   * Sets the text of this `TextBox` and place the cursor at the end.
    */
   def text_=(text: String): Unit = {
     setText(text)
+    state.set(Property.Text, text)
   }
 
   def setText(text: String, notify: Boolean = true) {
@@ -289,15 +295,35 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
           this.text = ""
           this.cursorPosition = 0
         }
+    case e: MouseEvent.DoubleClick =>
+      if (hovered(e.pos) && e.button == MouseButton.Left) {
+        val pos = cursorPositionFromX(local(e.pos).x)
+        val currentTime = System.currentTimeMillis()
+        if(currentTime - lastDoubleClick > 300)
+          doubleClickCount = 0
+        if (doubleClickCount == 1) {
+          doubleClickCount = 0
+          this.cursorPos = 0
+          this.selection = sb.length
+        } else if (doubleClickCount == 0) {
+          doubleClickCount += 1
+          cursorPos = pos
+          cursorPos = cursorPos + nextSpacePosition(true)
+          val newSelection = cursorPos + nextSpacePosition(false)
+          selection = if(newSelection == sb.length) newSelection else newSelection - 1
+          lastDoubleClick = currentTime
+        }
+      }
     case e: MouseEvent.Drag =>
-      if (focused && e.lastButton == MouseButton.Left) {
+      val localPos = local(e.pos)
+      if (focused && localPos.y > 0 && localPos.y < size.height && e.lastButton == MouseButton.Left) {
         val pos = cursorPositionFromX(local(e.pos).x)
         selection = pos
       }
     case KeyEvent.Type(char, code) =>
+      import org.lwjgl.input.Keyboard._
+      import TextBox._
       if (focused && enabled) {
-        import de.mineformers.core.client.ui.component.interaction.TextBox._
-        import org.lwjgl.input.Keyboard._
         if (code == KEY_ESCAPE) {
           if (!canLoseFocus)
             context.close()

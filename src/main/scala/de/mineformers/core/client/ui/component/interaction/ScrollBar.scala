@@ -29,6 +29,7 @@ import de.mineformers.core.client.ui.component.container.ScrollPanel
 import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation._
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
+import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
 import net.minecraft.client.gui.GuiScreen
@@ -108,6 +109,8 @@ class ScrollBar(length: Int, orientation: Int) extends Component {
       }
   }
 
+  override def defaultState(state: ComponentState): Unit = ()
+
   override def hovered(mousePosition: Point): Boolean = screenBounds contains mousePosition
 
   def offset = if (orientation == Horizontal) scrollerPos.x - 1 else scrollerPos.y - 1
@@ -129,7 +132,7 @@ class ScrollBar(length: Int, orientation: Int) extends Component {
 
   class ScrollBarSkin extends Skin {
     override protected def drawForeground(mousePos: Point): Unit = {
-      val drawable = TextureManager("scroller:" + (if (orientation == Horizontal) "horizontal" else "vertical") + (if (!enabled) ":disabled" else "")).getOrElse(null)
+      val drawable = TextureManager("scroller", Map("horizontal" -> (orientation == Horizontal), "vertical" -> (orientation != Horizontal), "enabled" -> enabled)).orNull
       if (drawable != null) {
         drawable.size = scrollerSize
         drawable.draw(mousePos, screen + scrollerPos, zIndex)

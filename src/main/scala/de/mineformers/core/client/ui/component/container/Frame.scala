@@ -26,6 +26,7 @@ package de.mineformers.core.client.ui.component.container
 import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.container.Frame.Anchor
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
+import de.mineformers.core.client.ui.util.MouseEvent
 import de.mineformers.core.reaction.Publisher
 import net.minecraft.client.Minecraft
 
@@ -40,6 +41,13 @@ class Frame(size0: Size) extends Panel {
   override def init(channel: Publisher, context: Context): Unit = {
     this.screen = position + anchor.pos(this, proxy)
     super.init(channel, context)
+
+    if (!fixed) {
+      reactions += {
+        case e: MouseEvent.Drag =>
+
+      }
+    }
   }
 
   def showProxy(): Unit = {
@@ -56,6 +64,7 @@ class Frame(size0: Size) extends Panel {
 
   var proxy: UIScreen = _
   var anchor = Anchor.Center
+  var fixed = true
 }
 
 object Frame {

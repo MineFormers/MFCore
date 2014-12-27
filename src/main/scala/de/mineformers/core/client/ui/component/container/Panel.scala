@@ -29,6 +29,7 @@ import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.layout.{Constraints, LayoutManager}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.ScissorRegion
+import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.reaction.Publisher
 import org.lwjgl.opengl.GL11
 
@@ -50,6 +51,13 @@ class Panel extends Component {
     })
     if (size == Size(0, 0))
       size = contentSize
+  }
+
+  override def updateState(mousePos: Point): Unit = {
+    super.updateState(mousePos)
+    content.foreach(c => {
+      c.updateState(mousePos)
+    })
   }
 
   override def update(mousePos: Point): Unit = {
@@ -123,6 +131,8 @@ class Panel extends Component {
     }
     null
   }
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   def content = _content
 

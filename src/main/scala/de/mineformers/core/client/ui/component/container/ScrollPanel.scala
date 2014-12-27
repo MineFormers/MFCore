@@ -65,7 +65,7 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
     scrollBarVertical.screen = screen + scrollBarVertical.position
     scrollBarHorizontal.enabled = contentSize.width > width
     scrollBarVertical.enabled = contentSize.height > height
-    var x = -((scrollBarHorizontal.offset / (width - scrollBarHorizontal.scrollerBounds.width + 2).toFloat) * (contentSize.width - width)).toInt
+    var x = -((scrollBarHorizontal.offset / (width - scrollBarHorizontal.scrollerBounds.width + 2).toFloat) * (contentSize.width - width + 2)).toInt
     var y = -((scrollBarVertical.offset / (height - (scrollBarVertical.scrollerBounds.height + 2)).toFloat) * (contentSize.height - height)).toInt
     if (contentSize.width < width)
       x = 0

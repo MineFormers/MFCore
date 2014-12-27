@@ -24,29 +24,32 @@
 package de.mineformers.core.client.ui.component.interaction
 
 import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.TextComponent
+import de.mineformers.core.client.ui.component.{Component, TextComponent}
+import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ComponentClicked}
-import de.mineformers.core.client.ui.util.{ComponentEvent, Font, MouseButton}
+import de.mineformers.core.client.ui.util.{Font, MouseButton}
+import net.minecraft.client.audio.PositionedSoundRecord
+import net.minecraft.util.ResourceLocation
 
 /**
  * Button
  *
  * @author PaleoCrafter
  */
-class Button(var text: String, initSize: Size = Size(50, 20)) extends TextComponent {
+class Button(var text: String, initSize: Size = Size(50, 20)) extends Component with TextComponent {
   this.size = initSize
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   reactions += {
     case ComponentClicked(c, button) =>
-      if ((button == MouseButton.Left) && (c eq this))
+      if ((button == MouseButton.Left) && (c eq this)) {
+        mc.getSoundHandler.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F))
         publish(ButtonPressed(this))
+      }
   }
 
   override def update(mousePos: Point): Unit = {
-    if (hovered(mousePos) && !identifier.endsWith("hovered"))
-      identifier = identifier + ":hovered"
-    else if (!hovered(mousePos) && identifier.endsWith("hovered"))
-      identifier = identifier.replace(":hovered", "")
   }
 
   override def textOff: Point = bounds.centerInSize(font.size(text))

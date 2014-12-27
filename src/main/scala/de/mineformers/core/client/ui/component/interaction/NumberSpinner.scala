@@ -27,6 +27,7 @@ import de.mineformers.core.client.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.container.Panel
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation
+import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.ComponentEvent
 import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ValueChanged}
 
@@ -71,6 +72,8 @@ class NumberSpinner(textWidth: Int = 50, var min: Int = 1, var max: Int = -1, va
         text.setText(value.toString, notify = false)
       }
   }
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   def value: Int = _value
 

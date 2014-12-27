@@ -23,7 +23,10 @@
  */
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
+import de.mineformers.core.client.shape2d.Point
+import de.mineformers.core.client.ui.state.{Property, ComponentState}
+import de.mineformers.core.client.ui.util.MouseButton
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 
 /**
  * Focusable
@@ -31,15 +34,16 @@ import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
  * @author PaleoCrafter
  */
 trait Focusable extends Component {
-  reactions += {
-    case e: MouseEvent.Click =>
-      if (e.button == MouseButton.Left) {
-        if (!hovered(e.pos) && focused && canLoseFocus) {
-          noFocus()
-        } else if (hovered(e.pos) && !focused) {
-          focus()
-        }
+  abstract override def defaultState(state: ComponentState) = super.defaultState(state.set(Property.Focused, false))
+
+  def onClick(pos: Point, button: MouseButton): Unit = {
+    if (button == MouseButton.Left) {
+      if (!hovered(pos) && focused && canLoseFocus) {
+        noFocus()
+      } else if (hovered(pos) && !focused) {
+        focus()
       }
+    }
   }
 
   def focused = _focused
@@ -48,12 +52,14 @@ trait Focusable extends Component {
 
   def focus(): Unit = {
     focused = true
+    state.set(Property.Focused, focused)
     context.focused = this
     gainFocus()
   }
 
   def noFocus(): Unit = {
     focused = false
+    state.set(Property.Focused, focused)
     context.focused = null
     loseFocus()
   }

@@ -24,7 +24,8 @@
 package de.mineformers.core.client.ui.component.decoration
 
 import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.TextComponent
+import de.mineformers.core.client.ui.component.{Component, TextComponent}
+import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.Font
 
 /**
@@ -32,8 +33,10 @@ import de.mineformers.core.client.ui.util.Font
  *
  * @author PaleoCrafter
  */
-class Tooltip(private var _text: String, var font: Font = Font.Default) extends TextComponent {
+class Tooltip(private var _text: String, var font: Font = Font.Default) extends Component with TextComponent {
   zIndex = 100
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   override def text: String = _text
 

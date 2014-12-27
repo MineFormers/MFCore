@@ -31,8 +31,9 @@ import de.mineformers.core.client.ui.component.container.Tab.Orientation.Orienta
 import de.mineformers.core.client.ui.layout.StackLayout
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.drawable.Drawable
+import de.mineformers.core.client.ui.state.{BooleanProperty, ComponentState}
 import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
-import de.mineformers.core.client.ui.util.{ComponentEvent, MouseButton, MouseEvent}
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
 
 import scala.collection.mutable
@@ -119,7 +120,9 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
 
     size = if (orientation.vertical) Size(32, 28) else Size(28, 32)
     tooltip = title
-    identifier = orientation.name + (if (first) ":first" else "")
+    identifier = orientation.name
+
+    override def defaultState(state: ComponentState): Unit = state.set(de.mineformers.core.client.ui.component.container.Tab.FirstProperty, first)
 
     override def update(mousePos: Point): Unit = ()
 
@@ -143,6 +146,8 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
 }
 
 object Tab {
+
+  final val FirstProperty = new BooleanProperty("first")
 
   object Orientation extends Enumeration {
     type Orientation = OrientationVal

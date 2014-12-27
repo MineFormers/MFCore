@@ -1,6 +1,6 @@
 {
     "gui": {
-        "target": "button:hovered",
+        "target": "button[hovered=true]",
         "type": "dynamic"
     }
 }

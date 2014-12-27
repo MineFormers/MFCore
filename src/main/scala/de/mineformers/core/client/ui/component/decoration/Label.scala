@@ -24,7 +24,8 @@
 package de.mineformers.core.client.ui.component.decoration
 
 import de.mineformers.core.client.shape2d.Point
-import de.mineformers.core.client.ui.component.TextComponent
+import de.mineformers.core.client.ui.component.{Component, TextComponent}
+import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.Font
 
 /**
@@ -32,9 +33,11 @@ import de.mineformers.core.client.ui.util.Font
  *
  * @author PaleoCrafter
  */
-class Label(private var _text: String) extends TextComponent {
+class Label(private var _text: String) extends Component with TextComponent {
   private var _font: Font = Font.DefaultDark
   size = font.size(_text)
+
+  override def defaultState(state: ComponentState): Unit = ()
 
   override def font_=(font: Font): Unit = {
     this._font = font

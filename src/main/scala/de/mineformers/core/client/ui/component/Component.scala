@@ -27,6 +27,7 @@ import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.component.container.Panel
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
+import de.mineformers.core.client.ui.state.{ComponentState, Property}
 import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
@@ -39,7 +40,7 @@ import net.minecraftforge.fml.client.FMLClientHandler
  *
  * @author PaleoCrafter
  */
-trait Component extends Publisher {
+abstract class Component extends Publisher {
   def init(channel: Publisher, context: Context): Unit = {
     listenTo(channel)
     this.context = context
@@ -47,6 +48,10 @@ trait Component extends Publisher {
 
   reactions += {
     case MouseEvent.Click(p, code) => if (hovered(p) && enabled && visible) context.publish(ComponentClicked(this, MouseButton(code)))
+  }
+
+  def updateState(mousePos: Point): Unit = {
+    state.set(Property.Hovered, hovered(mousePos))
   }
 
   def update(mousePos: Point): Unit
@@ -82,14 +87,31 @@ trait Component extends Publisher {
 
   def local(p: Point) = p - screen
 
+  def enabled = _enabled
+
+  def enabled_=(enabled: Boolean) = {
+    _enabled = enabled
+    state.set(Property.Enabled, enabled)
+  }
+
+  private def createState = {
+    val state = ComponentState.create(Property.Hovered, Property.Enabled)
+    state.set(Property.Enabled, true)
+    defaultState(state)
+    state
+  }
+
+  def defaultState(state: ComponentState): Unit = ()
+
   var skin: Skin
   lazy val mc: Minecraft = FMLClientHandler.instance.getClient
+  val state = createState
   val utils = GuiUtils
   var position = Point(0, 0)
   var screen = Point(0, 0)
   var size = Size(0, 0)
   var context: Context = _
-  var enabled: Boolean = true
+  private var _enabled: Boolean = true
   var visible: Boolean = true
   var parent: Panel = _
   var name: String = _
@@ -105,7 +127,7 @@ trait Component extends Publisher {
     val component = Component.this
 
     protected def drawBackground(mousePos: Point): Unit = {
-      val drawable = TextureManager(component).getOrElse(TextureManager(background).getOrElse(null))
+      val drawable = TextureManager(component).getOrElse(TextureManager(background).orNull)
       if (drawable != null) {
         drawable.size = size
         drawable.draw(mousePos, screen, zIndex)

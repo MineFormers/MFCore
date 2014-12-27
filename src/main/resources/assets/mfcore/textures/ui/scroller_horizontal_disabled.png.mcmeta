@@ -1,6 +1,6 @@
 {
     "gui": {
-        "target": "scroller:horizontal:disabled",
+        "target": "scroller[horizontal=true,enabled=false]",
         "type": "static"
     }
 }
