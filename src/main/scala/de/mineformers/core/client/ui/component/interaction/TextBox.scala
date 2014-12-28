@@ -26,7 +26,7 @@ package de.mineformers.core.client.ui.component.interaction
 import java.text.DecimalFormat
 
 import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{Component, Focusable, TextComponent}
+import de.mineformers.core.client.ui.component.{Component, Focus, TextComponent}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.state.{ComponentState, Property}
 import de.mineformers.core.client.ui.util.ComponentEvent.ValueChanged
@@ -41,7 +41,7 @@ import org.lwjgl.opengl.GL11
  *
  * @author PaleoCrafter
  */
-class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLightShadow) extends Component with TextComponent with Focusable {
+class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLightShadow) extends Component with TextComponent with Focus {
   /**
    * Current text of this <code>UITextField</code>
    */

@@ -23,7 +23,8 @@
  */
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.client.ui.component.Focusable
+import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.client.ui.component.Focus
 import de.mineformers.core.reaction.Publisher
 
 /**
@@ -32,7 +33,9 @@ import de.mineformers.core.reaction.Publisher
  * @author PaleoCrafter
  */
 trait Context extends Publisher {
-  var focused: Focusable = _
+  var focused: Focus = _
 
   def close(): Unit
+
+  def size: Size
 }

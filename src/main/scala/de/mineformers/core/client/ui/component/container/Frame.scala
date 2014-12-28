@@ -23,31 +23,38 @@
  */
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.client.shape2d.{Rectangle, Point, Size}
+import de.mineformers.core.client.ui.component.Drag
 import de.mineformers.core.client.ui.component.container.Frame.Anchor
+import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.component.interaction.FrameControl
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
-import de.mineformers.core.client.ui.util.MouseEvent
+import de.mineformers.core.client.ui.state.{BooleanProperty, ComponentState}
+import de.mineformers.core.client.ui.util.{Font, MouseButton, MouseEvent}
 import de.mineformers.core.reaction.Publisher
 import net.minecraft.client.Minecraft
+
+import scala.collection.mutable.ListBuffer
 
 /**
  * Frame
  *
  * @author PaleoCrafter
  */
-class Frame(size0: Size) extends Panel {
+class Frame(size0: Size) extends Panel with Drag {
   size = size0
 
   override def init(channel: Publisher, context: Context): Unit = {
     this.screen = position + anchor.pos(this, proxy)
+    if (!fixed)
+      padding = Padding(4, 8, 4, 4)
     super.init(channel, context)
-
-    if (!fixed) {
-      reactions += {
-        case e: MouseEvent.Drag =>
-
-      }
+    state.set(Frame.FixedProperty, fixed)
+    for (i <- 0 until controls.size) {
+      controls(i).screen = Point(screen.x + width - 11 - 10 * i, screen.y + 2)
     }
+
+    controls.foreach(_.init(channel, context))
   }
 
   def showProxy(): Unit = {
@@ -57,17 +64,58 @@ class Frame(size0: Size) extends Panel {
 
   def newProxy = new UIScreen(this)
 
+  override def defaultState(state: ComponentState): Unit = state.set(Frame.FixedProperty, fixed)
+
+  override def updateState(mousePos: Point): Unit = {
+    super.updateState(mousePos)
+    controls.foreach(_.updateState(mousePos))
+  }
+
   override def update(mousePos: Point): Unit = {
     super.update(mousePos)
-    this.screen = position + anchor.pos(this, proxy)
+    if (fixed)
+      this.screen = position + anchor.pos(this, proxy)
+    for (i <- 0 until controls.size) {
+      controls(i).screen = Point(screen.x + width - 11 - 10 * i, screen.y + 2)
+    }
+    controls.foreach(_.update(mousePos))
   }
+
+  def addControl(control: FrameControl): Unit = {
+    controls += control
+  }
+
+  def addDefaultControls(): Unit = {
+    val close = new FrameControl("close", () => context.close())
+    close.tooltip = "Close"
+    addControl(close)
+  }
+
+  override def canDrag: Boolean = !fixed
+
+  override def controlRegion: Rectangle = Rectangle(0, 0, width, 11)
+
+  skin = new FrameSkin
 
   var proxy: UIScreen = _
   var anchor = Anchor.Center
-  var fixed = true
+  var fixed = false
+  private val controls = ListBuffer.empty[FrameControl]
+
+  class FrameSkin extends PanelSkin {
+    override def drawForeground(mousePos: Point): Unit = {
+      super.drawForeground(mousePos)
+      Font.Default.draw("Test", screen.x + 2, screen.y + 3, zIndex, 0x6a6a6a)
+      Font.DefaultLight.draw("Test", screen.x + 2, screen.y + 2)
+      controls.foreach(_.skin.draw(mousePos))
+    }
+  }
+
 }
 
 object Frame {
+
+  final val FixedProperty = new BooleanProperty("fixed")
 
   object Anchor extends Enumeration {
     val HorizontalCenter = Value("horizontalCenter", (frame: Frame, screen: UIScreen) => Point((screen.width - frame.width) / 2, 0))

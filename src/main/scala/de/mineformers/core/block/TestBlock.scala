@@ -21,7 +21,7 @@ class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, M
   override def onBlockActivated(worldIn: World, pos: BlockPos, state: IBlockState, playerIn: EntityPlayer, side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
     if (worldIn.isRemote) {
       val panel = new Frame(Size(100, 100))
-      val scroll = new ScrollPanel(Size(92, 92), true, false)
+      val scroll = new ScrollPanel(Size(92, 88), true, false)
       val label = new Label("test")
       val text = new TextBox("test", Size(50, 20))
       text.position = Point(0, 40)
@@ -33,6 +33,7 @@ class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, M
       scroll add label
       scroll add button
       panel add scroll
+      panel.addDefaultControls()
       val proxy = panel.newProxy
       Minecraft.getMinecraft.displayGuiScreen(proxy)
     }

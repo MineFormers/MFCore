@@ -42,6 +42,7 @@ import net.minecraftforge.fml.client.FMLClientHandler
  */
 abstract class Component extends Publisher {
   def init(channel: Publisher, context: Context): Unit = {
+    this.state.set(Property.Name, name)
     listenTo(channel)
     this.context = context
   }
@@ -116,7 +117,7 @@ abstract class Component extends Publisher {
   var parent: Panel = _
   var name: String = _
   var tooltip: String = _
-  var identifier: String = getClass.getSimpleName.toLowerCase
+  var identifier: String = getClass.getSimpleName()(0).toLower + getClass.getSimpleName.substring(1)
   var background = identifier
   var zIndex = 0
   private var _bounds: Rectangle = Rectangle(position, width, height)

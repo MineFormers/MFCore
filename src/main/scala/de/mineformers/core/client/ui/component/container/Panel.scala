@@ -63,9 +63,9 @@ class Panel extends Component {
   override def update(mousePos: Point): Unit = {
     content.foreach(c => {
       if (layout != null)
-        c.screen = screen + layout.positionFor(this, c) + Point(padding.left, padding.right)
+        c.screen = screen + layout.positionFor(this, c) + Point(padding.left, padding.top)
       else
-        c.screen = screen + c.position + Point(padding.left, padding.right)
+        c.screen = screen + c.position + Point(padding.left, padding.top)
       c.update(mousePos)
     })
   }

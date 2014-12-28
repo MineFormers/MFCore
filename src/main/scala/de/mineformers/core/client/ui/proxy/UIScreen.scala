@@ -23,7 +23,7 @@
  */
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.client.shape2d.Point
+import de.mineformers.core.client.shape2d.{Size, Point}
 import de.mineformers.core.client.ui.component.container.Frame
 import de.mineformers.core.client.ui.component.decoration.Tooltip
 import de.mineformers.core.client.ui.util.{MouseButton, KeyEvent, MouseEvent}
@@ -42,22 +42,27 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
     frame.init(this, this)
   }
 
+  override def size: Size = Size(width, height)
+
   override def mouseClicked(x: Int, y: Int, button: Int): Unit = {
     val currentTime = System.currentTimeMillis()
-    if (focused != null)
-      focused.onClick(Point(x, y), MouseButton(button))
     publish(MouseEvent.Click(Point(x, y), button))
 
-    if (currentTime - lastClickTime <= 300) {
+    if (button == lastButton && currentTime - lastClickTime <= 300) {
       publish(MouseEvent.DoubleClick(Point(x, y), button))
     }
 
+    lastButton = button
     lastClickTime = currentTime
   }
 
   override def mouseClickMove(x: Int, y: Int, lastButton: Int, timeSinceClick: Long): Unit = {
     publish(MouseEvent.Drag(Point(x, y), lastDragPosition, lastButton, timeSinceClick))
     lastDragPosition = Point(x, y)
+  }
+
+  override def mouseReleased(x: Int, y: Int, button: Int): Unit = {
+    publish(MouseEvent.Release(Point(x, y), button))
   }
 
   override def keyTyped(char: Char, code: Int): Unit = {
@@ -104,6 +109,7 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
   }
 
   private val tooltip = new Tooltip("")
+  private var lastButton = -1
   private var lastClickTime = 0L
   private var lastMousePosition = Point(0, 0)
   private var lastDragPosition = Point(0, 0)

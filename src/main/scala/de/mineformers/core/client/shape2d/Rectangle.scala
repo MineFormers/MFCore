@@ -128,6 +128,8 @@ class Rectangle private(r: Bounds) extends Shape[Rectangle] {
 
   def contains(r: Rectangle): Boolean = (r.start xyGreaterOrEqual start) && (r.end xyLessOrEqual end)
 
+  def local(p: Point): Point = p - start
+
   override def bounds: Rectangle = this
 
   override def hashCode = _hashCode

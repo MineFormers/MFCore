@@ -42,7 +42,6 @@ case class SkinSelector(query: String) {
                 properties = properties.updated(p.name, value)
             }
           }
-          println(component.state)
         }
         properties.forall(p => component.state.byName(p._1).orNull == p._2)
       }

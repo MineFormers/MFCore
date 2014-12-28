@@ -63,6 +63,10 @@ object MouseEvent {
     def lastButton = MouseButton(lastButtonCode)
   }
 
+  case class Release(p: Point, buttonCode: Int) extends MouseEvent(p) {
+    def button = MouseButton(buttonCode)
+  }
+
   case class Scroll(p: Point, direction: Int) extends MouseEvent(p)
 
 }

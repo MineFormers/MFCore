@@ -22,7 +22,7 @@ trait ComponentState {
 
   def properties: HMap[Property]
 
-  override def toString: String = "{" + propertyNames.map(s => s"$s: ${byName(s).orNull}").mkString(",") + "}"
+  override def toString: String = "{" + propertyNames.map(s => s"$s: ${byName(s).orNull}").mkString(", ") + "}"
 }
 
 object ComponentState {

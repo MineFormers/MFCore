@@ -27,6 +27,7 @@ trait Property[+T] {
 }
 
 object Property {
+  final val Name = new StringProperty("name")
   final val Hovered = new BooleanProperty("hovered")
   final val Focused = new BooleanProperty("focused")
   final val Enabled = new BooleanProperty("enabled")

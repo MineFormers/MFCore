@@ -1,6 +1,6 @@
 {
     "gui": {
-        "target": "scrollbar",
+        "target": "scrollBar",
         "type": "dynamic"
     }
 }
