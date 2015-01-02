@@ -252,8 +252,10 @@ object RenderUtils {
     GL11.glViewport(cam.viewport.x, mc.displayHeight - cam.viewport.end.y, cam.viewport.width, cam.viewport.height)
     GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT)
     GL11.glMatrixMode(GL11.GL_PROJECTION)
+    println("Projection\n" + cam.projectionMatrix)
     loadMatrix(cam.projectionMatrix)
     GL11.glMatrixMode(GL11.GL_MODELVIEW)
+    println("View\n" + cam.viewMatrix)
     loadMatrix(cam.viewMatrix)
     GL11.glTranslated(-eye.x, -eye.y, -eye.z)
   }

@@ -68,7 +68,7 @@ object MFWorldRenderer {
       render.updateChunks(time)
     }
 
-    GlStateManager.matrixMode(5888)
+    GlStateManager.matrixMode(GL11.GL_MODELVIEW)
     GlStateManager.pushMatrix()
     GlStateManager.disableAlpha()
     render.renderBlockLayer(EnumWorldBlockLayer.SOLID, viewEntity)
@@ -77,18 +77,18 @@ object MFWorldRenderer {
     RenderUtils.mc.getTextureManager.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false)
     render.renderBlockLayer(EnumWorldBlockLayer.CUTOUT, viewEntity)
     RenderUtils.mc.getTextureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap()
-    GlStateManager.shadeModel(7424)
-    GlStateManager.alphaFunc(516, 0.1F)
-    GlStateManager.matrixMode(5888)
+    GlStateManager.shadeModel(GL11.GL_FLAT)
+    GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F)
+    GlStateManager.matrixMode(GL11.GL_MODELVIEW)
     GlStateManager.popMatrix()
 
     GlStateManager.enableBlend()
     GlStateManager.depthMask(false)
     RenderUtils.mc.getTextureManager.bindTexture(TextureMap.locationBlocksTexture)
-    GlStateManager.shadeModel(7425)
+    GlStateManager.shadeModel(GL11.GL_SMOOTH)
     if (RenderUtils.mc.gameSettings.fancyGraphics) {
       GlStateManager.enableBlend()
-      GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+      GlStateManager.tryBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO)
       render.renderBlockLayer(EnumWorldBlockLayer.TRANSLUCENT, viewEntity)
       GlStateManager.disableBlend()
     }
