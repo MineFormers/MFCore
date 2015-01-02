@@ -23,15 +23,15 @@
  */
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.shape2d.{Rectangle, Point, Size}
-import de.mineformers.core.client.ui.component.Drag
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.component.{View, Drag}
 import de.mineformers.core.client.ui.component.container.Frame.Anchor
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.interaction.FrameControl
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
 import de.mineformers.core.client.ui.state.{BooleanProperty, ComponentState}
-import de.mineformers.core.client.ui.util.{Font, MouseButton, MouseEvent}
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.client.ui.util.font.MCFont
+import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
 import net.minecraft.client.Minecraft
 
 import scala.collection.mutable.ListBuffer
@@ -44,12 +44,13 @@ import scala.collection.mutable.ListBuffer
 class Frame(size0: Size) extends Panel with Drag {
   size = size0
 
-  override def init(channel: Publisher, context: Context): Unit = {
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
     this.screen = position + anchor.pos(this, proxy)
     if (!fixed)
-      padding = Padding(4, 8, 4, 4)
+      padding = Padding(4, 14, 4, 4)
     super.init(channel, context)
     state.set(Frame.FixedProperty, fixed)
+    state.set(Frame.ResizableProperty, resizable)
     for (i <- 0 until controls.size) {
       controls(i).screen = Point(screen.x + width - 11 - 10 * i, screen.y + 2)
     }
@@ -62,9 +63,9 @@ class Frame(size0: Size) extends Panel with Drag {
     Minecraft.getMinecraft.displayGuiScreen(proxy)
   }
 
-  def newProxy = new UIScreen(this)
+  def newProxy = new UIScreen(Seq(this))
 
-  override def defaultState(state: ComponentState): Unit = state.set(Frame.FixedProperty, fixed)
+  override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(Frame.FixedProperty, fixed).set(Frame.ResizableProperty, resizable))
 
   override def updateState(mousePos: Point): Unit = {
     super.updateState(mousePos)
@@ -93,20 +94,42 @@ class Frame(size0: Size) extends Panel with Drag {
 
   override def canDrag: Boolean = !fixed
 
-  override def controlRegion: Rectangle = Rectangle(0, 0, width, 11)
+  override def controlRegions: Map[String, Rectangle] = Map("move" -> Rectangle(0, 0, width, 11), "resize" -> Rectangle(width - 5, height - 5, 5, 5))
+
+  override def onDrag(region: String, newPos: Point, lastPos: Point, delta: Point): Unit = region match {
+    case "move" => super.onDrag(region, newPos, lastPos, delta)
+    case "resize" =>
+      if(resizable) {
+        this.size += Size(delta.x, delta.y)
+      }
+  }
+
+  override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
+    var result = super.findComponent(mousePos, predicate)
+    if(result eq this) {
+      controls.foreach(c =>
+        if(predicate(c))
+          result = c
+      )
+    }
+    result
+  }
 
   skin = new FrameSkin
+  minSize = Size(50, 50)
 
+  var title = ""
   var proxy: UIScreen = _
   var anchor = Anchor.Center
   var fixed = false
+  var resizable = true
   private val controls = ListBuffer.empty[FrameControl]
 
   class FrameSkin extends PanelSkin {
     override def drawForeground(mousePos: Point): Unit = {
       super.drawForeground(mousePos)
-      Font.Default.draw("Test", screen.x + 2, screen.y + 3, zIndex, 0x6a6a6a)
-      Font.DefaultLight.draw("Test", screen.x + 2, screen.y + 2)
+      MCFont.Default.draw(title, screen.x + 2, screen.y + 3, zIndex, 0x6a6a6a)
+      MCFont.DefaultLight.draw(title, screen.x + 2, screen.y + 2)
       controls.foreach(_.skin.draw(mousePos))
     }
   }
@@ -116,6 +139,7 @@ class Frame(size0: Size) extends Panel with Drag {
 object Frame {
 
   final val FixedProperty = new BooleanProperty("fixed")
+  final val ResizableProperty = new BooleanProperty("resizable")
 
   object Anchor extends Enumeration {
     val HorizontalCenter = Value("horizontalCenter", (frame: Frame, screen: UIScreen) => Point((screen.width - frame.width) / 2, 0))

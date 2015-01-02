@@ -23,8 +23,9 @@
  */
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.util.math.shape2d.Size
 import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation.Orientation
+import de.mineformers.core.client.ui.state.{ComponentState, StringProperty}
 
 /**
  * NavigationButton
@@ -33,19 +34,23 @@ import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orie
  */
 class NavigationButton(orientation: Orientation) extends Button("") {
   size = if (orientation.vertical) Size(15, 10) else Size(10, 15)
-  identifier = orientation.name
+
+  override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(NavigationButton.OrientationProperty, orientation.name))
 }
 
 object NavigationButton {
+  final val OrientationProperty = new StringProperty("orientation", "left", Orientation.values.map(_.toString).toSeq)
 
   object Orientation extends Enumeration {
     type Orientation = OrientationVal
-    final val Left = Value("navigationLeft", vertical = false)
-    final val Right = Value("navigationRight", vertical = false)
-    final val Up = Value("navigationUp", vertical = true)
-    final val Down = Value("navigationDown", vertical = true)
+    final val Left = Value("left", vertical = false)
+    final val Right = Value("right", vertical = false)
+    final val Up = Value("up", vertical = true)
+    final val Down = Value("down", vertical = true)
 
-    class OrientationVal(val name: String, val vertical: Boolean) extends Val(nextId, name)
+    class OrientationVal(val name: String, val vertical: Boolean) extends Val(nextId, name) {
+      override def toString(): String = name
+    }
 
     protected final def Value(name: String, vertical: Boolean) = new OrientationVal(name, vertical)
   }

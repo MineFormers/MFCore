@@ -23,14 +23,13 @@
  */
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.layout.{Constraints, LayoutManager}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.ScissorRegion
-import de.mineformers.core.client.ui.state.ComponentState
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.reaction.GlobalPublisher
 import org.lwjgl.opengl.GL11
 
 /**
@@ -38,8 +37,8 @@ import org.lwjgl.opengl.GL11
  *
  * @author PaleoCrafter
  */
-class Panel extends Component {
-  override def init(channel: Publisher, context: Context): Unit = {
+class Panel extends View {
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
     super.init(channel, context)
     content.foreach(c => {
       c.parent = this
@@ -50,7 +49,7 @@ class Panel extends Component {
         c.screen = screen + c.position + Point(padding.left, padding.right)
     })
     if (size == Size(0, 0))
-      size = contentSize
+      size = contentSize()
   }
 
   override def updateState(mousePos: Point): Unit = {
@@ -66,33 +65,63 @@ class Panel extends Component {
         c.screen = screen + layout.positionFor(this, c) + Point(padding.left, padding.top)
       else
         c.screen = screen + c.position + Point(padding.left, padding.top)
+      if (!sizeUpdate)
+        c.onParentResized(this.size, this.size, Size(0, 0))
       c.update(mousePos)
     })
+    if (!sizeUpdate)
+      sizeUpdate = true
   }
 
   /**
    * Installed reaction won't receive events from the given publisher anylonger.
    */
-  override def deafTo(ps: Publisher*): Unit = {
+  override def deafTo(ps: GlobalPublisher*): Unit = {
     super.deafTo(ps: _*)
     content foreach {
       _.deafTo(ps: _*)
     }
   }
 
-  def deafToNonChildren(ps: Publisher*): Unit = {
+  def deafToNonChildren(ps: GlobalPublisher*): Unit = {
     super.deafTo(ps: _*)
   }
 
-  def add(c: Component): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
+  def addViews(cs: View*): Unit = cs.foreach(add)
 
-  def add(c: Component, constraints: Constraints): Unit = {
+  def add(c: View): Unit = this.add(c, if (layout != null) layout.defaultConstraints else null)
+
+  def add(c: View, constraints: Constraints): Unit = {
     content :+= c
     if (layout != null)
       layout.setConstraints(c, constraints)
   }
 
-  def contentSize: Size = {
+  def findComponent(mousePos: Point, predicate: View => Boolean): View = {
+    var result: View = null
+    if (predicate(this))
+      result = this
+    for (c <- content) {
+      c match {
+        case p: Panel => val pResult = p.findComponent(mousePos, predicate)
+          if (pResult != null)
+            result = pResult
+        case comp =>
+          if (predicate(comp))
+            result = comp
+      }
+    }
+    result
+  }
+
+  override def size_=(size: Size): Unit = {
+    val oldSize = this.size
+    super.size_=(size)
+    if (this.size != oldSize)
+      content.foreach(_.onParentResized(this.size, oldSize, this.size - oldSize))
+  }
+
+  def contentSize(withPadding: Boolean = true): Size = {
     if (layout != null) layout.size(this)
     else {
       var width = 0
@@ -103,14 +132,19 @@ class Panel extends Component {
         if (component.y + component.height > height)
           height = component.y + component.height
       }
-      Size(width, height)
+      if (withPadding)
+        Size(width + padding.left + padding.right, height + padding.top + padding.bottom)
+      else
+        Size(width, height)
     }
   }
+
+  def screenPaddingBounds = Rectangle(screen + Point(padding.left, padding.top), width - padding.left - padding.right, height - padding.top - padding.bottom)
 
   def scissorRegion: ScissorRegion = {
     var rect = Rectangle(screenBounds.start + Point(padding.left, padding.top), screenBounds.end - Point(padding.right, padding.bottom))
     if (parent != null) {
-      rect = (rect & parent.scissorRegion.bounds).orNull
+      rect = (rect & parent.scissorRegion.bounds).getOrElse(Rectangle(0, 0, 0, 0))
     }
     new ScissorRegion(rect)
   }
@@ -118,7 +152,7 @@ class Panel extends Component {
   def deepTooltip(p: Point): String = {
     content foreach {
       c =>
-        if (c.tooltip != null && c.hovered(p))
+        if (c.tooltip != null && (context.findHoveredComponent(p) eq c))
           return c.tooltip
         else
           c match {
@@ -132,17 +166,16 @@ class Panel extends Component {
     null
   }
 
-  override def defaultState(state: ComponentState): Unit = ()
-
   def content = _content
 
-  def content_=(content: Seq[Component]): Unit = _content = content
+  def content_=(content: Seq[View]): Unit = _content = content
 
   override var skin: Skin = new PanelSkin
   var layout: LayoutManager[_ <: Constraints] = _
-  var clip = true
+  var clip = false
   var padding: Padding = Padding(4)
-  private var _content = Seq.empty[Component]
+  private var _content = Seq.empty[View]
+  protected var sizeUpdate = false
 
   override def toString: String = s"Panel(layout=$layout, clip=$clip, padding=$padding, content=${content.mkString("[", ",", "]")})"
 

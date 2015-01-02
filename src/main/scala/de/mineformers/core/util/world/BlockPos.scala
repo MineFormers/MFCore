@@ -26,6 +26,7 @@ package de.mineformers.core.util.world
 import java.lang.{Integer => JInt}
 
 import com.google.common.base.Objects
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.{AxisAlignedBB, Vec3, BlockPos => VBlockPos}
 
@@ -37,7 +38,7 @@ import scala.collection.mutable
  *
  * @author PaleoCrafter
  */
-object BlockPos {
+object BlockPos extends Coord3Factory[Int, BlockPos] {
   implicit def custom2vanilla(pos: BlockPos): VBlockPos = new VBlockPos(pos.x, pos.y, pos.z)
 
   implicit def vanilla2custom(pos: VBlockPos): BlockPos = BlockPos(pos.getX, pos.getY, pos.getZ)
@@ -81,7 +82,7 @@ object BlockPos {
  *
  * @param coords a tuple representing the position's coordinates
  */
-class BlockPos private(coords: (Int, Int, Int)) extends Ordered[BlockPos] {
+class BlockPos private(coords: (Int, Int, Int)) extends Coord3[Int] with Ordered[BlockPos] {
   val (x, y, z) = coords
   private val _hashCode = Objects.hashCode(JInt.valueOf(x), JInt.valueOf(y), JInt.valueOf(z))
 
@@ -163,6 +164,8 @@ class BlockPos private(coords: (Int, Int, Int)) extends Ordered[BlockPos] {
    *         (this.x * pos.x, this.y * pos.y, this.z * pos.z)
    */
   def *(pos: BlockPos): BlockPos = BlockPos(this.x * pos.x, this.y * pos.y, this.z * pos.z)
+
+  def /(scalar: Int): BlockPos = BlockPos(x / scalar, y / scalar, z / scalar)
 
   def unary_+ = this
 

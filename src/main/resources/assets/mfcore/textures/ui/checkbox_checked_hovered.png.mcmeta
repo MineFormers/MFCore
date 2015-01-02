@@ -1,0 +1,6 @@
+{
+    "gui": {
+        "target": "checkBox[checked,hovered]",
+        "type": "static"
+    }
+}

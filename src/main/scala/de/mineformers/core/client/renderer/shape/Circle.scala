@@ -1,7 +1,7 @@
 package de.mineformers.core.client.renderer.shape
 
 import de.mineformers.core.client.renderer.RenderParams
-import de.mineformers.core.util.world.Vector3
+import de.mineformers.core.util.math.Vector3
 import org.lwjgl.opengl.GL11._
 
 /**

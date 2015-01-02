@@ -23,6 +23,8 @@
  */
 package de.mineformers.core.client.util
 
+import net.minecraft.util.MathHelper
+
 /**
  * Color
  *
@@ -60,5 +62,14 @@ case class Color(r: Float, g: Float, b: Float, a: Float) {
     i |= ((g * 255).toInt & 0xFF) << 8
     i |= (b * 255).toInt & 0xFF
     i
+  }
+
+  def lighten(amount: Float) = {
+    val hsv = java.awt.Color.RGBtoHSB((r * 255).toInt, (g * 255).toInt, (b * 255).toInt, null)
+    Color.fromHSV(hsv(0), hsv(1), MathHelper.clamp_float(hsv(2) + amount, 0, 1), a)
+  }
+
+  def darken(amount: Float) = {
+    lighten(-amount)
   }
 }

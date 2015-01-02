@@ -1,28 +1,43 @@
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.shape2d.{Rectangle, Point}
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle}
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
+
+import scala.collection.mutable
 
 /**
  * Draggable
  *
  * @author PaleoCrafter
  */
-trait Drag extends Component {
+trait Drag extends View {
   reactions += {
     case e: MouseEvent.Click if e.button == MouseButton.Left =>
       val localPos = local(e.pos)
-      if (hovered(e.pos) && controlRegion.contains(localPos)) {
-        lastDragPosition = e.pos
-        _dragged = true
+      if (hovered(e.pos)) {
+        controlRegions.find(_._2.contains(localPos)) match {
+          case Some((region, _)) =>
+            lastDragPositions += region -> e.pos
+            _dragged += region -> true
+          case _ =>
+        }
       }
+  }
+
+  globalReactions += {
     case e: MouseEvent.Release if e.button == MouseButton.Left =>
-      _dragged = false
-      onStopDragging(e.pos)
+      _dragged.find(_._2) match {
+        case Some((region, _)) =>
+          _dragged += region -> false
+          onStopDragging(region, e.pos)
+        case _ =>
+      }
     case e: MouseEvent.Move =>
-      if (dragged) {
-        this.screen += e.pos - lastDragPosition
-        lastDragPosition = e.pos
+      _dragged.find(_._2) match {
+        case Some((region, _)) =>
+          onDrag(region, e.pos, lastDragPositions(region), e.pos - lastDragPositions(region))
+          lastDragPositions += region -> e.pos
+        case _ =>
       }
       snapToWindow()
   }
@@ -39,16 +54,23 @@ trait Drag extends Component {
       screen = Point(screen.x, region.end.y - height)
   }
 
-  def onStopDragging(mousePos: Point): Unit = ()
+  def onStopDragging(region: String, mousePos: Point): Unit = ()
 
   def canDrag: Boolean
 
   def dragRegion: Rectangle = Rectangle(Point(0, 0), context.size)
 
-  def controlRegion: Rectangle = bounds
+  def controlRegions: Map[String, Rectangle] = Map("full" -> bounds)
 
-  def dragged = _dragged
+  def onDrag(region: String, newPos: Point, lastPos: Point, delta: Point): Unit = {
+    this.screen += delta
+  }
 
-  private var lastDragPosition = Point(0, 0)
-  private var _dragged = false
+  def dragged(region: String) = _dragged.get(region) match {
+    case Some(d) => d
+    case _ => false
+  }
+
+  private var lastDragPositions = mutable.Map.empty[String, Point]
+  private var _dragged = mutable.Map.empty[String, Boolean]
 }

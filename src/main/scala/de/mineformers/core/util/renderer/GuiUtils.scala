@@ -26,14 +26,13 @@ package de.mineformers.core.util.renderer
 import java.io.IOException
 import javax.imageio.ImageIO
 
-import de.mineformers.core.client.shape2d.Size
-import de.mineformers.core.client.ui.util.Font
+import de.mineformers.core.util.math.shape2d.{Rectangle, Size}
+import de.mineformers.core.client.ui.util.font.MCFont
 import de.mineformers.core.client.util.RenderUtils._
 import de.mineformers.core.util.ResourceUtils.Resource
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.Tessellator
-import net.minecraft.client.renderer.entity.RenderItem
+import net.minecraft.client.renderer.{GlStateManager, OpenGlHelper, RenderHelper, Tessellator}
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
@@ -72,6 +71,10 @@ object GuiUtils {
 
   def scaledHeight(height: Int): Int = height / scaledResolution.getScaleFactor
 
+  def scale(rectangle: Rectangle) = Rectangle(rectangle.start / scaledResolution.getScaleFactor, rectangle.end / scaledResolution.getScaleFactor)
+
+  def revertScale(rectangle: Rectangle) = Rectangle(rectangle.start * scaledResolution.getScaleFactor, rectangle.end * scaledResolution.getScaleFactor)
+
   def colorFromRGB(r: Int, g: Int, b: Int): Int = (0xFF0000 & (r << 16)) | (0x00FF00 & (g << 8)) | (0x0000FF & b)
 
   def colorFromRGB(color: Color): Int = (0xFF0000 & (color.getRed << 16)) | (0x00FF00 & (color.getGreen << 8)) | (0x0000FF & color.getBlue)
@@ -92,7 +95,7 @@ object GuiUtils {
     s
   }
 
-  def drawString(text: String, x: Int, y: Int, z: Int, font: Font): Unit = {
+  def drawString(text: String, x: Int, y: Int, z: Int, font: MCFont): Unit = {
     font.draw(text, x, y, z)
   }
 
@@ -181,7 +184,7 @@ object GuiUtils {
     renderer.addVertexWithUV(x + width, y + height, z, uMax, vMax)
     renderer.addVertexWithUV(x + width, y, z, uMax, v)
     renderer.addVertexWithUV(x, y, z, u, v)
-    tessellator.draw
+    tessellator.draw()
     glDisable(GL_BLEND)
   }
 
@@ -217,9 +220,23 @@ object GuiUtils {
     shaders.deactivate()
   }
 
-  def drawItemStack(stack: ItemStack, x: Int, y: Int, customAmount: String = null) {
+  def drawItemStack(stack: ItemStack, x: Int, y: Int, z: Int, customAmount: String = null) {
+    OpenGlHelper.setLightmapTextureCoords(OpenGlHelper.lightmapTexUnit, 240F, 240F)
+    RenderHelper.enableGUIStandardItemLighting()
+    GlStateManager.enableDepth()
+    GlStateManager.enableAlpha()
+    GlStateManager.disableBlend()
+    GlStateManager.enableRescaleNormal()
+    val oldZ = renderItem.zLevel
+    renderItem.zLevel = z - 101F
     renderItem.renderItemAndEffectIntoGUI(stack, x, y)
-    renderItem.renderItemOverlayIntoGUI(mc.fontRendererObj, stack, x, y, customAmount)
+    val font = stack.getItem.getFontRenderer(stack)
+    renderItem.renderItemOverlayIntoGUI(if (font != null) font else mc.fontRendererObj, stack, x, y, customAmount)
+    renderItem.zLevel = oldZ
+    GlStateManager.disableDepth()
+    GlStateManager.enableAlpha()
+    GlStateManager.enableBlend()
+    RenderHelper.disableStandardItemLighting()
   }
 
   private def shaders: ShaderSystem = {

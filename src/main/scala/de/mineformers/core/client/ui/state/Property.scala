@@ -18,6 +18,8 @@ trait Property[+T] {
 
   def parse(input: String): T
 
+  def priority: Int
+
   override def hashCode(): Int = Objects.hash(name, allowedValues)
 
   override def equals(obj: scala.Any): Boolean = obj match {
@@ -28,8 +30,9 @@ trait Property[+T] {
 
 object Property {
   final val Name = new StringProperty("name")
-  final val Hovered = new BooleanProperty("hovered")
+  final val Hovered = new BooleanProperty("hovered", priority = 1)
   final val Focused = new BooleanProperty("focused")
-  final val Enabled = new BooleanProperty("enabled")
+  final val Enabled = new BooleanProperty("enabled", priority = 2)
   final val Text = new StringProperty("text")
+  final val Style = new StringProperty("style")
 }

@@ -23,7 +23,8 @@
  */
 package de.mineformers.core.block
 
-import de.mineformers.core.util.world.{BlockPos, Vector3}
+import de.mineformers.core.util.math.Vector3
+import de.mineformers.core.util.world.BlockPos
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity

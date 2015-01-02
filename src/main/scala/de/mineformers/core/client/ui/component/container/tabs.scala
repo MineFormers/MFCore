@@ -23,18 +23,20 @@
  */
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.container.Tab.Orientation
 import de.mineformers.core.client.ui.component.container.Tab.Orientation.Orientation
+import de.mineformers.core.client.ui.component.decoration.Label
 import de.mineformers.core.client.ui.layout.StackLayout
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.drawable.Drawable
-import de.mineformers.core.client.ui.state.{BooleanProperty, ComponentState}
+import de.mineformers.core.client.ui.state.{Property, BooleanProperty, ComponentState, StringProperty}
 import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
-import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.client.ui.util.SimpleShadow
+import de.mineformers.core.client.util.Color
+import de.mineformers.core.reaction.GlobalPublisher
 
 import scala.collection.mutable
 
@@ -49,11 +51,11 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
   tabPanel.layout = new StackLayout(horizontal = !orientation.vertical)
   private val tabs = mutable.LinkedHashMap.empty[String, Tab]
   private var _active: String = _
-  private var channel: Publisher = _
+  private var channel: GlobalPublisher = _
   skin = new TabFrameSkin
 
-  reactions += {
-    case ComponentClicked(c, button) =>
+  globalReactions += {
+    case ComponentClicked(c, pos, button) =>
       c match {
         case tab: Tab =>
           active = tab.key
@@ -61,7 +63,7 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
       }
   }
 
-  override def init(channel: Publisher, context: Context): Unit = {
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
     super.init(channel, context)
     this.channel = channel
     tabPanel.init(channel, context)
@@ -113,16 +115,15 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
       active = key
   }
 
-  case class Tab(key: String, title: String, icon: Drawable, panel: Panel, first: Boolean = false) extends Component {
-    reactions += {
-      case MouseEvent.Click(p, code) => if (hovered(p) && visible) context.publish(ComponentClicked(this, MouseButton(code)))
-    }
-
+  case class Tab(key: String, title: String, icon: Drawable, panel: Panel, first: Boolean = false) extends View {
     size = if (orientation.vertical) Size(32, 28) else Size(28, 32)
     tooltip = title
-    identifier = orientation.name
 
-    override def defaultState(state: ComponentState): Unit = state.set(de.mineformers.core.client.ui.component.container.Tab.FirstProperty, first)
+    import de.mineformers.core.client.ui.component.container.{Tab => TabO}
+
+    override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(TabO.FirstProperty, first)
+      .set(TabO.OrientationProperty, orientation.name)
+      .set(TabO.TypeProperty, "panel"))
 
     override def update(mousePos: Point): Unit = ()
 
@@ -145,18 +146,106 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
 
 }
 
-object Tab {
+class TabbedPanel(orientation: Orientation = Orientation.Top) extends Panel {
+  padding = Padding.None
+  private val tabPanel = new Panel
+  tabPanel.padding = Padding.None
+  tabPanel.layout = new StackLayout(horizontal = !orientation.vertical)
+  private val tabContainer = new Panel
+  tabContainer.padding = Padding(1, 0, 1, 1)
+  tabContainer.maxSize = Size(Integer.MAX_VALUE, Integer.MAX_VALUE)
+  this.layout = new StackLayout(gap = 0, horizontal = orientation.vertical)
+  tabPanel.size = Size(12, 12)
+  tabPanel.maxSize = Size(if (!orientation.vertical) Integer.MAX_VALUE else 12, if (orientation.vertical) Integer.MAX_VALUE else 12)
+  if (orientation == Orientation.Top || orientation == Orientation.Left)
+    addViews(tabPanel, tabContainer)
+  else
+    addViews(tabContainer, tabPanel)
+  private val tabs = mutable.LinkedHashMap.empty[String, Tab]
+  private var _active: String = _
+  private var channel: GlobalPublisher = _
 
+  globalReactions += {
+    case ComponentClicked(c, pos, button) =>
+      c match {
+        case tab: Tab =>
+          active = tab.key
+        case _ =>
+      }
+  }
+
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
+    super.init(channel, context)
+    this.channel = channel
+  }
+
+  def activeTab = tabs.getOrElse(active, null)
+
+  def active = _active
+
+  def active_=(key: String): Unit = {
+    if (tabs contains key) {
+      val tab = activeTab
+      if (tab != null && tab.panel != null) {
+        tab.panel.deafTo(channel)
+        tab.enabled = true
+      }
+      _active = key
+      tabContainer.content = Seq(activeTab.panel)
+      if (channel != null) {
+        activeTab.panel.parent = this
+        activeTab.panel.init(channel, context)
+      }
+      sizeUpdate = false
+      layout.reset()
+      activeTab.enabled = false
+    }
+  }
+
+  def addTab(key: String, title: String, panel: Panel): Unit = {
+    val tab = Tab(key, title, panel, tabs.isEmpty)
+    tab.enabled = true
+    listenTo(tab)
+    tabs += key -> tab
+    tabPanel.add(tab)
+    if (active == null)
+      active = key
+  }
+
+  case class Tab(key: String, title: String, panel: Panel, first: Boolean = false) extends Label(title) {
+    shadow = SimpleShadow(0, 1, Color.black(0.3f))
+    padding = Padding(2, 2, 2, 1)
+
+    import de.mineformers.core.client.ui.component.container.{Tab => TabO}
+
+    override def updateState(mousePos: Point): Unit = {
+      super.updateState(mousePos)
+      if(enabled && !state(Property.Hovered))
+        shadow = SimpleShadow(0, 1, Color.black(0.2f))
+      else
+        shadow = SimpleShadow(0, 1, Color.black(0.3f))
+    }
+
+    override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(TabO.FirstProperty, first).set(TabO.OrientationProperty, orientation.name).set(TabO.TypeProperty, "panel"))
+  }
+
+}
+
+object Tab {
+  final val TypeProperty = new StringProperty("type", "frame", allowedValues = Seq("frame", "panel"))
   final val FirstProperty = new BooleanProperty("first")
+  final val OrientationProperty = new StringProperty("orientation", "left", Orientation.values.map(_.toString).toSeq)
 
   object Orientation extends Enumeration {
     type Orientation = OrientationVal
-    final val Left = Value("tabLeft", vertical = true)
-    final val Right = Value("tabRight", vertical = true)
-    final val Top = Value("tabTop", vertical = false)
-    final val Bottom = Value("tabBottom", vertical = false)
+    final val Left = Value("tab", vertical = true)
+    final val Right = Value("tab", vertical = true)
+    final val Top = Value("tab", vertical = false)
+    final val Bottom = Value("tab", vertical = false)
 
-    class OrientationVal(val name: String, val vertical: Boolean) extends Val(nextId, name)
+    class OrientationVal(val name: String, val vertical: Boolean) extends Val(nextId, name) {
+      override def toString(): String = name
+    }
 
     protected final def Value(name: String, vertical: Boolean) = new OrientationVal(name, vertical)
   }

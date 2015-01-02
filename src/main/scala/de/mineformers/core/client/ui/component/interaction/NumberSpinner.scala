@@ -23,13 +23,13 @@
  */
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.component.container.Panel
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation
-import de.mineformers.core.client.ui.state.ComponentState
-import de.mineformers.core.client.ui.util.ComponentEvent
 import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ValueChanged}
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
+import org.lwjgl.input.Mouse
 
 /**
  * NumberSpinner
@@ -42,38 +42,50 @@ class NumberSpinner(textWidth: Int = 50, var min: Int = 1, var max: Int = -1, va
   val text = new TextBox(start.toString, Size(textWidth, 12))
   text.formatter = TextBox.IntegerFormatter
   val btnUp = new NavigationButton(Orientation.Up)
-  btnUp.position = Point(textWidth + 1, 1)
+  btnUp.style = "numberSpinner"
+  btnUp.size = Size(9, 6)
+  btnUp.position = Point(textWidth + 1, 0)
   val btnDown = new NavigationButton(Orientation.Down)
-  btnDown.position = Point(textWidth + 16, 1)
+  btnDown.style = "numberSpinner"
+  btnDown.position = Point(textWidth + 1, 6)
+  btnDown.size = Size(9, 6)
+  this.size = Size(textWidth + 10, 12)
 
   add(text)
   add(btnUp)
   add(btnDown)
 
+  text.reactions += {
+    case e: MouseEvent.Scroll =>
+      value += e.direction
+  }
+
+  btnUp.reactions += {
+    case e: MouseEvent.ContinuousClick if e.button == MouseButton.Left =>
+      if(e.duration > 300)
+        value += 1
+  }
+
+  btnDown.reactions += {
+    case e: MouseEvent.ContinuousClick if e.button == MouseButton.Left =>
+      if(e.duration > 300)
+        value -= 1
+  }
+
   listenTo(text, btnUp, btnDown)
 
-  reactions += {
+  globalReactions += {
     case e: ValueChanged =>
       if (e.c eq text)
         if (text.text.nonEmpty) {
-          val old = value
           value = text.text.toInt
-          if (old != value)
-            publish(ValueChanged(this, old, this.value))
         }
     case ButtonPressed(b) =>
-      val old = value
       if (b eq btnUp)
         value += 1
       else if (b eq btnDown)
         value -= 1
-      if (old != value) {
-        publish(ValueChanged(this, old, this.value))
-        text.setText(value.toString, notify = false)
-      }
   }
-
-  override def defaultState(state: ComponentState): Unit = ()
 
   def value: Int = _value
 
@@ -82,5 +94,9 @@ class NumberSpinner(textWidth: Int = 50, var min: Int = 1, var max: Int = -1, va
     this._value = value max min
     if (max != -1)
       this._value = this.value min max
+    if (old != this.value) {
+      publish(ValueChanged(this, old, this.value))
+      text.setText(this.value.toString, notify = false)
+    }
   }
 }

@@ -31,7 +31,7 @@ import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
  *
  * @author PaleoCrafter
  */
-trait Focus extends Component {
+trait Focus extends View {
   abstract override def defaultState(state: ComponentState) = super.defaultState(state.set(Property.Focused, false))
 
   reactions += {
@@ -43,6 +43,14 @@ trait Focus extends Component {
           focus()
         }
       }
+  }
+
+  globalReactions += {
+    case e: MouseEvent.Click =>
+      if (e.button == MouseButton.Left)
+        if (!hovered(e.pos) && focused && canLoseFocus) {
+          noFocus()
+        }
   }
 
   def focused = _focused

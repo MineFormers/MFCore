@@ -7,7 +7,7 @@ import java.lang.{Integer => JInt}
  *
  * @author PaleoCrafter
  */
-class IntProperty(val name: String, val defaultValue: Int = 0, range: Range = null) extends Property[Int] {
+class IntProperty(val name: String, val defaultValue: Int = 0, range: Range = null, val priority: Int = 0) extends Property[Int] {
   val allowedValues = if (range != null) range.toSeq else null
 
   override def nameFrom[A >: Int](value: A): String = value.toString

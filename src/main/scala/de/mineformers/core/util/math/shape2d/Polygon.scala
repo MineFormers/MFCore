@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.shape2d
+package de.mineformers.core.util.math.shape2d
 
-import de.mineformers.core.client.shape2d.Polygon.{Corner, Edge, Edges}
+import de.mineformers.core.util.math.shape2d.Polygon.{Corner, Edge, Edges}
 
 import scala.collection.mutable
 

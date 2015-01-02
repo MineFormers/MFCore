@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.client.ui.layout
 
-import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.container.Panel
 
 import scala.util.control.Breaks
@@ -37,7 +37,7 @@ import scala.util.control.Breaks
 class StackLayout(var gap: Int = 2, var horizontal: Boolean = false, var cached: Boolean = true) extends LayoutManager[StackConstraints] {
   override def defaultConstraints: StackConstraints = null
 
-  override def positionFor(panel: Panel, component: Component): Point = {
+  override def positionFor(panel: Panel, component: View): Point = {
     if (this(component) != null && cached)
       this(component).pos
     else {

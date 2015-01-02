@@ -23,36 +23,41 @@
  */
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.component.container.Panel
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
+import de.mineformers.core.client.ui.skin.drawable.StaticTexture
 import de.mineformers.core.client.ui.state.{ComponentState, Property}
 import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.client.FMLClientHandler
 
 /**
- * Component
+ * View
  *
  * @author PaleoCrafter
  */
-abstract class Component extends Publisher {
-  def init(channel: Publisher, context: Context): Unit = {
+abstract class View extends GlobalPublisher {
+  def init(channel: GlobalPublisher, context: Context): Unit = {
     this.state.set(Property.Name, name)
     listenTo(channel)
     this.context = context
+    if (maxSize == Size(0, 0))
+      maxSize = context.size
   }
 
   reactions += {
-    case MouseEvent.Click(p, code) => if (hovered(p) && enabled && visible) context.publish(ComponentClicked(this, MouseButton(code)))
+    case MouseEvent.Click(p, code) =>
+      if (hovered(p) && enabled && visible) context.publish(ComponentClicked(this, local(p), MouseButton.get(code)))
   }
 
   def updateState(mousePos: Point): Unit = {
-    state.set(Property.Hovered, hovered(mousePos))
+    state.set(Property.Hovered, context.findHoveredComponent(mousePos) eq this)
   }
 
   def update(mousePos: Point): Unit
@@ -74,6 +79,18 @@ abstract class Component extends Publisher {
     _screenBounds
   }
 
+  def onParentResized(newSize: Size, oldSize: Size, delta: Size): Unit = {
+    if(parent != null) {
+      val sizeChange = parent.screenPaddingBounds.end - screen
+      if (maxSize.width == Integer.MAX_VALUE) {
+        this.size = Size(sizeChange.x, size.height)
+      }
+      if (maxSize.height == Integer.MAX_VALUE) {
+        this.size = Size(size.width, sizeChange.y)
+      }
+    }
+  }
+
   def x = position.x
 
   def y = position.y
@@ -83,7 +100,7 @@ abstract class Component extends Publisher {
   def height = size.height
 
   def hovered(mousePosition: Point): Boolean = {
-    if (parent != null && parent.clip) (screenBounds contains mousePosition) && parent.hovered(mousePosition) else screenBounds contains mousePosition
+    if (parent != null && parent.clip) (screenBounds contains mousePosition) && parent.hovered(mousePosition) && (parent.screenPaddingBounds contains mousePosition) else screenBounds contains mousePosition
   }
 
   def local(p: Point) = p - screen
@@ -95,12 +112,24 @@ abstract class Component extends Publisher {
     state.set(Property.Enabled, enabled)
   }
 
+  def size = _size
+
+  def size_=(size: Size): Unit = {
+    _size = Size(size.width.max(minSize.width), size.height.max(minSize.height))
+    if (maxSize != Size(0, 0))
+      _size = Size(this.size.width.min(maxSize.width), this.size.height.min(maxSize.height))
+  }
+
   private def createState = {
-    val state = ComponentState.create(Property.Hovered, Property.Enabled)
+    val state = ComponentState.create(Property.Hovered, Property.Enabled, Property.Style)
     state.set(Property.Enabled, true)
     defaultState(state)
     state
   }
+
+  def style = state(Property.Style)
+
+  def style_=(style: String) = state.set(Property.Style, style)
 
   def defaultState(state: ComponentState): Unit = ()
 
@@ -110,7 +139,9 @@ abstract class Component extends Publisher {
   val utils = GuiUtils
   var position = Point(0, 0)
   var screen = Point(0, 0)
-  var size = Size(0, 0)
+  private var _size = Size(0, 0)
+  var minSize = Size(0, 0)
+  var maxSize = Size(0, 0)
   var context: Context = _
   private var _enabled: Boolean = true
   var visible: Boolean = true
@@ -124,15 +155,21 @@ abstract class Component extends Publisher {
   private var _screenBounds: Rectangle = Rectangle(screen, width, height)
 
   trait Skin {
+    var stretchStatic = true
     val utils = GuiUtils
-    val component = Component.this
+    val component = View.this
 
     protected def drawBackground(mousePos: Point): Unit = {
+      GlStateManager.enableDepth()
       val drawable = TextureManager(component).getOrElse(TextureManager(background).orNull)
       if (drawable != null) {
-        drawable.size = size
+        if (!drawable.isInstanceOf[StaticTexture] || stretchStatic)
+          drawable.size = size
+        else
+          drawable.size = drawable.textureSize
         drawable.draw(mousePos, screen, zIndex)
       }
+      GlStateManager.disableDepth()
     }
 
     protected def drawForeground(mousePos: Point): Unit

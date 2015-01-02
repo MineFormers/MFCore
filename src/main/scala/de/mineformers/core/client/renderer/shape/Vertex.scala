@@ -24,7 +24,7 @@
 package de.mineformers.core.client.renderer.shape
 
 import de.mineformers.core.client.util.Color
-import de.mineformers.core.util.world.{Vector2, Vector3}
+import de.mineformers.core.util.math.{Vector2, Vector3}
 import net.minecraft.client.renderer.WorldRenderer
 
 /**

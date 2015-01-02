@@ -25,13 +25,14 @@ package de.mineformers.core.client.ui.component.interaction
 
 import java.text.DecimalFormat
 
-import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{Component, Focus, TextComponent}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.{View, Focus, TextView}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.state.{ComponentState, Property}
 import de.mineformers.core.client.ui.util.ComponentEvent.ValueChanged
 import de.mineformers.core.client.ui.util._
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.client.ui.util.font.{Font, MCFont}
+import de.mineformers.core.reaction.GlobalPublisher
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.ChatAllowedCharacters
 import org.lwjgl.opengl.GL11
@@ -41,7 +42,7 @@ import org.lwjgl.opengl.GL11
  *
  * @author PaleoCrafter
  */
-class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLightShadow) extends Component with TextComponent with Focus {
+class TextBox(initText: String, initSize: Size, var font: Font = MCFont.DefaultLightShadow) extends View with TextView with Focus {
   /**
    * Current text of this <code>UITextField</code>
    */
@@ -73,7 +74,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
 
   override def defaultState(state: ComponentState): Unit = ()
 
-  override def init(channel: Publisher, context: Context): Unit = {
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
     super.init(channel, context)
   }
 
@@ -224,7 +225,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
 
   def nextSpacePosition(backwards: Boolean): Int = {
     var pos: Int = cursorPosition + (if (backwards) -1 else 1)
-    if (pos < 0 || pos > sb.length) return 0
+    if (pos < 0 || pos > sb.length - 1) return if (backwards) 0 else sb.length
     if (sb.charAt(pos) == ' ')
       pos -= 1
     while (pos > 0 && pos < sb.length) {
@@ -299,7 +300,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
       if (hovered(e.pos) && e.button == MouseButton.Left) {
         val pos = cursorPositionFromX(local(e.pos).x)
         val currentTime = System.currentTimeMillis()
-        if(currentTime - lastDoubleClick > 300)
+        if (currentTime - lastDoubleClick > 300)
           doubleClickCount = 0
         if (doubleClickCount == 1) {
           doubleClickCount = 0
@@ -310,10 +311,13 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
           cursorPos = pos
           cursorPos = cursorPos + nextSpacePosition(true)
           val newSelection = cursorPos + nextSpacePosition(false)
-          selection = if(newSelection == sb.length) newSelection else newSelection - 1
+          selection = if (newSelection == sb.length) newSelection else newSelection - 1
           lastDoubleClick = currentTime
         }
       }
+  }
+
+  globalReactions += {
     case e: MouseEvent.Drag =>
       val localPos = local(e.pos)
       if (focused && localPos.y > 0 && localPos.y < size.height && e.lastButton == MouseButton.Left) {
@@ -321,8 +325,8 @@ class TextBox(initText: String, initSize: Size, var font: Font = Font.DefaultLig
         selection = pos
       }
     case KeyEvent.Type(char, code) =>
+      import de.mineformers.core.client.ui.component.interaction.TextBox._
       import org.lwjgl.input.Keyboard._
-      import TextBox._
       if (focused && enabled) {
         if (code == KEY_ESCAPE) {
           if (!canLoseFocus)

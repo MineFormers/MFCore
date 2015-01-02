@@ -26,7 +26,7 @@ package de.mineformers.core.client.particle
 import java.lang.reflect.Field
 
 import de.mineformers.core.client.particle.updater.ParticleUpdater
-import de.mineformers.core.util.world.Vector3
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
 import net.minecraft.client.renderer.{WorldRenderer, Tessellator}

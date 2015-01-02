@@ -21,12 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.util.world
+package de.mineformers.core.util.math
 
 import java.lang.{Double => JDouble}
 
 import com.google.common.base.Objects
+import de.mineformers.core.util.world.{BlockPos, Coord3, Coord3Factory}
 import net.minecraft.entity.Entity
+import net.minecraft.util.{MathHelper, Vec3}
 
 import scala.collection.mutable
 
@@ -36,11 +38,16 @@ import scala.collection.mutable
  *
  * @author PaleoCrafter
  */
-object Vector3 {
+object Vector3 extends Coord3Factory[Double, Vector3]  {
+  final val Rad = Math.PI.toFloat / 180F
   private val cache = mutable.WeakHashMap[(Double, Double, Double), Vector3]()
   val Zero = Vector3(0, 0, 0)
   val One = Vector3(1, 1, 1)
   val Center = Vector3(0.5D, 0.5D, 0.5D)
+
+  implicit def custom2vanilla(vector: Vector3): Vec3 = new Vec3(vector.x, vector.y, vector.z)
+
+  implicit def vanilla2custom(vec: Vec3): Vector3 = Vector3(vec.xCoord, vec.yCoord, vec.zCoord)
 
   /**
    * Create a new [[Vector3]] based on the given coordinates
@@ -61,13 +68,24 @@ object Vector3 {
   def unapply(vec: Vector3): Option[(Double, Double, Double)] = Some((vec.x, vec.y, vec.z))
 
   def fromEntityCenter(e: Entity) = Vector3(e.posX, e.posY - e.getYOffset + e.height / 2.0F, e.posZ)
+
+  def fromEntityView(e: Entity, partialTicks: Double) = {
+    val pitch = e.prevRotationPitch + (e.rotationPitch - e.prevRotationPitch) * partialTicks
+    val yaw = e.prevRotationYaw + (e.rotationYaw - e.prevRotationYaw) * partialTicks
+    val yawCos = MathHelper.cos((-yaw * Rad - Math.PI).toFloat)
+    val yawSin = MathHelper.sin((-yaw * Rad - Math.PI).toFloat)
+    val pitchCos = -MathHelper.cos((-pitch * Rad).toFloat)
+    val pitchSin = MathHelper.sin((-pitch * Rad).toFloat)
+
+    Vector3(yawSin * pitchCos, pitchSin, yawCos * pitchCos)
+  }
 }
 
 /**
  * Don't use! Use Vector3(x, y, z) for caching!
  * @param coords a tuple representing the coordinates of this vector
  */
-class Vector3 private(coords: (Double, Double, Double)) extends VectorLike[Vector3] {
+class Vector3 private(coords: (Double, Double, Double)) extends Coord3[Double] with Vector[Vector3] {
   val (x, y, z) = coords
   private val _hashCode = Objects.hashCode(JDouble.valueOf(x), JDouble.valueOf(y), JDouble.valueOf(z))
 
@@ -307,6 +325,8 @@ class Vector3 private(coords: (Double, Double, Double)) extends VectorLike[Vecto
   def isAxial: Boolean = {
     if (x == 0) y == 0 || z == 0 else y == 0 && z == 0
   }
+
+  def toBlockPos = BlockPos(x.floor.toInt, y.floor.toInt, z.floor.toInt)
 
   override def equals(that: Any): Boolean = {
     that match {

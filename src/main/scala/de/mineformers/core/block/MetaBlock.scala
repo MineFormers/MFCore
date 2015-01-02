@@ -23,7 +23,7 @@
  */
 package de.mineformers.core.block
 
-import de.mineformers.core.util.world.Vector3
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.block.material.Material
 import net.minecraft.block.state.{BlockState, IBlockState}
 import net.minecraft.creativetab.CreativeTabs

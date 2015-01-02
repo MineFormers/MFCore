@@ -23,7 +23,7 @@
  */
 package de.mineformers.core.tileentity
 
-import de.mineformers.core.util.world.Vector3
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.server.gui.IUpdatePlayerListBox
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}

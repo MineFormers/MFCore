@@ -7,7 +7,7 @@ import java.lang.{Double => JDouble}
  *
  * @author PaleoCrafter
  */
-class DoubleProperty(val name: String, val defaultValue: Double = 0D, range: Range = null) extends Property[Double] {
+class DoubleProperty(val name: String, val defaultValue: Double = 0D, range: Range = null, val priority: Int = 0) extends Property[Double] {
   val allowedValues = if (range != null) range.toSeq.map(_.toDouble) else null
 
   override def nameFrom[A >: Double](value: A): String = value.toString

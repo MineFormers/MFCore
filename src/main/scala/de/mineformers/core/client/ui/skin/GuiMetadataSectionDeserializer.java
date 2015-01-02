@@ -53,6 +53,7 @@ public class GuiMetadataSectionDeserializer extends BaseMetadataSectionSerialize
         {
             JsonArray arr = root.getAsJsonArray("multi");
             ImmutableMap.Builder<String, DrawableTexture> textures = ImmutableMap.builder();
+            ImmutableMap.Builder<String, String> data = ImmutableMap.builder();
             for (JsonElement e : arr)
             {
                 JsonObject o = e.getAsJsonObject();
@@ -64,19 +65,20 @@ public class GuiMetadataSectionDeserializer extends BaseMetadataSectionSerialize
                     textures.put(target, texture);
                 }
             }
-            return new GuiMetadataSection(textures.build());
+            return new GuiMetadataSection(textures.build(), data.build());
         }
         else
         {
+            ImmutableMap.Builder<String, String> data = ImmutableMap.builder();
             DrawableDeserializer deserializer = TextureManager.getDeserializer(root.get("type").getAsString());
             if (deserializer != null)
             {
                 String target = JsonUtils.getJsonObjectStringFieldValueOrDefault(root, "target", null);
                 DrawableTexture texture = deserializer.deserialize(root.get("type").getAsString(), root);
-                return new GuiMetadataSection(target, texture);
+                return new GuiMetadataSection(target, texture, data.build());
             }
             else
-                return new GuiMetadataSection(null, null);
+                return new GuiMetadataSection(null, null, data.build());
         }
     }
 

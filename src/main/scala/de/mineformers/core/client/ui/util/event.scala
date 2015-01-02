@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.client.ui.util
 
-import de.mineformers.core.client.shape2d.Point
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.Point
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.interaction.Button
 import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.reaction.Event
@@ -37,34 +37,38 @@ trait Positioned extends Event {
 
 object ComponentEvent {
 
-  case class ValueChanged(c: Component, oldVal: Any, newVal: Any) extends ComponentEvent(c)
+  case class ValueChanged(c: View, oldVal: Any, newVal: Any) extends ComponentEvent(c)
 
-  case class ComponentClicked(c: Component, button: MouseButton) extends ComponentEvent(c)
+  case class ComponentClicked(c: View, mousePos: Point, button: MouseButton) extends ComponentEvent(c)
 
   case class ButtonPressed(b: Button) extends ComponentEvent(b)
 
 }
 
-class ComponentEvent(c: Component) extends Event
+class ComponentEvent(c: View) extends Event
 
 object MouseEvent {
 
   case class Click(p: Point, buttonCode: Int) extends MouseEvent(p) {
-    def button = MouseButton(buttonCode)
+    def button = MouseButton.get(buttonCode)
+  }
+
+  case class ContinuousClick(p: Point, buttonCode: Int, duration: Long) extends MouseEvent(p) {
+    def button = MouseButton.get(buttonCode)
   }
 
   case class DoubleClick(p: Point, buttonCode: Int) extends MouseEvent(p) {
-    def button = MouseButton(buttonCode)
+    def button = MouseButton.get(buttonCode)
   }
 
   case class Move(p: Point, lastPos: Point) extends MouseEvent(p)
 
   case class Drag(p: Point, lastPos: Point, lastButtonCode: Int, timeSinceClick: Long) extends MouseEvent(p) {
-    def lastButton = MouseButton(lastButtonCode)
+    def lastButton = MouseButton.get(lastButtonCode)
   }
 
   case class Release(p: Point, buttonCode: Int) extends MouseEvent(p) {
-    def button = MouseButton(buttonCode)
+    def button = MouseButton.get(buttonCode)
   }
 
   case class Scroll(p: Point, direction: Int) extends MouseEvent(p)

@@ -26,7 +26,8 @@ package de.mineformers.core.util.world
 import net.minecraft.block.Block
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
-import net.minecraft.world.World
+import net.minecraft.world.{IWorldAccess, World}
+import net.minecraftforge.fml.relauncher.ReflectionHelper
 
 import scala.collection.mutable
 
@@ -43,6 +44,8 @@ object RichWorld {
   implicit def worldToRich(world: World): RichWorld = apply(world)
 
   implicit def richToWorld(rich: RichWorld): World = rich.world
+
+  private val worldAccessesField = ReflectionHelper.findField(classOf[World], "worldAccesses", "field_73021_x")
 }
 
 class RichWorld(val world: World) {
@@ -72,4 +75,17 @@ class RichWorld(val world: World) {
   def setBlock(pos: BlockPos, block: Block, meta: Int) = world.setBlockState(pos, block.getStateFromMeta(meta))
 
   def setBlock(pos: BlockPos, block: Block, meta: Int, flag: Int) = world.setBlockState(pos, block.getStateFromMeta(meta), flag)
+
+  def worldAccesses = {
+    RichWorld.worldAccessesField.setAccessible(true)
+    import scala.collection.JavaConversions._
+    RichWorld.worldAccessesField.get(world).asInstanceOf[java.util.List[_]].toList map {
+      _.asInstanceOf[IWorldAccess]
+    }
+  }
+
+  def clearWorldAccesses(): Unit = {
+    RichWorld.worldAccessesField.setAccessible(true)
+    RichWorld.worldAccessesField.get(world).asInstanceOf[java.util.List[_]].clear()
+  }
 }

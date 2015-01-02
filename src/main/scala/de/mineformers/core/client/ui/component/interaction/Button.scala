@@ -23,11 +23,12 @@
  */
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{Component, TextComponent}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.{View, TextView}
 import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ComponentClicked}
-import de.mineformers.core.client.ui.util.{Font, MouseButton}
+import de.mineformers.core.client.ui.util.MouseButton
+import de.mineformers.core.client.ui.util.font.{Font, MCFont}
 import net.minecraft.client.audio.PositionedSoundRecord
 import net.minecraft.util.ResourceLocation
 
@@ -36,14 +37,12 @@ import net.minecraft.util.ResourceLocation
  *
  * @author PaleoCrafter
  */
-class Button(var text: String, initSize: Size = Size(50, 20)) extends Component with TextComponent {
+class Button(var text: String, initSize: Size = Size(50, 20)) extends View with TextView {
   this.size = initSize
 
-  override def defaultState(state: ComponentState): Unit = ()
-
-  reactions += {
-    case ComponentClicked(c, button) =>
-      if ((button == MouseButton.Left) && (c eq this)) {
+  globalReactions += {
+    case ComponentClicked(c, pos, button) =>
+      if (button == MouseButton.Left && (c eq this)) {
         mc.getSoundHandler.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F))
         publish(ButtonPressed(this))
       }
@@ -54,5 +53,5 @@ class Button(var text: String, initSize: Size = Size(50, 20)) extends Component 
 
   override def textOff: Point = bounds.centerInSize(font.size(text))
 
-  var font: Font = Font.DefaultShadow
+  var font: Font = MCFont.DefaultShadow
 }

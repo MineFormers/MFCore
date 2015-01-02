@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.util.world
+package de.mineformers.core.util.math
 
 import java.lang.{Double => JDouble}
 
@@ -63,7 +63,7 @@ object Vector2 {
  * Don't use! Use Vector2(x, y, z) for caching!
  * @param coords a tuple representing the coordinates of this vector
  */
-class Vector2 private(coords: (Double, Double)) extends VectorLike[Vector2] {
+class Vector2 private(coords: (Double, Double)) extends Vector[Vector2] {
   val (x, y) = coords
   private val _hashCode = Objects.hashCode(JDouble.valueOf(x), JDouble.valueOf(y))
 

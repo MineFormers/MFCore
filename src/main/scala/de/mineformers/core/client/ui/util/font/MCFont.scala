@@ -21,9 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.util
+package de.mineformers.core.client.ui.util.font
 
-import de.mineformers.core.client.shape2d.Size
+import de.mineformers.core.util.math.shape2d.Size
+import de.mineformers.core.client.util.Color
 import de.mineformers.core.client.util.RenderUtils.mc
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.gui.FontRenderer
@@ -37,39 +38,37 @@ import scala.collection.mutable
  *
  * @author PaleoCrafter
  */
-object Font {
+object MCFont {
   private val renderers: mutable.HashMap[String, FontRenderer] = mutable.HashMap[String, FontRenderer]("default" -> mc.fontRendererObj, "small" -> new FontRenderer(mc.gameSettings, new ResourceLocation("textures/font/ascii.png"), mc.renderEngine, true))
-  val Default = Font("default")
-  val DefaultShadow = Font("default", drawShadow = true)
-  val DefaultDark = Font("default", 0x404040)
-  val DefaultDarkShadow = Font("default", 0x404040, drawShadow = true)
-  val DefaultLight = Font("default", 0xF5F5F5)
-  val DefaultLightShadow = Font("default", 0xF5F5F5, drawShadow = true)
-  val Small = Font("small")
-  val SmallShadow = Font("small", drawShadow = true)
-  val SmallDark = Font("small", 0x404040)
-  val SmallDarkShadow = Font("small", 0x404040, drawShadow = true)
-  val SmallLight = Font("small", 0xF5F5F5)
-  val SmallLightShadow = Font("small", 0xF5F5F5, drawShadow = true)
+  val Default = MCFont("default")
+  val DefaultShadow = MCFont("default", drawShadow = true)
+  val DefaultDark = MCFont("default", 0x404040)
+  val DefaultDarkShadow = MCFont("default", 0x404040, drawShadow = true)
+  val DefaultLight = MCFont("default", 0xF5F5F5)
+  val DefaultLightShadow = MCFont("default", 0xF5F5F5, drawShadow = true)
+  val Small = MCFont("small")
+  val SmallShadow = MCFont("small", drawShadow = true)
+  val SmallDark = MCFont("small", 0x404040)
+  val SmallDarkShadow = MCFont("small", 0x404040, drawShadow = true)
+  val SmallLight = MCFont("small", 0xF5F5F5)
+  val SmallLightShadow = MCFont("small", 0xF5F5F5, drawShadow = true)
 
-  def apply(name: String, color: Int = 0xe0e0e0, drawShadow: Boolean = false) = new Font(name, color, drawShadow)
+  def apply(name: String, color: Int = 0xe0e0e0, drawShadow: Boolean = false) = new MCFont(name, color, drawShadow)
 
   def rendererFor(id: String) = renderers.getOrElse(id, renderers("default"))
 
   def addRenderer(id: String, renderer: FontRenderer) = renderers + id -> renderer
 }
 
-class Font(name: String, var color: Int = 0xe0e0e0, var drawShadow: Boolean = false) {
-  def draw(text: String, x: Int, y: Int): Unit = draw(text, x, y, 0, color)
-
-  def draw(text: String, x: Int, y: Int, z: Int): Unit = draw(text, x, y, z, color)
-
-  def draw(text: String, x: Int, y: Int, z: Int, color: Int): Unit = {
+class MCFont(name: String, var color: Int = 0xe0e0e0, var drawShadow: Boolean = false) extends Font {
+  override def draw(text: String, x: Int, y: Int, z: Int, color: Int): Unit = {
     GL11.glDisable(GL11.GL_DEPTH_TEST)
     GL11.glDisable(GL12.GL_RESCALE_NORMAL)
     GL11.glTranslatef(0, 0, z)
+    val rgba = Color(color)
+//    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
     var i = 0
-    for (line <- text.split("\\n").mkString("\\\\n").split("\\\\n")) {
+    for (line <- text.split("\\n").mkString("<br>").split("<br>")) {
       renderer.drawString(line, x, y + i * (height + 1), color, drawShadow)
       i += 1
     }
@@ -78,23 +77,15 @@ class Font(name: String, var color: Int = 0xe0e0e0, var drawShadow: Boolean = fa
     GL11.glEnable(GL11.GL_DEPTH_TEST)
   }
 
-  def height = renderer.FONT_HEIGHT
+  override def height = renderer.FONT_HEIGHT
 
-  def width(text: String): Int = width(text.split("\\n").mkString("\\\\n").split("\\\\n"): _*)
+  override def width(lines: String*): Int = renderer.getStringWidth(GuiUtils.longestString(lines: _*))
 
-  def width(lines: String*): Int = renderer.getStringWidth(GuiUtils.longestString(lines: _*))
+  override def height(lines: String*): Int = (height + 1) * lines.length - 1
 
-  def height(text: String): Int = height(text.split("\\n").mkString("\\\\n").split("\\\\n"): _*)
+  override def charWidth(char: Char): Int = renderer.getCharWidth(char)
 
-  def height(lines: String*): Int = (height + 1) * lines.length - 1
+  override def fit(text: String, width: Int, reverse: Boolean): String = renderer.trimStringToWidth(text, width, reverse)
 
-  def charWidth(char: Char): Int = renderer.getCharWidth(char)
-
-  def fit(text: String, width: Int): String = fit(text, width, reverse = false)
-
-  def fit(text: String, width: Int, reverse: Boolean): String = renderer.trimStringToWidth(text, width, reverse)
-
-  def size(text: String): Size = Size(width(text), height(text))
-
-  lazy val renderer = Font.rendererFor(name)
+  lazy val renderer = MCFont.rendererFor(name)
 }

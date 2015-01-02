@@ -53,8 +53,8 @@ minecraft {
     } else {
         runDir = "eclipse"
     }
-    version = "1.8-11.14.0.1274-1.8"
-	mappings = "snapshot_20141222"
+    version = "1.8-11.14.0.1281-1.8"
+	mappings = "snapshot_20141231"
 }
 
 configurations {

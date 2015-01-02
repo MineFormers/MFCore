@@ -23,15 +23,15 @@
  */
 package de.mineformers.core.client.ui.component.interaction
 
-import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.container.ScrollPanel
 import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation._
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
 import de.mineformers.core.client.ui.state.ComponentState
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
 import net.minecraft.client.gui.GuiScreen
 
 /**
@@ -39,11 +39,11 @@ import net.minecraft.client.gui.GuiScreen
  *
  * @author PaleoCrafter
  */
-class ScrollBar(length: Int, orientation: Int) extends Component {
+class ScrollBar(length: Int, orientation: Int) extends View {
   private val scrollerSize = Size(if (orientation == Horizontal) 15 else 12, if (orientation == Horizontal) 12 else 15)
   size = Size(if (orientation == Horizontal) length + 2 else scrollerSize.width + 2, if (orientation == Horizontal) scrollerSize.height + 2 else length + 2)
 
-  override def init(channel: Publisher, context: Context): Unit = {
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
     this.context = context
     listenTo(context)
   }
@@ -76,28 +76,30 @@ class ScrollBar(length: Int, orientation: Int) extends Component {
 
   def clamp(p: Point): Point = clampLocal(local(p))
 
-  reactions += {
+  globalReactions += {
     case e: MouseEvent.Drag if enabled =>
       if (e.lastButton == MouseButton.Left && clicked) {
         scrollerPos = clamp(e.pos)
       }
-    case e: MouseEvent.Click if enabled => clicked = scrollerBounds.contains(local(e.pos))
+    case e: MouseEvent.Click if enabled =>
+      clicked = scrollerBounds.contains(local(e.pos))
       if (!clicked && hovered(e.pos))
         scrollerPos = clamp(e.pos)
+  }
+
+  reactions += {
     case e: MouseEvent.Scroll if enabled && !GuiScreen.isShiftKeyDown =>
       parent match {
         case s: ScrollPanel =>
           if (orientation == Vertical) {
-            if (parent.hovered(e.pos) && (!s.scrollHorizontal || !s.scrollBarHorizontal.enabled)) {
-              scroll(e.direction)
-            } else if (parent.hovered(e.pos) && !GuiScreen.isCtrlKeyDown)
-              scroll(e.direction)
-            else if (hovered(e.pos))
-              scroll(e.direction)
+            if (!s.scrollBarHorizontal.hovered(e.pos) && !GuiScreen.isCtrlKeyDown)
+              if (parent.hovered(e.pos) && (!s.scrollHorizontal || !s.scrollBarHorizontal.enabled)) {
+                scroll(e.direction)
+              }
+              else if (hovered(e.pos))
+                scroll(e.direction)
           } else if (orientation == Horizontal) {
             if (parent.hovered(e.pos) && (!s.scrollVertical || !s.scrollBarVertical.enabled))
-              scroll(e.direction)
-            else if (parent.hovered(e.pos) && GuiScreen.isCtrlKeyDown)
               scroll(e.direction)
             else if (hovered(e.pos))
               scroll(e.direction)
@@ -108,8 +110,6 @@ class ScrollBar(length: Int, orientation: Int) extends Component {
           }
       }
   }
-
-  override def defaultState(state: ComponentState): Unit = ()
 
   override def hovered(mousePosition: Point): Boolean = screenBounds contains mousePosition
 

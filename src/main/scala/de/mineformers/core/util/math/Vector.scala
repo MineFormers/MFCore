@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.util.world
+package de.mineformers.core.util.math
 
 /**
  * VectorLike
  *
  * @author PaleoCrafter
  */
-trait VectorLike[T <: VectorLike[T]] extends Ordered[T] {
+trait Vector[T <: Vector[T]] extends Ordered[T] {
   this: T =>
   /**
    * Add the given coordinates to this vector

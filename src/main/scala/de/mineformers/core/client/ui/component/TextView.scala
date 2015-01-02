@@ -21,25 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.shape2d
+package de.mineformers.core.client.ui.component
+
+import de.mineformers.core.util.math.shape2d.Point
+import de.mineformers.core.client.ui.state.{ComponentState, Property}
+import de.mineformers.core.client.ui.util.font.Font
+import org.lwjgl.opengl.GL11
 
 /**
- * Shape
+ * TextComponent
  *
  * @author PaleoCrafter
  */
-trait Shape[A <: Shape[A]] {
-  def intersects(r: Rectangle): Boolean = (this & r) != None
+trait TextView extends View {
+  def font: Font
 
-  def &(r: Rectangle): Option[A] = intersect(r)
+  def font_=(font: Font): Unit
 
-  def intersect(r: Rectangle): Option[A]
+  def text: String
 
-  def contains(p: Point): Boolean
+  def text_=(text: String): Unit
 
-  def contains(r: Rectangle): Boolean
+  def textOff: Point = Point(0, 0)
 
-  def translate(p: Point): A
+  override var skin: Skin = new TextSkin
 
-  def bounds: Rectangle
+  abstract override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(Property.Text, ""))
+
+  class TextSkin extends Skin {
+    def drawForeground(mousePos: Point): Unit = {
+      GL11.glColor4f(1, 1, 1, 1)
+      font.draw(text, component.screen.x + textOff.x, component.screen.y + textOff.y, component.zIndex, font.color)
+      GL11.glColor4f(1, 1, 1, 1)
+    }
+  }
+
 }

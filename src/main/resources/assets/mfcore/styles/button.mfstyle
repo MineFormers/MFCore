@@ -1,0 +1,3 @@
+button[disabled] {
+    font: default;
+}

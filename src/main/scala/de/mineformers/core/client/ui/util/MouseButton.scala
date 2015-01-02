@@ -34,7 +34,7 @@ object MouseButton extends Enumeration {
   val Default = Array(Left, Right, Middle)
 
   def get(code: Int): MouseButton = {
-    if (code > 0 && code < Default.length)
+    if (code >= 0 && code < Default.length)
       return Default(code)
     Unknown
   }

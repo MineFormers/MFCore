@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.shape2d
+package de.mineformers.core.util.math.shape2d
 
-import de.mineformers.core.client.shape2d.Point.Coordinates
+import de.mineformers.core.util.math.shape2d.Point.Coordinates
 
 import scala.collection.mutable
 
@@ -72,9 +72,13 @@ class Point private(p: Coordinates) {
 
   def -(p: Point): Point = this + -p
 
+  def *(s: Int): Point = this * Point(s, s)
+
   def *(p: Coordinates): Point = this * Point(p)
 
   def *(p: Point): Point = Point(x * p.x, y * p.y)
+
+  def /(s: Int): Point = this / Point(s, s)
 
   def /(p: Coordinates): Point = this / Point(p)
 

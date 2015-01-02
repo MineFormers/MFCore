@@ -1,6 +1,6 @@
 package de.mineformers.core.client.ui.skin
 
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.client.ui.component.View
 
 /**
  * SkinSelector
@@ -27,26 +27,32 @@ case class SkinSelector(query: String) {
 
   private var properties: Map[String, Any] = null
 
-  def matches(component: Component): Boolean = {
-    if (component.identifier == id) {
-      if (rawProperties == null)
-        true
-      else {
-        if (properties == null) {
-          properties = Map.empty[String, Any]
-          val props = component.state.properties.keySet
-          props foreach { p =>
-            if (rawProperties.contains(p.name)) {
-              val value = p.parse(rawProperties(p.name))
-              if (value != null && (p.allowedValues == null || p.allowedValues.contains(value)))
-                properties = properties.updated(p.name, value)
-            }
-          }
+  def priority(component: View) = {
+    if(properties != null) {
+      properties.foldLeft(0)((acc, s) => acc + component.state.propertyPriority(s._1))
+    } else 0
+  }
+
+  def initProperties(component: View): Unit = {
+    if (properties == null && rawProperties != null) {
+      properties = Map.empty[String, Any]
+      val props = component.state.properties.keySet
+      props foreach { p =>
+        if (rawProperties.contains(p.name)) {
+          val value = p.parse(rawProperties(p.name))
+          if (value != null && (p.allowedValues == null || p.allowedValues.contains(value)))
+            properties = properties.updated(p.name, value)
         }
-        properties.forall(p => component.state.byName(p._1).orNull == p._2)
       }
-    } else
-      false
+    }
+  }
+
+  def matches(component: View): Boolean = {
+    if (rawProperties == null)
+      true
+    else {
+      properties.forall(p => component.state.byName(p._1).orNull == p._2)
+    }
   }
 
   def matches(properties: Map[String, String]) = this.rawProperties.toList forall (properties.toList contains)

@@ -23,23 +23,28 @@
  */
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.client.shape2d.{Size, Point}
-import de.mineformers.core.client.ui.component.container.Frame
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.View
+import de.mineformers.core.client.ui.component.container.{DebugWindow, Frame}
 import de.mineformers.core.client.ui.component.decoration.Tooltip
-import de.mineformers.core.client.ui.util.{MouseButton, KeyEvent, MouseEvent}
+import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.gui.GuiScreen
 import org.lwjgl.input.Mouse
+
+import scala.collection.mutable
 
 /**
  * UIScreen
  *
  * @author PaleoCrafter
  */
-class UIScreen(frame: Frame) extends GuiScreen with Context {
+class UIScreen(frames0: Seq[Frame]) extends GuiScreen with Context {
   override def initGui(): Unit = {
-    frame.proxy = this
-    frame.init(this, this)
+    frames foreach {
+      f => f.proxy = this
+        f.init(this, this)
+    }
   }
 
   override def size: Size = Size(width, height)
@@ -81,12 +86,27 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
       publish(MouseEvent.Move(pos, lastMousePosition))
       lastMousePosition = pos
     }
+    for(i <- 0 until Mouse.getButtonCount) {
+      if(Mouse.isButtonDown(i)) {
+        val current = continuousClick.getOrElseUpdate(i, (0L, System.currentTimeMillis()))
+        val duration = System.currentTimeMillis() - current._2 + current._1
+        publish(MouseEvent.ContinuousClick(pos, i, duration))
+        continuousClick.put(i, (duration, System.currentTimeMillis()))
+      } else {
+        continuousClick.put(i, (0L, System.currentTimeMillis()))
+      }
+    }
     val dWheel = Mouse.getDWheel / 120
     if (dWheel != 0) {
       publish(MouseEvent.Scroll(pos, dWheel))
     }
-    frame.update(pos)
-    frame.updateState(pos)
+    frames.foreach {
+      frame =>
+        frame.update(pos)
+        frame.updateState(pos)
+    }
+    if(attached != null)
+      attached.update(pos)
   }
 
   override def close(): Unit = {
@@ -99,16 +119,35 @@ class UIScreen(frame: Frame) extends GuiScreen with Context {
   override def drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float): Unit = {
     this.drawWorldBackground(0)
     val p = Point(mouseX, mouseY)
-    frame.skin.draw(p)
-    tooltip.screen = p + Point(5, 5)
-    val text = frame.deepTooltip(p)
-    if (text != null) {
-      tooltip.text = text
-      tooltip.skin.draw(p)
+    tooltip.text = ""
+    frames.foreach {
+      frame =>
+        frame.skin.draw(p)
+        tooltip.screen = p + Point(5, 5)
+        val text = frame.deepTooltip(p)
+        if (text != null) {
+          tooltip.text = text
+        }
     }
+    if(attached != null)
+      attached.skin.draw(p)
+    if (tooltip.text != "")
+      tooltip.skin.draw(p)
   }
 
+  override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
+    for (frame <- frames.sortBy(_.zIndex).reverse) {
+      val comp = frame.findComponent(mousePos, predicate)
+      if (comp != null)
+        return comp
+    }
+    null
+  }
+
+  private val debug = true
+  val frames = frames0 ++ (if (debug) Seq(new DebugWindow) else Seq())
   private val tooltip = new Tooltip("")
+  private val continuousClick = mutable.HashMap.empty[Int, (Long, Long)]
   private var lastButton = -1
   private var lastClickTime = 0L
   private var lastMousePosition = Point(0, 0)

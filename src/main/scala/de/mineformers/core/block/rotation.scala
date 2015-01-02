@@ -26,8 +26,8 @@ package de.mineformers.core.block
 import com.google.common.base.Predicate
 import de.mineformers.core.tileentity.Rotation
 import de.mineformers.core.util.Implicits._
+import de.mineformers.core.util.math.Vector3
 import de.mineformers.core.util.world.RichWorld._
-import de.mineformers.core.util.world.Vector3
 import net.minecraft.block.properties.PropertyDirection
 import net.minecraft.block.state.{BlockState, IBlockState}
 import net.minecraft.block.{Block, BlockPistonBase}

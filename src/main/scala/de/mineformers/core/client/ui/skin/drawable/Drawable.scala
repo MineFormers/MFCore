@@ -23,7 +23,7 @@
  */
 package de.mineformers.core.client.ui.skin.drawable
 
-import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.util.renderer.GuiUtils
 
 /**

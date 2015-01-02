@@ -25,8 +25,8 @@ package de.mineformers.core.client.ui.skin
 
 import com.google.common.collect.ImmutableMap
 import com.google.gson.{JsonArray, JsonObject}
-import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.skin.drawable.{DrawableTexture, DynamicTexture, StaticTexture}
 import de.mineformers.core.util.ResourceUtils.Resource
 import de.mineformers.core.util.renderer.GuiUtils
@@ -42,16 +42,39 @@ import scala.collection.mutable
  */
 object TextureManager {
   private var resources = HashMap.empty[String, Resource]
-  private val textures = new mutable.HashMap[String, List[TextureMapping]]
+  private val textures = new mutable.HashMap[String, (Boolean, List[TextureMapping])]
   private var deserializers = HashMap[String, DrawableDeserializer]("dynamic" -> new DynamicTexture.Deserializer(), "static" -> new StaticTexture.Deserializer())
 
-  def apply(comp: Component): Option[DrawableTexture] = {
-    if (!textures.contains(comp.identifier))
-      apply(comp.identifier)
-    else {
-      val mappings = textures(comp.identifier)
-      mappings.find(_.selector.matches(comp)).map(_.texture)
+  def identifier(comp: Class[_]): String =
+    comp.getSimpleName()(0).toLower + comp.getSimpleName.substring(1)
+
+  def apply(comp: View): Option[DrawableTexture] = {
+    var clazz: Class[_] = comp.getClass
+    var result: Option[DrawableTexture] = None
+
+    while (result.isEmpty && clazz != classOf[View]) {
+      val mappings = textures.get(identifier(clazz))
+      mappings match {
+        case Some((sorted, maps)) =>
+          maps.foreach(_.selector.initProperties(comp))
+          if (sorted) {
+            result = maps.find(_.selector.matches(comp)).map(_.texture)
+          } else {
+            sort(identifier(clazz), comp).find(_.selector.matches(comp)).map(_.texture)
+          }
+        case _ =>
+      }
+      clazz = clazz.getSuperclass
     }
+
+    result.orElse(apply(identifier(comp.getClass)))
+  }
+
+  private def sort(id: String, comp: View): List[TextureMapping] = {
+    val current = textures(id)._2
+    val newMappings = current.sortBy(m => (m.selector.propertyCount, m.selector.priority(comp))).reverse
+    textures.put(id, (true, newMappings))
+    newMappings
   }
 
   def apply(id: String): Option[DrawableTexture] = {
@@ -60,7 +83,7 @@ object TextureManager {
         set(id, load(resources(id)).head)
       }
     }
-    textures.get(id).map(_.head.texture)
+    textures.get(id).map(_._2.head.texture)
   }
 
   def apply(id: String, properties: Map[String, Any]): Option[DrawableTexture] = {
@@ -68,7 +91,7 @@ object TextureManager {
       apply(id)
     else {
       val mappings = textures(id)
-      mappings.find(_.selector.matches(properties.map(p => (p._1, p._2.toString)))).map(_.texture)
+      mappings._2.find(_.selector.matches(properties.map(p => (p._1, p._2.toString)))).map(_.texture)
     }
   }
 
@@ -132,8 +155,13 @@ object TextureManager {
   def set(id: String, texture: DrawableTexture): Unit = {
     val selector = SkinSelector(id)
     if (!textures.contains(selector.id))
-      textures.put(selector.id, List())
-    textures.put(selector.id, (TextureMapping(selector, texture) :: textures(selector.id)).sortBy(_.selector.propertyCount).reverse)
+      textures.put(selector.id, (false, List()))
+    val sorted = textures(selector.id)._1
+    val current = textures(selector.id)._2
+    if (!sorted)
+      textures.put(selector.id, (sorted, (TextureMapping(selector, texture) :: current).sortBy(_.selector.propertyCount).reverse))
+    else
+      textures.put(selector.id, (false, (TextureMapping(selector, texture) :: current).sortBy(_.selector.propertyCount).reverse))
   }
 
   private case class TextureMapping(selector: SkinSelector, texture: DrawableTexture)
@@ -154,6 +182,6 @@ trait DrawableDeserializer {
   def getPointFromArray(array: JsonArray): Point = Point(array.get(0).getAsInt, array.get(1).getAsInt)
 }
 
-class GuiMetadataSection(val map: ImmutableMap[String, DrawableTexture]) extends IMetadataSection {
-  def this(target: String, texture: DrawableTexture) = this(ImmutableMap.of(target, texture))
+class GuiMetadataSection(val map: ImmutableMap[String, DrawableTexture], val data: ImmutableMap[String, String]) extends IMetadataSection {
+  def this(target: String, texture: DrawableTexture, data: ImmutableMap[String, String]) = this(ImmutableMap.of(target, texture), data)
 }

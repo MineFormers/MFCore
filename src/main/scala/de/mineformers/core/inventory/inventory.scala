@@ -47,6 +47,8 @@ object Inventory {
 
   def createSimple(size: Int) = new SimpleInventory(size)
 
+  def enhance(inventory: IInventory): Inventory = InventoryHolder.of(inventory)
+
   def writeStackList(stacks: Traversable[ItemStack]): NBTTagList = {
     val indexed = stacks.toIndexedSeq
     val nbt = new NBTTagList()
@@ -83,7 +85,9 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
 
   val content = Array.ofDim[ItemStack](getSizeInventory)
 
-  def apply(slot: Int) = Option(getStackInSlot(slot))
+  def apply(slot: Int) = getStackInSlot(slot)
+
+  def get(slot: Int) = Option(getStackInSlot(slot))
 
   override def getStackInSlot(slot: Int): ItemStack =
     if (slot < 0 || slot >= content.length)
@@ -92,7 +96,7 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
       content(slot)
 
   override def decrStackSize(slot: Int, count: Int): ItemStack =
-    this(slot) match {
+    this.get(slot) match {
       case Some(stack) =>
         if (stack.stackSize <= count) {
           val returnStack = stack
@@ -163,7 +167,7 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
     Inventory.readStackList(content, tag.getTagList(Inventory.InventoryKey, Constants.NBT.TAG_COMPOUND))
   }
 
-  override def foreach[U](f: (ItemStack) => U): Unit = content foreach f
+  override def foreach[U](f: (ItemStack) => U): Unit = for(i <- 0 until getSizeInventory) f(getStackInSlot(i))
 
   def selectDynamic(field: String): Int = if(fields.contains(field)) fields(field)._2 else throw new IllegalArgumentException("Field " + field + " doesn't exist")
 
@@ -183,10 +187,51 @@ trait InventoryHolder extends Inventory {
 
   def createInventory: IInventory
 
+  override def getStackInSlot(slot: Int): ItemStack = inventory.getStackInSlot(slot)
+
+  override def decrStackSize(slot: Int, count: Int): ItemStack = inventory.decrStackSize(slot, count)
+
+  override def setInventorySlotContents(slot: Int, stack: ItemStack): Unit = inventory.setInventorySlotContents(slot, stack)
+
+  override def markDirty(): Unit = {
+    super.markDirty()
+    inventory.markDirty()
+  }
+
+  override def getStackInSlotOnClosing(slot: Int): ItemStack = inventory.getStackInSlotOnClosing(slot)
+
+  override def getInventoryStackLimit: Int = inventory.getInventoryStackLimit
+
+  override def isItemValidForSlot(slot: Int, stack: ItemStack): Boolean = inventory.isItemValidForSlot(slot, stack)
+
+  override def isUseableByPlayer(player: EntityPlayer): Boolean = inventory.isUseableByPlayer(player)
+
+  override def openInventory(player: EntityPlayer): Unit = inventory.openInventory(player)
+
+  override def closeInventory(player: EntityPlayer): Unit = inventory.closeInventory(player)
+
+  override def hasCustomName: Boolean = inventory.hasCustomName
+
+  override def getName: String = inventory.getName
+
+  override def getDisplayName: IChatComponent = inventory.getDisplayName
+
+  override def clear(): Unit = inventory.clear()
+
+  override def getFieldCount: Int = inventory.getFieldCount
+
+  override def getField(id: Int): Int = inventory.getField(id)
+
+  override def setField(id: Int, value: Int): Unit = inventory.setField(id, value)
+
   override def getSizeInventory: Int = inventory.getSizeInventory
 }
 
 object InventoryHolder {
+
+  def of(heldInventory: IInventory): InventoryHolder = new InventoryHolder {
+    override def createInventory: IInventory = heldInventory
+  }
 
   trait Sided extends InventoryHolder with ISidedInventory {
     val accessibleSlots: Map[EnumFacing, Array[Int]]

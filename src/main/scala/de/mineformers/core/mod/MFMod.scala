@@ -41,7 +41,7 @@ trait MFMod {
 
   def texture(tpe: String, name: String) = this("textures/" + tpe.replace(".", "/") + "/" + name + ".png")
 
-  def icon(name: String) = ResourcePath + ":" + name
+  def model(name: String) = ResourcePath + ":" + name
 
   def name(name: String) = ResourcePath + ":" + name
 

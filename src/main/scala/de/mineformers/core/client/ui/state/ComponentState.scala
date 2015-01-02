@@ -22,6 +22,8 @@ trait ComponentState {
 
   def properties: HMap[Property]
 
+  def propertyPriority(name: String): Int
+
   override def toString: String = "{" + propertyNames.map(s => s"$s: ${byName(s).orNull}").mkString(", ") + "}"
 }
 
@@ -56,6 +58,11 @@ object ComponentState {
     override def byName(name: String): Option[Any] = data.keySet.find(_.name == name) match {
       case Some(p) => get(p)
       case None => None
+    }
+
+    override def propertyPriority(name: String): Int = data.keySet.find(_.name == name) match {
+      case Some(p) => p.priority
+      case None => 0
     }
 
     override def cycle[T](property: Property[T]): ComponentState = {

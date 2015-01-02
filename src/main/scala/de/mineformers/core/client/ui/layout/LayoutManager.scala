@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.client.ui.layout
 
-import de.mineformers.core.client.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.Component
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.container.Panel
 
 import scala.collection.mutable
@@ -35,11 +35,11 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 trait LayoutManager[C <: Constraints] {
-  def apply(c: Component): C = {
+  def apply(c: View): C = {
     constraints.getOrElseUpdate(c, defaultConstraints)
   }
 
-  def setConstraints(c: Component, constraints: Constraints): Unit = {
+  def setConstraints(c: View, constraints: Constraints): Unit = {
     if (constraints != null)
       this.constraints.put(c, constraints.asInstanceOf[C])
     else
@@ -48,7 +48,7 @@ trait LayoutManager[C <: Constraints] {
 
   def defaultConstraints: C
 
-  def positionFor(panel: Panel, component: Component): Point
+  def positionFor(panel: Panel, component: View): Point
 
   def size(panel: Panel): Size
 
@@ -56,7 +56,7 @@ trait LayoutManager[C <: Constraints] {
 
   def clear(): Unit = constraints.clear()
 
-  val constraints = new mutable.LinkedHashMap[Component, C]()
+  val constraints = new mutable.LinkedHashMap[View, C]()
 }
 
 trait Constraints

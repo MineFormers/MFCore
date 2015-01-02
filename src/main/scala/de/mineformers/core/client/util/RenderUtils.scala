@@ -24,10 +24,10 @@
 package de.mineformers.core.client.util
 
 import de.mineformers.core.client.renderer.shape.Vertex
-import de.mineformers.core.util.world.{Vector2, Vector3}
+import de.mineformers.core.util.math.{Camera, Matrix4, Vector2, Vector3}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
-import net.minecraft.client.renderer.{OpenGlHelper, RenderHelper, Tessellator}
+import net.minecraft.client.renderer.{GLAllocation, OpenGlHelper, RenderHelper, Tessellator}
 import net.minecraft.entity.Entity
 import net.minecraft.util.{EnumFacing, MathHelper, ResourceLocation, Timer}
 import net.minecraftforge.fml.client.FMLClientHandler
@@ -44,6 +44,13 @@ import scala.util.Random
  */
 object RenderUtils {
   def mc: Minecraft = FMLClientHandler.instance.getClient
+
+  def calculateCamPosition(entity: Entity) = {
+    val camX = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
+    val camY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks
+    val camZ = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks
+    Vector3(camX, camY, camZ)
+  }
 
   def bindTexture(path: ResourceLocation): Unit = {
     mc.getTextureManager.bindTexture(path)
@@ -241,6 +248,43 @@ object RenderUtils {
     RenderHelper.enableStandardItemLighting()
   }
 
+  def applyCamera(cam: Camera, eye: Vector3): Unit = {
+    GL11.glViewport(cam.viewport.x, mc.displayHeight - cam.viewport.end.y, cam.viewport.width, cam.viewport.height)
+    GL11.glClear(GL11.GL_DEPTH_BUFFER_BIT)
+    GL11.glMatrixMode(GL11.GL_PROJECTION)
+    loadMatrix(cam.projectionMatrix)
+    GL11.glMatrixMode(GL11.GL_MODELVIEW)
+    loadMatrix(cam.viewMatrix)
+    GL11.glTranslated(-eye.x, -eye.y, -eye.z)
+  }
+
+  def setupOverlayRendering(): Unit = {
+    GL11.glViewport(0, 0, mc.displayWidth, mc.displayHeight)
+    mc.entityRenderer.setupOverlayRendering()
+  }
+
+  def loadMatrix(mat: Matrix4) {
+    MatrixBuffer.rewind()
+    MatrixBuffer.put(mat(0, 0).toFloat)
+    MatrixBuffer.put(mat(0, 1).toFloat)
+    MatrixBuffer.put(mat(0, 2).toFloat)
+    MatrixBuffer.put(mat(0, 3).toFloat)
+    MatrixBuffer.put(mat(1, 0).toFloat)
+    MatrixBuffer.put(mat(1, 1).toFloat)
+    MatrixBuffer.put(mat(1, 2).toFloat)
+    MatrixBuffer.put(mat(1, 3).toFloat)
+    MatrixBuffer.put(mat(2, 0).toFloat)
+    MatrixBuffer.put(mat(2, 1).toFloat)
+    MatrixBuffer.put(mat(2, 2).toFloat)
+    MatrixBuffer.put(mat(2, 3).toFloat)
+    MatrixBuffer.put(mat(3, 0).toFloat)
+    MatrixBuffer.put(mat(3, 1).toFloat)
+    MatrixBuffer.put(mat(3, 2).toFloat)
+    MatrixBuffer.put(mat(3, 3).toFloat)
+    MatrixBuffer.rewind()
+    GL11.glLoadMatrix(MatrixBuffer)
+  }
+
   def partialTicks: Float = {
     timerField.setAccessible(true)
     timerField.get(Minecraft.getMinecraft).asInstanceOf[Timer].renderPartialTicks
@@ -248,10 +292,11 @@ object RenderUtils {
 
   def particles: Array[Iterable[EntityFX]] = {
     particlesField.setAccessible(true)
-    import scala.collection.JavaConversions.collectionAsScalaIterable
+    import scala.collection.JavaConversions._
     particlesField.get(Minecraft.getMinecraft.effectRenderer).asInstanceOf[Array[java.util.List[EntityFX]]] map collectionAsScalaIterable
   }
 
   private val particlesField = ReflectionHelper.findField(classOf[EffectRenderer], "fxLayers", "field_78876_b")
   private val timerField = ReflectionHelper.findField(classOf[Minecraft], "timer", "field_71428_T")
+  private final val MatrixBuffer = GLAllocation.createDirectFloatBuffer(16)
 }

@@ -23,7 +23,7 @@
  */
 package de.mineformers.core.client.renderer
 
-import de.mineformers.core.util.world.Vector3
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer
 import net.minecraft.tileentity.TileEntity
 import org.lwjgl.opengl.GL11

@@ -21,36 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component
-
-import de.mineformers.core.client.shape2d.Point
-import de.mineformers.core.client.ui.state.{Property, ComponentState}
-import de.mineformers.core.client.ui.util.Font
+package de.mineformers.core.util.math.shape2d
 
 /**
- * TextComponent
+ * Shape
  *
  * @author PaleoCrafter
  */
-trait TextComponent extends Component {
-  def font: Font
+trait Shape[A <: Shape[A]] {
+  def intersects(r: Rectangle): Boolean = (this & r) != None
 
-  def font_=(font: Font): Unit
+  def &(r: Rectangle): Option[A] = intersect(r)
 
-  def text: String
+  def intersect(r: Rectangle): Option[A]
 
-  def text_=(text: String): Unit
+  def contains(p: Point): Boolean
 
-  def textOff: Point = Point(0, 0)
+  def contains(r: Rectangle): Boolean
 
-  override var skin: Skin = new TextSkin
+  def translate(p: Point): A
 
-  abstract override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(Property.Text, ""))
-
-  class TextSkin extends Skin {
-    def drawForeground(mousePos: Point): Unit = {
-      font.draw(text, component.screen.x + textOff.x, component.screen.y + textOff.y, component.zIndex)
-    }
-  }
-
+  def bounds: Rectangle
 }

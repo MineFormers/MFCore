@@ -23,36 +23,59 @@
  */
 package de.mineformers.core.client.ui.component.decoration
 
-import de.mineformers.core.client.shape2d.Point
-import de.mineformers.core.client.ui.component.{Component, TextComponent}
-import de.mineformers.core.client.ui.state.ComponentState
-import de.mineformers.core.client.ui.util.Font
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.component.{View, TextView}
+import de.mineformers.core.client.ui.proxy.Context
+import de.mineformers.core.client.ui.util.Shadow
+import de.mineformers.core.client.ui.util.font.{Font, MCFont}
+import de.mineformers.core.client.util.Color
+import de.mineformers.core.reaction.GlobalPublisher
 
 /**
  * Label
  *
  * @author PaleoCrafter
  */
-class Label(private var _text: String) extends Component with TextComponent {
-  private var _font: Font = Font.DefaultDark
+class Label(private var _text: String) extends View with TextView {
+  private var _font: Font = MCFont.DefaultDark
   size = font.size(_text)
+  skin = new LabelSkin
 
-  override def defaultState(state: ComponentState): Unit = ()
+  var shadow: Shadow = null
+  var padding = Padding.None
+
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
+    super.init(channel, context)
+    this.size = font.size(text) + Size(padding.left + padding.right, padding.top + padding.bottom)
+  }
+
+  override def textOff: Point = Point(padding.left, padding.top)
 
   override def font_=(font: Font): Unit = {
     this._font = font
-    size = font.size(text)
+    size = font.size(text) + Size(padding.left + padding.right, padding.top + padding.bottom)
   }
 
   override def font = _font
 
   override def text_=(text: String): Unit = {
     this._text = text
-    size = font.size(text)
+    size = font.size(text) + Size(padding.left + padding.right, padding.top + padding.bottom)
   }
 
   override def text = _text
 
   override def update(mousePos: Point): Unit = {
   }
+
+  class LabelSkin extends TextSkin {
+    override def drawForeground(mousePos: Point): Unit = {
+      if (shadow != null) {
+        shadow.draw(text, component.screen.x + textOff.x, component.screen.y + textOff.y, component.zIndex, font, Color(font.color))
+      }
+      super.drawForeground(mousePos)
+    }
+  }
+
 }

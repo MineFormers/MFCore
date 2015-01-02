@@ -24,7 +24,7 @@
 package de.mineformers.core.client.ui.skin.drawable
 
 import com.google.gson.JsonObject
-import de.mineformers.core.client.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.skin.DrawableDeserializer
 import de.mineformers.core.client.ui.skin.drawable.DynamicTexture.{Corner, Side}
 import de.mineformers.core.client.util.RenderUtils
@@ -60,6 +60,7 @@ object DynamicTexture {
         val tObject = json.getAsJsonObject("top")
         val iObject = json.getAsJsonObject("inner")
         texture = new DynamicTexture(getUVsFromObject(tlObject), getUVsFromObject(tObject), getUVsFromObject(iObject))
+        println(texture)
       } else if (json.has("corners")) {
         val c = json.getAsJsonObject("corners")
         val s = json.getAsJsonObject("sides")
@@ -163,7 +164,7 @@ class DynamicTexture(_texture: Resource, textureWidth: Int, textureHeight: Int, 
 
   def scaleV(v: Int): Float = scaleV * v
 
-  override def toString: String = s"$corners,$sides,$inner"
+  override def toString: String = s"${corners.mkString("[", ",", "]")},${sides.mkString("[", ",", "]")},$inner"
 
   var repeatSides = true
   var repeatInner = true

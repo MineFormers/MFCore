@@ -4,7 +4,7 @@ import de.mineformers.core.client.renderer.RenderParams.RPBuilding
 import de.mineformers.core.client.renderer.shape.{Face, Shape, Vertex}
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.util.Implicits.VBlockPos
-import de.mineformers.core.util.world.Vector3
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.client.renderer.Tessellator
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack

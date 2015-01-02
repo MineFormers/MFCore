@@ -23,13 +23,15 @@
  */
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.client.shape2d.{Point, Size}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.View
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.interaction.ScrollBar
 import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.util.Positioned
-import de.mineformers.core.reaction.{Event, Publisher}
+import de.mineformers.core.client.ui.util.MouseEvent
+import de.mineformers.core.reaction.GlobalPublisher
+import net.minecraft.client.gui.GuiScreen
 import org.lwjgl.opengl.GL11
 
 /**
@@ -43,10 +45,17 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
   skin = new ScrollPanelSkin
   clip = true
 
-  override def init(channel: Publisher, context: Context): Unit = {
+  reactions += {
+    case e: MouseEvent.Scroll =>
+      if(scrollBarHorizontal.enabled && scrollHorizontal && (GuiScreen.isCtrlKeyDown || !scrollVertical))
+        scrollBarHorizontal.scroll(e.direction)
+      if(scrollBarVertical.enabled && scrollVertical && (!GuiScreen.isCtrlKeyDown || !scrollHorizontal))
+        scrollBarVertical.scroll(e.direction)
+  }
+
+  override def init(channel: GlobalPublisher, context: Context): Unit = {
     this.listenTo(channel)
-    super.init(this, context)
-    this.deafToNonChildren(this)
+    super.init(channel, context)
     this.channel = channel
     scrollBarHorizontal.parent = this
     scrollBarVertical.parent = this
@@ -54,22 +63,41 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
       scrollBarHorizontal.init(channel, context)
     if (scrollVertical)
       scrollBarVertical.init(channel, context)
+
     scrollBarHorizontal.position = Point(0, height - 14)
     scrollBarVertical.position = Point(width - 14, 0)
     scrollBarHorizontal.screen = screen + scrollBarHorizontal.position
     scrollBarVertical.screen = screen + scrollBarVertical.position
   }
 
+  override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
+    var result = super.findComponent(mousePos, predicate)
+    if (result eq this) {
+      if (predicate(scrollBarHorizontal))
+        result = scrollBarHorizontal
+      if (predicate(scrollBarVertical))
+        result = scrollBarVertical
+    }
+    result
+  }
+
+  override def onParentResized(newSize: Size, oldSize: Size, delta: Size): Unit = {
+    super.onParentResized(newSize, oldSize, delta)
+    resetScrollBars()
+  }
+
   override def update(mousePos: Point): Unit = {
     scrollBarHorizontal.screen = screen + scrollBarHorizontal.position
     scrollBarVertical.screen = screen + scrollBarVertical.position
-    scrollBarHorizontal.enabled = contentSize.width > width
-    scrollBarVertical.enabled = contentSize.height > height
-    var x = -((scrollBarHorizontal.offset / (width - scrollBarHorizontal.scrollerBounds.width + 2).toFloat) * (contentSize.width - width + 2)).toInt
-    var y = -((scrollBarVertical.offset / (height - (scrollBarVertical.scrollerBounds.height + 2)).toFloat) * (contentSize.height - height)).toInt
-    if (contentSize.width < width)
+    val contentSize = this.contentSize(withPadding = false)
+    scrollBarHorizontal.enabled = contentSize.width > width - padding.right - padding.left
+    scrollBarVertical.enabled = contentSize.height > height - padding.bottom - padding.top
+    var x = -((scrollBarHorizontal.offset / (width - padding.left - padding.right - scrollBarHorizontal.scrollerBounds.width - 2).toFloat) * (contentSize.width - width + padding.left + padding.right)).toInt
+    var y = -((scrollBarVertical.offset / (height - padding.top - padding.bottom - scrollBarVertical.scrollerBounds.height - 2).toFloat) * (contentSize.height - height + padding.top + padding.bottom)).toInt
+
+    if (contentSize.width < width - padding.right)
       x = 0
-    if (contentSize.height < height)
+    if (contentSize.height < height - padding.bottom)
       y = 0
     val off = screen + Point(x, y)
     content.foreach(c => {
@@ -102,18 +130,17 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
     scrollBarHorizontal.offset = hOff
     scrollBarVertical = new ScrollBar(size.height - (if (scrollHorizontal) 16 else 2), Orientation.Vertical)
     scrollBarVertical.offset = vOff
+    scrollBarHorizontal.position = Point(0, height - 14)
+    scrollBarVertical.position = Point(width - 14, 0)
+    scrollBarHorizontal.parent = this
+    scrollBarVertical.parent = this
     scrollBarHorizontal.init(channel, context)
     scrollBarVertical.init(channel, context)
   }
 
-  reactions += {
-    case e: Positioned =>
-      if (hovered(e.pos)) publish(e)
-    case e: Event => publish(e)
-  }
   private[component] var scrollBarHorizontal = new ScrollBar(size.width - (if (scrollVertical) 16 else 2), Orientation.Horizontal)
   private[component] var scrollBarVertical = new ScrollBar(size.height - (if (scrollHorizontal) 16 else 2), Orientation.Vertical)
-  private var channel: Publisher = _
+  private var channel: GlobalPublisher = _
 
   class ScrollPanelSkin extends PanelSkin {
     override def drawForeground(mousePos: Point): Unit = {

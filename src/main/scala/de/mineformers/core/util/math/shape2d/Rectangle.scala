@@ -21,10 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.shape2d
+package de.mineformers.core.util.math.shape2d
 
 import com.google.common.base.Objects
-import de.mineformers.core.client.shape2d.Rectangle.Bounds
+import de.mineformers.core.util.math.shape2d.Rectangle.Bounds
 
 import scala.collection.mutable
 

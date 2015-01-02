@@ -1,0 +1,6 @@
+{
+    "gui": {
+        "target": "tab[type=panel,hovered]",
+        "type": "dynamic"
+    }
+}

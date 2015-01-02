@@ -2,7 +2,7 @@
     "gui": {
         "multi": [
             {
-                "target": "navigationUp",
+                "target": "navigationButton[orientation=up]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -16,7 +16,7 @@
                 }
             },
             {
-                "target": "navigationUp[hovered=true]",
+                "target": "navigationButton[orientation=up,hovered]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -30,7 +30,7 @@
                 }
             },
             {
-                "target": "navigationUp[enabled=false]",
+                "target": "navigationButton[orientation=up,disabled]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -44,7 +44,7 @@
                 }
             },
             {
-                "target": "navigationDown",
+                "target": "navigationButton[orientation=down]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -58,7 +58,7 @@
                 }
             },
             {
-                "target": "navigationDown[hovered=true]",
+                "target": "navigationButton[orientation=down,hovered]",
                 "type": "static",
                 "uv": {
                     "start": [
@@ -72,7 +72,7 @@
                 }
             },
             {
-                "target": "navigationDown[enabled=false]",
+                "target": "navigationButton[orientation=down,disabled]",
                 "type": "static",
                 "uv": {
                     "start": [

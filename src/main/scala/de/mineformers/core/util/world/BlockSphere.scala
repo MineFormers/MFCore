@@ -23,6 +23,7 @@
  */
 package de.mineformers.core.util.world
 
+import de.mineformers.core.util.math.Vector3
 import net.minecraft.world.World
 
 import scala.language.postfixOps

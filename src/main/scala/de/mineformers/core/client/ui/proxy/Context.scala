@@ -23,19 +23,38 @@
  */
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.client.shape2d.Size
-import de.mineformers.core.client.ui.component.Focus
-import de.mineformers.core.reaction.Publisher
+import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.component.{View, Focus}
+import de.mineformers.core.client.ui.util.Positioned
+import de.mineformers.core.reaction.{GlobalPublisher, Event, Publisher}
 
 /**
  * Context
  *
  * @author PaleoCrafter
  */
-trait Context extends Publisher {
+trait Context extends GlobalPublisher {
+  var attached: View = _
   var focused: Focus = _
 
   def close(): Unit
 
   def size: Size
+
+  def findAffectedComponent(mousePos: Point): View = findComponent(mousePos, c => c.hovered(mousePos) && c.visible && c.enabled)
+
+  def findHoveredComponent(mousePos: Point): View = findComponent(mousePos, c => c.hovered(mousePos))
+
+  def findComponent(mousePos: Point, predicate: View => Boolean): View
+
+  override def publish(e: Event): Unit = {
+    e match {
+      case p: Positioned =>
+        val reactor = findAffectedComponent(p.pos)
+        if (reactor != null)
+          reactor.reactions(p)
+      case _ =>
+    }
+    super.publish(e)
+  }
 }

@@ -32,12 +32,21 @@ import net.minecraftforge.fml.common.Loader
  * BaseItem
  *
  * @param name the unlocalized name of the item
- * @param texture the texture of the item
+ * @param modelName the texture of the item
  * @param tab the creative tab for this item
  * @author PaleoCrafter
  */
-class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
+class BaseItem(name: String, modelName: String, tab: CreativeTabs) extends Item {
   def this(name: String, tab: CreativeTabs) = this(name, name, tab)
+
+  val model = {
+    val mod = Loader.instance().activeModContainer()
+    mod.getMod match {
+      case m: MFMod =>
+        m.model(modelName)
+      case _ => mod.getModId.toLowerCase + ":" + modelName
+    }
+  }
 
   this.setUnlocalizedName({
     val mod = Loader.instance().activeModContainer()
@@ -48,12 +57,6 @@ class BaseItem(name: String, texture: String, tab: CreativeTabs) extends Item {
     }
   })
   this.setCreativeTab(tab)
-//  this.setTextureName({
-//    val mod = Loader.instance().activeModContainer()
-//    mod.getMod match {
-//      case m: MFMod =>
-//        m.icon(texture)
-//      case _ => mod.getModId.toLowerCase + ":" + texture
-//    }
-//  })
+
+  def getModel(damage: Int) = model
 }

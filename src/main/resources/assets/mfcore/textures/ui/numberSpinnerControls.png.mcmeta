@@ -1,0 +1,90 @@
+{
+    "gui": {
+        "multi": [
+            {
+                "target": "navigationButton[style=numberSpinner,orientation=up]",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        0,
+                        0
+                    ],
+                    "size": [
+                        18,
+                        12
+                    ]
+                }
+            },
+            {
+                "target": "navigationButton[style=numberSpinner,orientation=up,hovered]",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        18,
+                        0
+                    ],
+                    "size": [
+                        18,
+                        12
+                    ]
+                }
+            },
+            {
+                "target": "navigationButton[style=numberSpinner,orientation=up,disabled]",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        36,
+                        0
+                    ],
+                    "size": [
+                        18,
+                        12
+                    ]
+                }
+            },
+            {
+                "target": "navigationButton[style=numberSpinner,orientation=down]",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        0,
+                        12
+                    ],
+                    "size": [
+                        18,
+                        12
+                    ]
+                }
+            },
+            {
+                "target": "navigationButton[style=numberSpinner,orientation=down,hovered]",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        18,
+                        12
+                    ],
+                    "size": [
+                        18,
+                        12
+                    ]
+                }
+            },
+            {
+                "target": "navigationButton[style=numberSpinner,orientation=down,disabled]",
+                "type": "static",
+                "uv": {
+                    "start": [
+                        36,
+                        12
+                    ],
+                    "size": [
+                        18,
+                        12
+                    ]
+                }
+            }
+        ]
+    }
+}

@@ -24,6 +24,7 @@
 
 package de.mineformers.core.util.world;
 
+import de.mineformers.core.util.math.Vector3;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
 import net.minecraft.world.World;

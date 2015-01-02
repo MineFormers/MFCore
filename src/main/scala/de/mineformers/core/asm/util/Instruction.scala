@@ -94,7 +94,7 @@ object Instruction {
 
   case class MethodOp(opcode: Int, owner: String, name: String, desc: String) extends Instruction[MethodInsnNode](opcode) {
     require(legalMethodOpcodes contains opcode)
-    override lazy val asm: MethodInsnNode = new MethodInsnNode(opcode, owner, name, desc)
+    override lazy val asm: MethodInsnNode = new MethodInsnNode(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE)
   }
 
   case class Jump(opcode: Int, label: LabelOp) extends Instruction[JumpInsnNode](opcode) {
