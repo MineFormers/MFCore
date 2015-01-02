@@ -3,6 +3,7 @@ package de.mineformers.core.block
 import de.mineformers.core.client.ui.component.container.{Frame, Panel, ScrollPanel, TabbedPanel}
 import de.mineformers.core.client.ui.component.decoration.Label
 import de.mineformers.core.client.ui.component.interaction.{Button, NumberSpinner, WorldSnapshotView}
+import de.mineformers.core.client.util.RenderUtils
 import de.mineformers.core.util.Implicits.VBlockPos
 import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.util.world.snapshot.WorldSnapshot
@@ -13,6 +14,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util
 import net.minecraft.util.{EnumFacing, EnumWorldBlockLayer}
@@ -52,7 +54,10 @@ class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, M
       scroll add text
       scroll add label
       val tab2 = new Panel
-      tab2 add new WorldSnapshotView(snapshot, Size(50, 50))
+      tab2.maxSize = Size(Integer.MAX_VALUE, Integer.MAX_VALUE)
+      val snapshotview = new WorldSnapshotView(snapshot, Size(180, 150))
+      snapshotview.maxSize = Size(Integer.MAX_VALUE, Integer.MAX_VALUE)
+      tab2 add snapshotview
       tabs.addTab("scroll", "Scrolling", scroll)
       tabs.addTab("scroll1", "Test", tab2)
       panel add tabs

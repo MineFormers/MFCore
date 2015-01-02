@@ -1,6 +1,7 @@
 package de.mineformers.core.client.ui.component
 
-import de.mineformers.core.util.math.shape2d.{Rectangle, Point}
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle}
 
 /**
  * Drop
@@ -12,8 +13,8 @@ trait Drop extends View with Drag {
 
   def dropRegion: Rectangle = dragRegion
 
-  override def onStopDragging(region: String, mousePos: Point): Unit = {
-    if(dropRegion.contains(mousePos))
+  override def onStopDragging(region: String, mousePos: Point, button: MouseButton): Unit = {
+    if (dropRegion.contains(mousePos))
       onDrop(dropRegion.local(mousePos), success = true)
     else
       onDrop(mousePos, success = false)

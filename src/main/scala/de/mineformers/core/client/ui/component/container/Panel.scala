@@ -59,6 +59,11 @@ class Panel extends View {
     })
   }
 
+  override def dispose(): Unit = {
+    super.dispose()
+    content.foreach(_.dispose())
+  }
+
   override def update(mousePos: Point): Unit = {
     content.foreach(c => {
       if (layout != null)
@@ -172,7 +177,7 @@ class Panel extends View {
 
   override var skin: Skin = new PanelSkin
   var layout: LayoutManager[_ <: Constraints] = _
-  var clip = false
+  var clip = true
   var padding: Padding = Padding(4)
   private var _content = Seq.empty[View]
   protected var sizeUpdate = false

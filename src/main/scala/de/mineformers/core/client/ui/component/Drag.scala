@@ -1,5 +1,7 @@
 package de.mineformers.core.client.ui.component
 
+import de.mineformers.core.client.ui.util.MouseButton
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle}
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 
@@ -12,30 +14,30 @@ import scala.collection.mutable
  */
 trait Drag extends View {
   reactions += {
-    case e: MouseEvent.Click if e.button == MouseButton.Left =>
+    case e: MouseEvent.Click =>
       val localPos = local(e.pos)
       if (hovered(e.pos)) {
         controlRegions.find(_._2.contains(localPos)) match {
           case Some((region, _)) =>
-            lastDragPositions += region -> e.pos
-            _dragged += region -> true
+            lastDragPositions += (region, e.button) -> e.pos
+            _dragged += (region, e.button) -> true
           case _ =>
         }
       }
   }
 
   globalReactions += {
-    case e: MouseEvent.Release if e.button == MouseButton.Left =>
-      _dragged.find(_._2) match {
+    case e: MouseEvent.Release =>
+      _dragged.find(d => d._1._2 == e.button && d._2) match {
         case Some((region, _)) =>
           _dragged += region -> false
-          onStopDragging(region, e.pos)
+          onStopDragging(region._1, e.pos, region._2)
         case _ =>
       }
     case e: MouseEvent.Move =>
       _dragged.find(_._2) match {
         case Some((region, _)) =>
-          onDrag(region, e.pos, lastDragPositions(region), e.pos - lastDragPositions(region))
+          onDrag(region._1, e.pos, lastDragPositions(region), e.pos - lastDragPositions(region), region._2)
           lastDragPositions += region -> e.pos
         case _ =>
       }
@@ -54,7 +56,7 @@ trait Drag extends View {
       screen = Point(screen.x, region.end.y - height)
   }
 
-  def onStopDragging(region: String, mousePos: Point): Unit = ()
+  def onStopDragging(region: String, mousePos: Point, button: MouseButton): Unit = ()
 
   def canDrag: Boolean
 
@@ -62,15 +64,15 @@ trait Drag extends View {
 
   def controlRegions: Map[String, Rectangle] = Map("full" -> bounds)
 
-  def onDrag(region: String, newPos: Point, lastPos: Point, delta: Point): Unit = {
+  def onDrag(region: String, newPos: Point, lastPos: Point, delta: Point, button: MouseButton): Unit = {
     this.screen += delta
   }
 
-  def dragged(region: String) = _dragged.get(region) match {
+  def dragged(region: String, button: MouseButton) = _dragged.get((region, button)) match {
     case Some(d) => d
     case _ => false
   }
 
-  private var lastDragPositions = mutable.Map.empty[String, Point]
-  private var _dragged = mutable.Map.empty[String, Boolean]
+  private var lastDragPositions = mutable.Map.empty[(String, MouseButton), Point]
+  private var _dragged = mutable.Map.empty[(String, MouseButton), Boolean]
 }

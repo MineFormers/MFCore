@@ -49,6 +49,11 @@ class RenderWorld(world: World) extends IWorldAccess {
   private val chunksToUpdate = mutable.LinkedHashSet.empty[RenderChunk]
   private var renderSort = Vector3(0, 0, 0)
 
+  def dispose(): Unit = {
+    if(viewFrustum != null)
+      viewFrustum.deleteGlResources()
+  }
+
   def reloadRenderers(viewEntity: Entity): Unit = {
     if (this.world != null) {
       hasToUpdate = true

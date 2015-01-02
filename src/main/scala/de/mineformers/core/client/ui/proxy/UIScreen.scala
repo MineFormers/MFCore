@@ -109,6 +109,8 @@ class UIScreen(frames0: Seq[Frame]) extends GuiScreen with Context {
       attached.update(pos)
   }
 
+  override def onGuiClosed(): Unit = frames.foreach(_.dispose())
+
   override def close(): Unit = {
     this.mc.displayGuiScreen(null)
     this.mc.setIngameFocus()

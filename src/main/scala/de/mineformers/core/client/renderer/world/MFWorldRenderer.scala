@@ -47,8 +47,9 @@ object MFWorldRenderer {
   def renderWorld(viewEntity: Entity, world: World, render: RenderWorld, partialTicks: Float, time: Long): Unit = {
     GlStateManager.enableDepth()
     GlStateManager.enableAlpha()
-    GlStateManager.alphaFunc(GL11.GL_GREATER, 0.5F)
-
+    GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F)
+    GlStateManager.rotate(viewEntity.prevRotationPitch + (viewEntity.rotationPitch - viewEntity.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F)
+    GlStateManager.rotate(viewEntity.prevRotationYaw + (viewEntity.rotationYaw - viewEntity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F)
     this.renderWorldPass(2, viewEntity, world, render, partialTicks, time)
   }
 
@@ -79,8 +80,18 @@ object MFWorldRenderer {
     RenderUtils.mc.getTextureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap()
     GlStateManager.shadeModel(GL11.GL_FLAT)
     GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F)
+
     GlStateManager.matrixMode(GL11.GL_MODELVIEW)
     GlStateManager.popMatrix()
+    GlStateManager.pushMatrix()
+    RenderHelper.enableStandardItemLighting()
+    net.minecraftforge.client.ForgeHooksClient.setRenderPass(0)
+    render.renderTileEntities(viewEntity, frustum, partialTicks)
+    net.minecraftforge.client.ForgeHooksClient.setRenderPass(0)
+    RenderHelper.disableStandardItemLighting()
+    GlStateManager.matrixMode(GL11.GL_MODELVIEW)
+    GlStateManager.popMatrix()
+    GlStateManager.pushMatrix()
 
     GlStateManager.enableBlend()
     GlStateManager.depthMask(false)
@@ -95,6 +106,17 @@ object MFWorldRenderer {
     else {
       render.renderBlockLayer(EnumWorldBlockLayer.TRANSLUCENT, viewEntity)
     }
+
+    GlStateManager.matrixMode(GL11.GL_MODELVIEW)
+    GlStateManager.popMatrix()
+    GlStateManager.pushMatrix()
+    RenderHelper.enableStandardItemLighting()
+    net.minecraftforge.client.ForgeHooksClient.setRenderPass(1)
+    render.renderTileEntities(viewEntity, frustum, partialTicks)
+    net.minecraftforge.client.ForgeHooksClient.setRenderPass(-1)
+    RenderHelper.disableStandardItemLighting()
+    GlStateManager.matrixMode(GL11.GL_MODELVIEW)
+    GlStateManager.popMatrix()
   }
 
   private def updateRenderInfo(entity: Entity): Unit = {

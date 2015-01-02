@@ -86,6 +86,7 @@ class RichWorld(val world: World) {
 
   def clearWorldAccesses(): Unit = {
     RichWorld.worldAccessesField.setAccessible(true)
-    RichWorld.worldAccessesField.get(world).asInstanceOf[java.util.List[_]].clear()
+    if (world != null)
+      RichWorld.worldAccessesField.get(world).asInstanceOf[java.util.List[_]].clear()
   }
 }

@@ -5,6 +5,7 @@ import java.util
 import de.mineformers.core.util.Implicits.VBlockPos
 import de.mineformers.core.util.world.{BlockCuboid, BlockPos}
 import net.minecraft.entity.EnumCreatureType
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.IProgressUpdate
 import net.minecraft.world.chunk.{EmptyChunk, Chunk, IChunkProvider}
 import net.minecraft.world.storage.{SaveHandlerMP, WorldInfo}
@@ -89,7 +90,15 @@ object WorldSnapshot {
       p =>
         val localPos = area.local(p)
         snapshot.setBlockState(localPos, source.getBlockState(p))
-        snapshot.setTileEntity(localPos, source.getTileEntity(p))
+        val tile = snapshot.getTileEntity(localPos)
+        if(source.getTileEntity(p) != null) {
+          val nbt = new NBTTagCompound
+          source.getTileEntity(p).writeToNBT(nbt)
+          nbt.setInteger("x", localPos.x)
+          nbt.setInteger("y", localPos.y)
+          nbt.setInteger("z", localPos.z)
+          tile.readFromNBT(nbt)
+        }
     }
     snapshot
   }

@@ -23,15 +23,16 @@
  */
 package de.mineformers.core.client.ui.component.container
 
-import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.{View, Drag}
 import de.mineformers.core.client.ui.component.container.Frame.Anchor
 import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.component.interaction.FrameControl
+import de.mineformers.core.client.ui.component.{Drag, View}
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
 import de.mineformers.core.client.ui.state.{BooleanProperty, ComponentState}
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.client.ui.util.font.MCFont
-import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
+import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import net.minecraft.client.Minecraft
 
 import scala.collection.mutable.ListBuffer
@@ -96,19 +97,19 @@ class Frame(size0: Size) extends Panel with Drag {
 
   override def controlRegions: Map[String, Rectangle] = Map("move" -> Rectangle(0, 0, width, 11), "resize" -> Rectangle(width - 5, height - 5, 5, 5))
 
-  override def onDrag(region: String, newPos: Point, lastPos: Point, delta: Point): Unit = region match {
-    case "move" => super.onDrag(region, newPos, lastPos, delta)
+  override def onDrag(region: String, newPos: Point, lastPos: Point, delta: Point, button: MouseButton): Unit = region match {
+    case "move" => super.onDrag(region, newPos, lastPos, delta, button)
     case "resize" =>
-      if(resizable) {
+      if (resizable) {
         this.size += Size(delta.x, delta.y)
       }
   }
 
   override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
     var result = super.findComponent(mousePos, predicate)
-    if(result eq this) {
+    if (result eq this) {
       controls.foreach(c =>
-        if(predicate(c))
+        if (predicate(c))
           result = c
       )
     }

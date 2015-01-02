@@ -39,6 +39,7 @@ import de.mineformers.core.util.renderer.GuiUtils
 import de.mineformers.core.util.world.{BlockCuboid, BlockPos}
 import de.mineformers.core.util.world.snapshot.WorldSnapshot
 import net.minecraft.client.Minecraft
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.resources.SimpleReloadableResourceManager
 import net.minecraft.entity.Entity
 import net.minecraft.entity.player.EntityPlayer
@@ -118,7 +119,9 @@ class MFCoreContainer extends DummyModContainer(new ModMetadata) {
     GL11.glPushMatrix()
     GL11.glTranslatef(0, 8, 0)
     val player = RenderUtils.mc.thePlayer
-    cam.setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch)
+    cam.setLocationAndAngles(player.posX, player.posY, player.posZ, -player.rotationYawHead, -player.rotationPitch)
+    cam.prevRotationYaw = -player.prevRotationYawHead
+    cam.prevRotationPitch = -player.prevRotationPitch
     cam.lastTickPosX = player.lastTickPosX
     cam.lastTickPosY = player.lastTickPosY
     cam.lastTickPosZ = player.lastTickPosZ
