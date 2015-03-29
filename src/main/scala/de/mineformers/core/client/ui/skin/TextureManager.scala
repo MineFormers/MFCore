@@ -25,8 +25,8 @@ package de.mineformers.core.client.ui.skin
 
 import com.google.common.collect.ImmutableMap
 import com.google.gson.{JsonArray, JsonObject}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.interaction.WorldSnapshotView
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.interaction.WorldSnapshotView
 import de.mineformers.core.client.ui.skin.drawable.{DrawableTexture, DynamicTexture, StaticTexture}
 import de.mineformers.core.util.ResourceUtils.Resource
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}

@@ -1,6 +1,6 @@
 package de.mineformers.core.client.renderer.world
 
-import de.mineformers.core.client.util.RenderUtils
+import de.mineformers.core.client.util.{Color, RenderUtils}
 import de.mineformers.core.util.math.Vector3
 import de.mineformers.core.util.world.RichWorld
 import net.minecraft.client.Minecraft
@@ -48,8 +48,20 @@ object MFWorldRenderer {
     GlStateManager.enableDepth()
     GlStateManager.enableAlpha()
     GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F)
+
+    RenderUtils.drawLine(Vector3(viewEntity.posX, viewEntity.posY - 100, viewEntity.posZ - 0.02), Vector3(viewEntity.posX, viewEntity.posY + 100, viewEntity.posZ - 0.02), 1, Color(1, 0, 0, 1))
+    RenderUtils.drawLine(Vector3(viewEntity.posX - 100, viewEntity.posY, viewEntity.posZ - 0.02), Vector3(viewEntity.posX + 100, viewEntity.posY, viewEntity.posZ - 0.02), 1, Color(1, 0, 0, 1))
+
     GlStateManager.rotate(viewEntity.prevRotationPitch + (viewEntity.rotationPitch - viewEntity.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F)
-    GlStateManager.rotate(viewEntity.prevRotationYaw + (viewEntity.rotationYaw - viewEntity.prevRotationYaw) * partialTicks + 180.0F, 0.0F, 1.0F, 0.0F)
+    GlStateManager.rotate(viewEntity.prevRotationYaw + (viewEntity.rotationYaw - viewEntity.prevRotationYaw) * partialTicks + 180, 0.0F, 1.0F, 0.0F)
+
+    GlStateManager.color(1f, 1f, 0f, 1)
+    RenderUtils.drawCuboid(viewEntity.posX - 0.25, viewEntity.posY - 0.25, viewEntity.posZ - 5, 0.5, 0.5, 0.5)
+
+    RenderUtils.drawLine(Vector3(0, 0, 0), Vector3(100, 0, 0), 1, Color(1, 0, 0, 1))
+    RenderUtils.drawLine(Vector3(0, 0, 0), Vector3(0, 100, 0), 1, Color(0, 1, 0, 1))
+    RenderUtils.drawLine(Vector3(0, 0, 0), Vector3(0, 0, 100), 1, Color(0, 0, 1, 1))
+
     this.renderWorldPass(2, viewEntity, world, render, partialTicks, time)
   }
 

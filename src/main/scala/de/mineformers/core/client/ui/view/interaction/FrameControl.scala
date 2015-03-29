@@ -1,7 +1,7 @@
-package de.mineformers.core.client.ui.component.interaction
+package de.mineformers.core.client.ui.view.interaction
 
 import de.mineformers.core.util.math.shape2d.Size
-import de.mineformers.core.client.ui.util.ComponentEvent.ButtonPressed
+import de.mineformers.core.client.ui.util.ViewEvent.ButtonPressed
 
 /**
  * FrameControl

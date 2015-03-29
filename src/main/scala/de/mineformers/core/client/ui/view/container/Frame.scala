@@ -21,14 +21,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.container
+package de.mineformers.core.client.ui.view.container
 
-import de.mineformers.core.client.ui.component.container.Frame.Anchor
-import de.mineformers.core.client.ui.component.container.Panel.Padding
-import de.mineformers.core.client.ui.component.interaction.FrameControl
-import de.mineformers.core.client.ui.component.{Drag, View}
+import de.mineformers.core.client.ui.view.container.Frame.Anchor
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.interaction.FrameControl
+import de.mineformers.core.client.ui.view.{Drag, View}
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
-import de.mineformers.core.client.ui.state.{BooleanProperty, ComponentState}
+import de.mineformers.core.client.ui.state.{BooleanProperty, ViewState}
 import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.client.ui.util.font.MCFont
 import de.mineformers.core.reaction.GlobalPublisher
@@ -45,8 +45,17 @@ import scala.collection.mutable.ListBuffer
 class Frame(size0: Size) extends Panel with Drag {
   size = size0
 
+  private val controls = ListBuffer.empty[FrameControl]
+  var title = ""
+  var proxy: UIScreen = _
+  var anchor = Anchor.Center
+  var fixed = true
+  var resizable = false
+  skin = new FrameSkin
+  minSize = Size(50, 50)
+
   override def init(channel: GlobalPublisher, context: Context): Unit = {
-    this.screen = position + anchor.pos(this, proxy)
+    this.screen = position + anchor.pos(this, context)
     if (!fixed)
       padding = Padding(4, 14, 4, 4)
     super.init(channel, context)
@@ -66,7 +75,7 @@ class Frame(size0: Size) extends Panel with Drag {
 
   def newProxy = new UIScreen(Seq(this))
 
-  override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(Frame.FixedProperty, fixed).set(Frame.ResizableProperty, resizable))
+  override def defaultState(state: ViewState): Unit = super.defaultState(state.set(Frame.FixedProperty, fixed).set(Frame.ResizableProperty, resizable))
 
   override def updateState(mousePos: Point): Unit = {
     super.updateState(mousePos)
@@ -76,21 +85,22 @@ class Frame(size0: Size) extends Panel with Drag {
   override def update(mousePos: Point): Unit = {
     super.update(mousePos)
     if (fixed)
-      this.screen = position + anchor.pos(this, proxy)
+      this.screen = position + anchor.pos(this, context)
     for (i <- 0 until controls.size) {
       controls(i).screen = Point(screen.x + width - 11 - 10 * i, screen.y + 2)
+      controls(i).zIndex = zIndex
     }
     controls.foreach(_.update(mousePos))
-  }
-
-  def addControl(control: FrameControl): Unit = {
-    controls += control
   }
 
   def addDefaultControls(): Unit = {
     val close = new FrameControl("close", () => context.close())
     close.tooltip = "Close"
     addControl(close)
+  }
+
+  def addControl(control: FrameControl): Unit = {
+    controls += control
   }
 
   override def canDrag: Boolean = !fixed
@@ -105,8 +115,8 @@ class Frame(size0: Size) extends Panel with Drag {
       }
   }
 
-  override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
-    var result = super.findComponent(mousePos, predicate)
+  override def findView(mousePos: Point, predicate: View => Boolean): View = {
+    var result = super.findView(mousePos, predicate)
     if (result eq this) {
       controls.foreach(c =>
         if (predicate(c))
@@ -116,15 +126,7 @@ class Frame(size0: Size) extends Panel with Drag {
     result
   }
 
-  skin = new FrameSkin
-  minSize = Size(50, 50)
-
-  var title = ""
-  var proxy: UIScreen = _
-  var anchor = Anchor.Center
-  var fixed = false
-  var resizable = true
-  private val controls = ListBuffer.empty[FrameControl]
+  override def contains(view: View): Boolean = super.contains(view) || controls.contains(view)
 
   class FrameSkin extends PanelSkin {
     override def drawForeground(mousePos: Point): Unit = {
@@ -143,17 +145,17 @@ object Frame {
   final val ResizableProperty = new BooleanProperty("resizable")
 
   object Anchor extends Enumeration {
-    val HorizontalCenter = Value("horizontalCenter", (frame: Frame, screen: UIScreen) => Point((screen.width - frame.width) / 2, 0))
-    val VerticalCenter = Value("verticalCenter", (frame: Frame, screen: UIScreen) => Point(0, (screen.height - frame.height) / 2))
-    val Center = Value("center", (frame: Frame, screen: UIScreen) => Point((screen.width - frame.width) / 2, (screen.height - frame.height) / 2))
-    val TopLeft = Value("topLeft", (frame: Frame, screen: UIScreen) => Point(0, 0))
-    val TopRight = Value("topRight", (frame: Frame, screen: UIScreen) => Point(screen.width - frame.width, 0))
-    val BottomLeft = Value("bottomLeft", (frame: Frame, screen: UIScreen) => Point(0, screen.height - frame.height))
-    val BottomRight = Value("bottomRight", (frame: Frame, screen: UIScreen) => Point(screen.width - frame.width, screen.height - frame.height))
+    val HorizontalCenter = Value("horizontalCenter", (frame: Frame, screen: Context) => Point((screen.size.width - frame.width) / 2, 0))
+    val VerticalCenter = Value("verticalCenter", (frame: Frame, screen: Context) => Point(0, (screen.size.height - frame.height) / 2))
+    val Center = Value("center", (frame: Frame, screen: Context) => Point((screen.size.width - frame.width) / 2, (screen.size.height - frame.height) / 2))
+    val TopLeft = Value("topLeft", (frame: Frame, screen: Context) => Point(0, 0))
+    val TopRight = Value("topRight", (frame: Frame, screen: Context) => Point(screen.size.width - frame.width, 0))
+    val BottomLeft = Value("bottomLeft", (frame: Frame, screen: Context) => Point(0, screen.size.height - frame.height))
+    val BottomRight = Value("bottomRight", (frame: Frame, screen: Context) => Point(screen.size.width - frame.width, screen.size.height - frame.height))
 
-    class AnchorVal(name: String, val pos: (Frame, UIScreen) => Point) extends Val(nextId, name)
+    protected final def Value(name: String, pos: (Frame, Context) => Point): AnchorVal = new AnchorVal(name, pos)
 
-    protected final def Value(name: String, pos: (Frame, UIScreen) => Point): AnchorVal = new AnchorVal(name, pos)
+    class AnchorVal(name: String, val pos: (Frame, Context) => Point) extends Val(nextId, name)
   }
 
 }

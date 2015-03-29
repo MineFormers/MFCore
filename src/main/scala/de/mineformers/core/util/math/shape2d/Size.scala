@@ -36,6 +36,10 @@ object Size {
   private val cache = new mutable.WeakHashMap[Dimensions, Size]
   type Dimensions = (Int, Int)
 
+  final val MaxWidth = Size(Integer.MAX_VALUE, 0)
+  final val MaxHeight = Size(0, Integer.MAX_VALUE)
+  final val Max = MaxWidth + MaxHeight
+
   /**
    * Create a new [[Size]] based on the given dimensions
    * @param width the height of the new size representation
@@ -78,5 +82,5 @@ class Size private(dimensions: Dimensions) {
     false
   }
 
-  override def toString: String = s"( $width, $height )"
+  override def toString: String = s"($width, $height)"
 }

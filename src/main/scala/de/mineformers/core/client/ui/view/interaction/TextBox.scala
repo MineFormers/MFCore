@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.interaction
+package de.mineformers.core.client.ui.view.interaction
 
 import java.text.DecimalFormat
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{View, Focus, TextView}
+import de.mineformers.core.client.ui.view.{View, Focus, TextView}
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.state.{ComponentState, Property}
-import de.mineformers.core.client.ui.util.ComponentEvent.ValueChanged
+import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.util.ViewEvent.ValueChanged
 import de.mineformers.core.client.ui.util._
 import de.mineformers.core.client.ui.util.font.{Font, MCFont}
 import de.mineformers.core.reaction.GlobalPublisher
@@ -72,7 +72,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = MCFont.DefaultL
   private var lastDoubleClick = 0L
   private var doubleClickCount = 0
 
-  override def defaultState(state: ComponentState): Unit = ()
+  override def defaultState(state: ViewState): Unit = ()
 
   override def init(channel: GlobalPublisher, context: Context): Unit = {
     super.init(channel, context)
@@ -325,7 +325,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = MCFont.DefaultL
         selection = pos
       }
     case KeyEvent.Type(char, code) =>
-      import de.mineformers.core.client.ui.component.interaction.TextBox._
+      import de.mineformers.core.client.ui.view.interaction.TextBox._
       import org.lwjgl.input.Keyboard._
       if (focused && enabled) {
         if (code == KEY_ESCAPE) {
@@ -416,7 +416,7 @@ class TextBox(initText: String, initSize: Size, var font: Font = MCFont.DefaultL
       var start: Int = Math.max(Math.min(cursorPosition, selectionPosition), charOffset)
       var width: Int = textWidth(start, Math.max(cursorPosition, selectionPosition))
       start = textWidth(charOffset, start)
-      width = Math.min(component.width - start - textOff.x * 2, width)
+      width = Math.min(view.width - start - textOff.x * 2, width)
       utils.drawRectangle(0x0000FF, screen.x + start + textOff.x, screen.y + textOff.y, 0, width, 10)
       GL11.glDisable(GL11.GL_COLOR_LOGIC_OP)
     }

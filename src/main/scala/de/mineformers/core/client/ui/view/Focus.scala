@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component
+package de.mineformers.core.client.ui.view
 
-import de.mineformers.core.client.ui.state.{ComponentState, Property}
+import de.mineformers.core.client.ui.state.{ViewState, Property}
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 
 /**
@@ -32,7 +32,7 @@ import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
  * @author PaleoCrafter
  */
 trait Focus extends View {
-  abstract override def defaultState(state: ComponentState) = super.defaultState(state.set(Property.Focused, false))
+  abstract override def defaultState(state: ViewState) = super.defaultState(state.set(Property.Focused, false))
 
   reactions += {
     case e: MouseEvent.Click =>

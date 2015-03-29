@@ -1,48 +1,48 @@
 {
-    "gui": {
-        "multi": [
-            {
-                "target": "frameControl[name=close]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        0,
-                        0
-                    ],
-                    "size": [
-                        9,
-                        9
-                    ]
-                }
-            },
-            {
-                "target": "frameControl[name=close,hovered]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        0,
-                        9
-                    ],
-                    "size": [
-                        9,
-                        9
-                    ]
-                }
-            },
-            {
-                "target": "frameControl[name=close,disabled]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        0,
-                        18
-                    ],
-                    "size": [
-                        9,
-                        9
-                    ]
-                }
-            }
-        ]
-    }
+  "gui": {
+    "multi": [
+      {
+        "target": "frameControl[name=close]",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            0
+          ],
+          "size": [
+            9,
+            9
+          ]
+        }
+      },
+      {
+        "target": "frameControl[name=close,hovered]",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            9
+          ],
+          "size": [
+            9,
+            9
+          ]
+        }
+      },
+      {
+        "target": "frameControl[name=close,disabled]",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            18
+          ],
+          "size": [
+            9,
+            9
+          ]
+        }
+      }
+    ]
+  }
 }

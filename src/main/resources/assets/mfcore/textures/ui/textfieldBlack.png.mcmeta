@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "textBox[style=black]",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "textBox[style=black]",
+    "type": "dynamic"
+  }
 }

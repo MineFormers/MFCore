@@ -63,7 +63,7 @@ object StructureHelper {
         val pos: NBTTagList = newTag.getTagList("Pos", Constants.NBT.TAG_DOUBLE)
         val newPos: NBTTagList = new NBTTagList
         for (i <- 0 until pos.tagCount) {
-          newPos.appendTag(new NBTTagDouble(pos.getDouble(i) + posAdd(i)))
+          newPos.appendTag(new NBTTagDouble(pos.getDoubleAt(i) + posAdd(i)))
         }
         newTag.setTag("Pos", newPos)
         val e: Entity = EntityList.createEntityFromNBT(newTag, world)
@@ -114,7 +114,7 @@ object StructureHelper {
           val pos: NBTTagList = tag.getTagList("Pos", Constants.NBT.TAG_DOUBLE)
           val newPos: NBTTagList = new NBTTagList
           for (i <- 0 until pos.tagCount())
-            newPos.appendTag(new NBTTagDouble(pos.getDouble(i) - mins(i)))
+            newPos.appendTag(new NBTTagDouble(pos.getDoubleAt(i) - mins(i)))
           tag.setTag("Pos", newPos)
         }
         structure.addEntity(tag)

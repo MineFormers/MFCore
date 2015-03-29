@@ -141,9 +141,9 @@ trait Inventory extends IInventory with Publisher with Traversable[ItemStack] {
 
   override def hasCustomName: Boolean = false
 
-  override def getName: String = ""
+  override def getCommandSenderName: String = ""
 
-  override def getDisplayName: IChatComponent = new ChatComponentText(getName)
+  override def getDisplayName: IChatComponent = new ChatComponentText(getCommandSenderName)
 
   override def clear(): Unit = for (i <- 0 until content.length) content(i) = null
 
@@ -212,7 +212,7 @@ trait InventoryHolder extends Inventory {
 
   override def hasCustomName: Boolean = inventory.hasCustomName
 
-  override def getName: String = inventory.getName
+  override def getCommandSenderName: String = inventory.getCommandSenderName
 
   override def getDisplayName: IChatComponent = inventory.getDisplayName
 

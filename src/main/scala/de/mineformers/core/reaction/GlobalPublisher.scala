@@ -10,7 +10,7 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 trait GlobalPublisher extends GlobalReactor {
-  protected val globalListeners = new RefSet[Reaction] {
+  val globalListeners = new RefSet[Reaction] {
 
     import scala.ref._
 

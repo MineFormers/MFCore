@@ -142,5 +142,5 @@ class Rectangle private(r: Bounds) extends Shape[Rectangle] {
     false
   }
 
-  override def toString = s"( start=$start, width=$width, height=$height )"
+  override def toString = s"(start=$start, width=$width, height=$height)"
 }

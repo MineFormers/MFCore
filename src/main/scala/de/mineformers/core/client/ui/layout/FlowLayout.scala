@@ -23,46 +23,47 @@
  */
 package de.mineformers.core.client.ui.layout
 
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.Panel
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel
-
-import scala.util.control.Breaks
 
 /**
  * FlowLayout
  *
  * @author PaleoCrafter
  */
-class FlowLayout(hGap: Int = 2, vGap: Int = 2, cached: Boolean = true) extends LayoutManager[FlowConstraints] {
+class FlowLayout(hGap: Int = 2, vGap: Int = 2, right: Boolean = false, cached: Boolean = true) extends LayoutManager[FlowConstraints] {
   override def defaultConstraints: FlowConstraints = null
 
-  override def positionFor(panel: Panel, component: View): Point = {
-    if (this(component) != null && cached)
-      this(component).pos
+  override def positionFor(panel: Panel, view: View): Point = {
+    if (this(view) != null && cached)
+      this(view).pos
     else {
-      var pos = Point(0, 0)
-      val iterator = panel.content.iterator.buffered
+      var pos = Point(if(!right) 0 else panel.width - view.width, 0)
+      val iterator = if(!right) panel.content.iterator.buffered else panel.content.reverseIterator.buffered
       var highest = 0
-      import scala.util.control.Breaks._
-      breakable(while (iterator.hasNext) {
+      while (iterator.hasNext) {
         val current = iterator.next()
         if (current.height > highest)
           highest = current.height
-        if (current eq component)
-          break()
-        if (iterator.head eq component) {
-          val p = if (cached) this(current).pos else positionFor(panel, current)
+        if (current eq view) {
+          if (cached)
+            setConstraints(view, FlowConstraints(pos))
+          return pos
+        }
+        if (iterator.head eq view) {
+          val p = if (cached && !right) this(current).pos else positionFor(panel, current)
           pos = p
-          pos += Point(current.width + hGap, 0)
-          if (pos.x + component.width + panel.padding.left + panel.padding.right > panel.width) {
-            pos = Point(0, pos.y + highest + vGap)
+          pos += (if(!right) Point(current.width + hGap, 0) else Point(-view.width - hGap, 0))
+          val bigger = if(!right) pos.x + view.width + panel.padding.left + panel.padding.right > panel.width else pos.x - panel.padding.left - panel.padding.right < 0
+          if (bigger) {
+            pos = Point(if(!right) 0 else panel.width - panel.padding.right - view.width, pos.y + highest + vGap)
             highest = 0
           }
         }
-      })
+      }
       if (cached)
-        setConstraints(component, FlowConstraints(pos))
+        setConstraints(view, FlowConstraints(pos))
       pos
     }
   }
@@ -78,6 +79,11 @@ class FlowLayout(hGap: Int = 2, vGap: Int = 2, cached: Boolean = true) extends L
         height = pos.y + c.height
     }
     Size(width, height)
+  }
+
+  override def usableSize(panel: Panel, view: View): Size = {
+    val temp = panel.screenPaddingBounds.end - view.screen
+    Size(temp.x, temp.y)
   }
 }
 

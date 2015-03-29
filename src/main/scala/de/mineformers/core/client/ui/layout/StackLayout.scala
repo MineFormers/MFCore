@@ -24,8 +24,8 @@
 package de.mineformers.core.client.ui.layout
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.Panel
 
 import scala.util.control.Breaks
 
@@ -37,24 +37,24 @@ import scala.util.control.Breaks
 class StackLayout(var gap: Int = 2, var horizontal: Boolean = false, var cached: Boolean = true) extends LayoutManager[StackConstraints] {
   override def defaultConstraints: StackConstraints = null
 
-  override def positionFor(panel: Panel, component: View): Point = {
-    if (this(component) != null && cached)
-      this(component).pos
+  override def positionFor(panel: Panel, view: View): Point = {
+    if (this(view) != null && cached)
+      this(view).pos
     else {
-      var pos = Point(if (!horizontal) component.x else 0, if (!horizontal) 0 else component.y)
+      var pos = Point(if (!horizontal) view.x else 0, if (!horizontal) 0 else view.y)
       val iterator = panel.content.iterator.buffered
       import scala.util.control.Breaks._
       breakable(while (iterator.hasNext) {
         val current = iterator.next()
-        if (current eq component)
+        if (current eq view)
           break()
-        if (iterator.head eq component) {
+        if (iterator.head eq view) {
           val p = if (cached) this(current).pos else positionFor(panel, current)
-          pos = p + Point(if (horizontal) current.width + gap else component.x, if (horizontal) component.y - current.y else current.height + gap)
+          pos = p + Point(if (horizontal) current.width + gap else view.x, if (horizontal) view.y - current.y else current.height + gap)
         }
       })
       if (cached)
-        setConstraints(component, StackConstraints(pos))
+        setConstraints(view, StackConstraints(pos))
       pos
     }
   }
@@ -70,6 +70,21 @@ class StackLayout(var gap: Int = 2, var horizontal: Boolean = false, var cached:
         height = pos.y + c.height
     }
     Size(width, height)
+  }
+
+  override def usableSize(panel: Panel, view: View): Size = {
+    val fillHorizontal = panel.content.count(_.maxSize.width == Integer.MAX_VALUE)
+    val fillVertical = panel.content.count(_.maxSize.height == Integer.MAX_VALUE)
+    val viewHorizontal = panel.content.view.filterNot(_.maxSize.width == Integer.MAX_VALUE)
+    val viewVertical = panel.content.view.filterNot(_.maxSize.height == Integer.MAX_VALUE)
+    val notFilledHorizontal = viewHorizontal.size
+    val notFilledVertical = viewVertical.size
+    val usedWidth = viewHorizontal.foldLeft(0)(_ + _.width)
+    val usedHeight = viewVertical.foldLeft(0)(_ + _.height)
+    val usableWidth = if(!horizontal || fillHorizontal == 0) panel.screenPaddingBounds.width else (panel.screenPaddingBounds.width - usedWidth - notFilledHorizontal * gap) / fillHorizontal - gap
+    val usableHeight = if(horizontal || fillVertical == 0) panel.screenPaddingBounds.height else (panel.screenPaddingBounds.height - usedHeight - notFilledVertical * gap) / fillVertical - gap
+
+    Size(usableWidth, usableHeight)
   }
 }
 

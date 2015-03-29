@@ -1,25 +1,22 @@
 [
-   {
-      "modid" : "mfcore",
-      "name" : "MineFormers Core",
-      "description" : "Common functionality shared among various MF mods",
-      "version" : "${version}",
-      "mcversion" : "${mcversion}",
-      "url" : "",
-      "updateUrl" : "",
-      "authorList" :
-         [
-            "MetaMist",
-            "Din"
-         ],
-      "credits" : "By PaleoCrafter",
-      "screenshots" :
-         [
-         ],
-      "parent" : "",
-      "dependencies" :
-         [
-            "mod_MinecraftForge"
-         ]
-   }
+  {
+    "modid": "mfcore",
+    "name": "MineFormers Core",
+    "description": "Common functionality shared among various MF mods",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "updateUrl": "",
+    "authorList": [
+      "MetaMist",
+      "Din"
+    ],
+    "credits": "By PaleoCrafter",
+    "screenshots": [
+    ],
+    "parent": "",
+    "dependencies": [
+      "mod_MinecraftForge"
+    ]
+  }
 ]

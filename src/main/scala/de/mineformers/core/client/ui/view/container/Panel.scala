@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.container
+package de.mineformers.core.client.ui.view.container
 
-import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel.Padding
 import de.mineformers.core.client.ui.layout.{Constraints, LayoutManager}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.ScissorRegion
-import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.{EventControl, View}
+import de.mineformers.core.reaction.{Event, GlobalPublisher}
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import org.lwjgl.opengl.GL11
 
 /**
@@ -37,7 +37,7 @@ import org.lwjgl.opengl.GL11
  *
  * @author PaleoCrafter
  */
-class Panel extends View {
+class Panel extends View with EventControl {
   override def init(channel: GlobalPublisher, context: Context): Unit = {
     super.init(channel, context)
     content.foreach(c => {
@@ -50,6 +50,10 @@ class Panel extends View {
     })
     if (size == Size(0, 0))
       size = contentSize()
+    else if(size.width == 0)
+      size = Size(contentSize().width, size.height)
+    else if(size.height == 0)
+      size = Size(size.width, contentSize().height)
   }
 
   override def updateState(mousePos: Point): Unit = {
@@ -72,8 +76,11 @@ class Panel extends View {
         c.screen = screen + c.position + Point(padding.left, padding.top)
       if (!sizeUpdate)
         c.onParentResized(this.size, this.size, Size(0, 0))
+      c.zIndex = zIndex
       c.update(mousePos)
     })
+    if(!sizeUpdate && layout != null)
+      layout.clear()
     if (!sizeUpdate)
       sizeUpdate = true
   }
@@ -102,18 +109,45 @@ class Panel extends View {
       layout.setConstraints(c, constraints)
   }
 
-  def findComponent(mousePos: Point, predicate: View => Boolean): View = {
+  def findView(mousePos: Point, predicate: View => Boolean): View = {
     var result: View = null
     if (predicate(this))
       result = this
     for (c <- content) {
       c match {
-        case p: Panel => val pResult = p.findComponent(mousePos, predicate)
+        case p: Panel => val pResult = p.findView(mousePos, predicate)
           if (pResult != null)
             result = pResult
         case comp =>
           if (predicate(comp))
             result = comp
+      }
+    }
+    result
+  }
+
+  override def canReceiveEvent(view: View, event: Event): Boolean = {
+    var result = true
+    for (v <- content) {
+      v match {
+        case p: EventControl =>
+          if (!p.canReceiveEvent(view, event))
+            result = false
+        case _ =>
+      }
+    }
+    result
+  }
+
+  def contains(view: View): Boolean = {
+    var result = false
+    for (v <- content) {
+      v match {
+        case p: Panel =>
+          if (p.contains(view))
+            result = true
+        case _ =>
+          v eq view
       }
     }
     result
@@ -131,17 +165,23 @@ class Panel extends View {
     else {
       var width = 0
       var height = 0
-      for (component <- content) {
-        if (component.x + component.width > width)
-          width = component.x + component.width
-        if (component.y + component.height > height)
-          height = component.y + component.height
+      for (view <- content) {
+        if (view.x + view.width > width)
+          width = view.x + view.width
+        if (view.y + view.height > height)
+          height = view.y + view.height
       }
       if (withPadding)
         Size(width + padding.left + padding.right, height + padding.top + padding.bottom)
       else
         Size(width, height)
     }
+  }
+
+  def usableSize(view: View): Size = if (layout != null) layout.usableSize(this, view)
+  else {
+    val temp = screenPaddingBounds.end - view.screen
+    Size(temp.x, temp.y)
   }
 
   def screenPaddingBounds = Rectangle(screen + Point(padding.left, padding.top), width - padding.left - padding.right, height - padding.top - padding.bottom)
@@ -157,7 +197,7 @@ class Panel extends View {
   def deepTooltip(p: Point): String = {
     content foreach {
       c =>
-        if (c.tooltip != null && (context.findHoveredComponent(p) eq c))
+        if (c.tooltip != null && (context.findHoveredView(p) eq c))
           return c.tooltip
         else
           c match {

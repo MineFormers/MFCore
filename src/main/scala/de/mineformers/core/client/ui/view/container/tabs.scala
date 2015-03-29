@@ -21,19 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.container
+package de.mineformers.core.client.ui.view.container
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel.Padding
-import de.mineformers.core.client.ui.component.container.Tab.Orientation
-import de.mineformers.core.client.ui.component.container.Tab.Orientation.Orientation
-import de.mineformers.core.client.ui.component.decoration.Label
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.container.Tab.Orientation
+import de.mineformers.core.client.ui.view.container.Tab.Orientation.Orientation
+import de.mineformers.core.client.ui.view.decoration.Label
 import de.mineformers.core.client.ui.layout.StackLayout
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.drawable.Drawable
-import de.mineformers.core.client.ui.state.{Property, BooleanProperty, ComponentState, StringProperty}
-import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
+import de.mineformers.core.client.ui.state.{Property, BooleanProperty, ViewState, StringProperty}
+import de.mineformers.core.client.ui.util.ViewEvent.ViewClicked
 import de.mineformers.core.client.ui.util.SimpleShadow
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.reaction.GlobalPublisher
@@ -55,7 +55,7 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
   skin = new TabFrameSkin
 
   globalReactions += {
-    case ComponentClicked(c, pos, button) =>
+    case ViewClicked(c, pos, button) =>
       c match {
         case tab: Tab =>
           active = tab.key
@@ -119,9 +119,9 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
     size = if (orientation.vertical) Size(32, 28) else Size(28, 32)
     tooltip = title
 
-    import de.mineformers.core.client.ui.component.container.{Tab => TabO}
+    import de.mineformers.core.client.ui.view.container.{Tab => TabO}
 
-    override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(TabO.FirstProperty, first)
+    override def defaultState(state: ViewState): Unit = super.defaultState(state.set(TabO.FirstProperty, first)
       .set(TabO.OrientationProperty, orientation.name)
       .set(TabO.TypeProperty, "panel"))
 
@@ -166,7 +166,7 @@ class TabbedPanel(orientation: Orientation = Orientation.Top) extends Panel {
   private var channel: GlobalPublisher = _
 
   globalReactions += {
-    case ComponentClicked(c, pos, button) =>
+    case ViewClicked(c, pos, button) =>
       c match {
         case tab: Tab =>
           active = tab.key
@@ -216,7 +216,7 @@ class TabbedPanel(orientation: Orientation = Orientation.Top) extends Panel {
     shadow = SimpleShadow(0, 1, Color.black(0.3f))
     padding = Padding(2, 2, 2, 1)
 
-    import de.mineformers.core.client.ui.component.container.{Tab => TabO}
+    import de.mineformers.core.client.ui.view.container.{Tab => TabO}
 
     override def updateState(mousePos: Point): Unit = {
       super.updateState(mousePos)
@@ -226,7 +226,7 @@ class TabbedPanel(orientation: Orientation = Orientation.Top) extends Panel {
         shadow = SimpleShadow(0, 1, Color.black(0.3f))
     }
 
-    override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(TabO.FirstProperty, first).set(TabO.OrientationProperty, orientation.name).set(TabO.TypeProperty, "panel"))
+    override def defaultState(state: ViewState): Unit = super.defaultState(state.set(TabO.FirstProperty, first).set(TabO.OrientationProperty, orientation.name).set(TabO.TypeProperty, "panel"))
   }
 
 }

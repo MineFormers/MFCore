@@ -21,15 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component
+package de.mineformers.core.client.ui.view
+
+import javafx.scene.control.Skin
 
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.container.Panel
+import de.mineformers.core.client.ui.view.container.Panel
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
 import de.mineformers.core.client.ui.skin.drawable.StaticTexture
-import de.mineformers.core.client.ui.state.{ComponentState, Property}
-import de.mineformers.core.client.ui.util.ComponentEvent.ComponentClicked
+import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.util.ViewEvent.ViewClicked
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
 import de.mineformers.core.util.renderer.GuiUtils
@@ -47,17 +49,16 @@ abstract class View extends GlobalPublisher {
     this.state.set(Property.Name, name)
     listenTo(channel)
     this.context = context
-    if (maxSize == Size(0, 0))
-      maxSize = context.size
+    maxSize = Size(if(maxSize.width == 0) context.size.width else maxSize.width, if(maxSize.height == 0) context.size.height else maxSize.height)
   }
 
   reactions += {
     case MouseEvent.Click(p, code) =>
-      if (hovered(p) && enabled && visible) context.publish(ComponentClicked(this, local(p), MouseButton.get(code)))
+      if (hovered(p) && enabled && visible) context.publish(ViewClicked(this, local(p), MouseButton.get(code)))
   }
 
   def updateState(mousePos: Point): Unit = {
-    state.set(Property.Hovered, context.findHoveredComponent(mousePos) eq this)
+    state.set(Property.Hovered, context.findHoveredView(mousePos) eq this)
   }
 
   def update(mousePos: Point): Unit
@@ -81,12 +82,12 @@ abstract class View extends GlobalPublisher {
 
   def onParentResized(newSize: Size, oldSize: Size, delta: Size): Unit = {
     if(parent != null) {
-      val sizeChange = parent.screenPaddingBounds.end - screen
+      val usable = parent.usableSize(this)
       if (maxSize.width == Integer.MAX_VALUE) {
-        this.size = Size(sizeChange.x, size.height)
+        this.size = Size(usable.width, size.height)
       }
       if (maxSize.height == Integer.MAX_VALUE) {
-        this.size = Size(size.width, sizeChange.y)
+        this.size = Size(size.width, usable.height)
       }
     }
   }
@@ -121,7 +122,7 @@ abstract class View extends GlobalPublisher {
   }
 
   private def createState = {
-    val state = ComponentState.create(Property.Hovered, Property.Enabled, Property.Style)
+    val state = ViewState.create(Property.Hovered, Property.Enabled, Property.Style)
     state.set(Property.Enabled, true)
     defaultState(state)
     state
@@ -131,7 +132,9 @@ abstract class View extends GlobalPublisher {
 
   def style_=(style: String) = state.set(Property.Style, style)
 
-  def defaultState(state: ComponentState): Unit = ()
+  def defaultState(state: ViewState): Unit = ()
+
+  def propertyString = s"size=$size, minSize=$minSize, maxSize=$maxSize, position=$position, screenPosition=$screen, bounds=$bounds, visible=$visible"
 
   var skin: Skin
   lazy val mc: Minecraft = FMLClientHandler.instance.getClient
@@ -153,16 +156,17 @@ abstract class View extends GlobalPublisher {
   var zIndex = 0
   private var _bounds: Rectangle = Rectangle(position, width, height)
   private var _screenBounds: Rectangle = Rectangle(screen, width, height)
+  protected var hasBackground = true
 
   trait Skin {
     var stretchStatic = true
     val utils = GuiUtils
-    val component = View.this
+    val view = View.this
 
     protected def drawBackground(mousePos: Point): Unit = {
       GlStateManager.enableDepth()
-      val drawable = TextureManager(component).getOrElse(TextureManager(background).orNull)
-      if (drawable != null) {
+      val drawable = TextureManager(view).getOrElse(TextureManager(background).orNull)
+      if (drawable != null && hasBackground) {
         if (!drawable.isInstanceOf[StaticTexture] || stretchStatic)
           drawable.size = size
         else

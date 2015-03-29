@@ -3,11 +3,11 @@ package de.mineformers.core.client.ui.state
 import de.mineformers.core.util.collection.{MutableHMap, HMap}
 
 /**
- * ComponentState
+ * ViewState
  *
  * @author PaleoCrafter
  */
-trait ComponentState {
+trait ViewState {
   def propertyNames: Set[String]
 
   def apply[T](property: Property[T]): T
@@ -16,9 +16,9 @@ trait ComponentState {
 
   def byName(name: String): Option[Any]
 
-  def set[T](property: Property[T], value: T): ComponentState
+  def set[T](property: Property[T], value: T): ViewState
 
-  def cycle[T](property: Property[T]): ComponentState
+  def cycle[T](property: Property[T]): ViewState
 
   def properties: HMap[Property]
 
@@ -27,14 +27,14 @@ trait ComponentState {
   override def toString: String = "{" + propertyNames.map(s => s"$s: ${byName(s).orNull}").mkString(", ") + "}"
 }
 
-object ComponentState {
+object ViewState {
 
-  private class Impl extends ComponentState {
+  private class Impl extends ViewState {
     override def propertyNames: Set[String] = data.keySet map {
       _.name
     }
 
-    override def set[T](property: Property[T], value: T): ComponentState = {
+    override def set[T](property: Property[T], value: T): ViewState = {
       if ((propertyNames.contains(property.name) && data.keySet.contains(property)) || !propertyNames.contains(property.name)) {
         if (property.allowedValues == null || property.allowedValues.contains(value))
           data.put(property, value)
@@ -65,7 +65,7 @@ object ComponentState {
       case None => 0
     }
 
-    override def cycle[T](property: Property[T]): ComponentState = {
+    override def cycle[T](property: Property[T]): ViewState = {
       val currentValue = this(property)
       if (property.allowedValues != null) {
         val index = property.allowedValues.indexOf(currentValue)
@@ -81,7 +81,7 @@ object ComponentState {
     private val data = MutableHMap.empty[Property]
   }
 
-  def create(properties: Property[_]*): ComponentState = {
+  def create(properties: Property[_]*): ViewState = {
     val impl = new Impl
     properties.foreach(p => impl.set(p, p.defaultValue))
     impl

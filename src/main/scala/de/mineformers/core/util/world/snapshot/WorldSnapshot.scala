@@ -49,7 +49,7 @@ class WorldSnapshot(width: Int, height: Int, length: Int, client: Boolean) exten
 
     override def canSave: Boolean = false
 
-    override def func_177458_a(creatureType: EnumCreatureType, p_177458_2_ : VBlockPos): util.List[_] = null
+    override def getPossibleCreatures(creatureType: EnumCreatureType, p_177458_2_ : VBlockPos): util.List[_] = null
 
     override def makeString(): String = "WorldSnapshotChunkCache: " + getLoadedChunkCount
 

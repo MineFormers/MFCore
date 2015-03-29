@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.decoration
+package de.mineformers.core.client.ui.view.decoration
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.container.Panel.Padding
-import de.mineformers.core.client.ui.component.{View, TextView}
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.{View, TextView}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.util.Shadow
 import de.mineformers.core.client.ui.util.font.{Font, MCFont}
@@ -72,7 +72,7 @@ class Label(private var _text: String) extends View with TextView {
   class LabelSkin extends TextSkin {
     override def drawForeground(mousePos: Point): Unit = {
       if (shadow != null) {
-        shadow.draw(text, component.screen.x + textOff.x, component.screen.y + textOff.y, component.zIndex, font, Color(font.color))
+        shadow.draw(text, view.screen.x + textOff.x, view.screen.y + textOff.y, view.zIndex, font, Color(font.color))
       }
       super.drawForeground(mousePos)
     }

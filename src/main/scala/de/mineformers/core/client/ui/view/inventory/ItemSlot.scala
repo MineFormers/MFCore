@@ -21,12 +21,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.inventory
+package de.mineformers.core.client.ui.view.inventory
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel
-import de.mineformers.core.client.ui.component.container.Panel.Padding
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.Panel
+import de.mineformers.core.client.ui.view.container.Panel.Padding
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.item.ItemStack
@@ -63,7 +63,7 @@ class ItemSlot(private var _stack: ItemStack, drawSlot: Boolean = false, val att
 
   globalReactions += {
     case e: MouseEvent.Click if attached =>
-      val clicked = context.findAffectedComponent(e.pos)
+      val clicked = context.findAffectedView(e.pos)
       if (e.button == MouseButton.Left) {
         clicked match {
           case i: ItemSlot if i.stack == null => i.stack = stack
@@ -73,7 +73,7 @@ class ItemSlot(private var _stack: ItemStack, drawSlot: Boolean = false, val att
         }
       }
     case e: MouseEvent.Release if attached =>
-      val clicked = context.findAffectedComponent(e.pos)
+      val clicked = context.findAffectedView(e.pos)
       if (e.button == MouseButton.Left) {
         clicked match {
           case i: ItemSlot if i.stack == null => i.stack = stack

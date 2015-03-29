@@ -27,7 +27,6 @@ import javax.imageio.ImageIO
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.util.MathUtils
 import de.mineformers.core.util.renderer.GuiUtils
-import net.minecraft.client.renderer.Tessellator
 import org.lwjgl.BufferUtils
 import org.lwjgl.opengl.{GL11, GL12}
 import org.lwjgl.util.glu.GLU
@@ -49,24 +48,84 @@ class TrueTypeFont(font: JFont, antiAlias: Boolean, additionalChars: Array[Char]
    * Map of user defined font characters (Character <-> IntObject)
    */
   private val customChars: mutable.Map[Char, CharContainer] = mutable.HashMap.empty[Char, CharContainer]
-
   private val fontSize = font.getSize + 3
-
+  /**
+   * Default font texture height
+   */
+  private val textureHeight: Int = 1024
+  var color: Int = 0x404040
   private var fontHeight = 0f
-
   private var fontMetrics: FontMetrics = null
-
   private var textureId = -1
   /**
    * Default font texture width
    */
   private var textureWidth: Int = 1024
-  /**
-   * Default font texture height
-   */
-  private val textureHeight: Int = 1024
 
   createSet(additionalChars)
+
+  override def withColor(color: Int): Font = {
+    val temp = new TrueTypeFont(font, antiAlias, additionalChars)
+    temp.color = color
+    temp
+  }
+
+  override def fit(text: String, width: Int, reverse: Boolean): String = text
+
+  override def draw(text: String, x: Int, y: Int, z: Int, color: Int): Unit = {
+    GL11.glPushMatrix()
+    val sr = GuiUtils.scaledResolution
+    val scaleX = 1F
+    val scaleY = 1F
+    var totalWidth: Float = 0
+    val c: Int = 8
+    var startY = 0
+    GL11.glDisable(GL11.GL_DEPTH_TEST)
+    GL11.glDisable(GL12.GL_RESCALE_NORMAL)
+    GL11.glTranslatef(0, 0, z)
+
+    GL11.glScalef(scaleX, scaleY, 1.0f)
+
+    GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId)
+    val rgba = Color(color)
+    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
+
+    for (charCurrent <- text) {
+      val charContainer = if (charCurrent < 256) charArray(charCurrent) else customChars(charCurrent)
+      if (charContainer != null) {
+        if (charCurrent == '\n') {
+          startY += fontHeight.toInt
+          totalWidth = 0
+        }
+        else {
+          val uMin = charContainer.x / 1024F
+          val vMin = charContainer.y / 1024F
+          val uMax = (charContainer.x + charContainer.width) / 1024F
+          val vMax = (charContainer.y + charContainer.height) / 1024F
+          GuiUtils.drawQuad((x / scaleX + totalWidth).toInt, (y / scaleY + startY).toInt, z, charContainer.width.toInt, charContainer.height.toInt, uMin, vMin, uMax, vMax)
+          //drawQuad((totalWidth + charContainer.width) + x / scaleX, startY + y / scaleY, totalWidth + x / scaleX, (startY + charContainer.height) + y / scaleY, charContainer.x + charContainer.width, charContainer.y + charContainer.height, charContainer.x, charContainer.y)
+          totalWidth += (charContainer.width - c)
+        }
+      }
+    }
+    GL11.glTranslatef(0, 0, -z)
+    GL11.glEnable(GL12.GL_RESCALE_NORMAL)
+    GL11.glEnable(GL11.GL_DEPTH_TEST)
+    GL11.glPopMatrix()
+  }
+
+  override def charWidth(char: Char): Int = if (char.toInt > 255) customChars(char).width.toInt else charArray(char).width.toInt
+
+  override def height: Int = fontHeight.toInt - 3
+
+  override def width(lines: String*): Int = fontMetrics.stringWidth(GuiUtils.longestString(lines: _*)) + GuiUtils.longestString(lines: _*).length
+
+  def destroy(): Unit = {
+    val scratch: IntBuffer = BufferUtils.createIntBuffer(1)
+    scratch.put(0, textureId)
+    GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
+    GL11.glDeleteTextures(scratch)
+  }
 
   private def createSet(customCharsArray: Array[Char]) {
     if (customCharsArray != null && customCharsArray.length > 0) {
@@ -190,65 +249,6 @@ class TrueTypeFont(font: JFont, antiAlias: Boolean, additionalChars: Array[Char]
         throw e
     }
     -1
-  }
-
-  var color: Int = 0x404040
-
-  override def fit(text: String, width: Int, reverse: Boolean): String = text
-
-  override def draw(text: String, x: Int, y: Int, z: Int, color: Int): Unit = {
-    GL11.glPushMatrix()
-    val sr = GuiUtils.scaledResolution
-    val scaleX = 1F
-    val scaleY = 1F
-    var totalWidth: Float = 0
-    val c: Int = 8
-    var startY = 0
-    GL11.glDisable(GL11.GL_DEPTH_TEST)
-    GL11.glDisable(GL12.GL_RESCALE_NORMAL)
-    GL11.glTranslatef(0, 0, z)
-
-    GL11.glScalef(scaleX, scaleY, 1.0f)
-
-    GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId)
-    val rgba = Color(color)
-    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
-
-    for (charCurrent <- text) {
-      val charContainer = if (charCurrent < 256) charArray(charCurrent) else customChars(charCurrent)
-      if (charContainer != null) {
-        if (charCurrent == '\n') {
-          startY += fontHeight.toInt
-          totalWidth = 0
-        }
-        else {
-          val uMin = charContainer.x / 1024F
-          val vMin = charContainer.y / 1024F
-          val uMax = (charContainer.x + charContainer.width) / 1024F
-          val vMax = (charContainer.y + charContainer.height) / 1024F
-          GuiUtils.drawQuad((x / scaleX + totalWidth).toInt, (y / scaleY + startY).toInt, z, charContainer.width.toInt, charContainer.height.toInt, uMin, vMin, uMax, vMax)
-          //drawQuad((totalWidth + charContainer.width) + x / scaleX, startY + y / scaleY, totalWidth + x / scaleX, (startY + charContainer.height) + y / scaleY, charContainer.x + charContainer.width, charContainer.y + charContainer.height, charContainer.x, charContainer.y)
-          totalWidth += (charContainer.width - c)
-        }
-      }
-    }
-    GL11.glTranslatef(0, 0, -z)
-    GL11.glEnable(GL12.GL_RESCALE_NORMAL)
-    GL11.glEnable(GL11.GL_DEPTH_TEST)
-    GL11.glPopMatrix()
-  }
-
-  override def charWidth(char: Char): Int = if (char.toInt > 255) customChars(char).width.toInt else charArray(char).width.toInt
-
-  override def height: Int = fontHeight.toInt - 3
-
-  override def width(lines: String*): Int = fontMetrics.stringWidth(GuiUtils.longestString(lines: _*)) + GuiUtils.longestString(lines: _*).length
-
-  def destroy(): Unit = {
-    val scratch: IntBuffer = BufferUtils.createIntBuffer(1)
-    scratch.put(0, textureId)
-    GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0)
-    GL11.glDeleteTextures(scratch)
   }
 
   private case class CharContainer(x: Float, y: Float, width: Float, height: Float)

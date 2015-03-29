@@ -23,7 +23,6 @@
  */
 package de.mineformers.core.client.ui.util.font
 
-import de.mineformers.core.util.math.shape2d.Size
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.client.util.RenderUtils.mc
 import de.mineformers.core.util.renderer.GuiUtils
@@ -60,13 +59,15 @@ object MCFont {
   def addRenderer(id: String, renderer: FontRenderer) = renderers + id -> renderer
 }
 
-class MCFont(name: String, var color: Int = 0xe0e0e0, var drawShadow: Boolean = false) extends Font {
+class MCFont(name: String, val color: Int = 0xe0e0e0, val drawShadow: Boolean = false) extends Font {
+  def withColor(color: Int): Font = MCFont(name, color, drawShadow)
+
   override def draw(text: String, x: Int, y: Int, z: Int, color: Int): Unit = {
     GL11.glDisable(GL11.GL_DEPTH_TEST)
     GL11.glDisable(GL12.GL_RESCALE_NORMAL)
     GL11.glTranslatef(0, 0, z)
     val rgba = Color(color)
-//    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
+    //    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
     var i = 0
     for (line <- text.split("\\n").mkString("<br>").split("<br>")) {
       renderer.drawString(line, x, y + i * (height + 1), color, drawShadow)

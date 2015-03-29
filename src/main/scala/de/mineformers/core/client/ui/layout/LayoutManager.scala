@@ -24,8 +24,8 @@
 package de.mineformers.core.client.ui.layout
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.Panel
 
 import scala.collection.mutable
 
@@ -48,9 +48,11 @@ trait LayoutManager[C <: Constraints] {
 
   def defaultConstraints: C
 
-  def positionFor(panel: Panel, component: View): Point
+  def positionFor(panel: Panel, view: View): Point
 
   def size(panel: Panel): Size
+
+  def usableSize(panel: Panel, view: View): Size
 
   def reset(): Unit = ()
 

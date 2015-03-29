@@ -49,6 +49,8 @@ object Vector3 extends Coord3Factory[Double, Vector3]  {
 
   implicit def vanilla2custom(vec: Vec3): Vector3 = Vector3(vec.xCoord, vec.yCoord, vec.zCoord)
 
+  def apply(vanilla: Vec3) = vanilla2custom(vanilla)
+
   /**
    * Create a new [[Vector3]] based on the given coordinates
    * @param x the X of the new vector

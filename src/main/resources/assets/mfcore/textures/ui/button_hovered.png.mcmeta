@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "button[hovered=true]",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "button[hovered=true]",
+    "type": "dynamic"
+  }
 }

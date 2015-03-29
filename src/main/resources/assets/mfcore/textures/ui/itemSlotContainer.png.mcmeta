@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "itemSlotContainer",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "itemSlotContainer",
+    "type": "dynamic"
+  }
 }

@@ -60,7 +60,6 @@ object DynamicTexture {
         val tObject = json.getAsJsonObject("top")
         val iObject = json.getAsJsonObject("inner")
         texture = new DynamicTexture(getUVsFromObject(tlObject), getUVsFromObject(tObject), getUVsFromObject(iObject))
-        println(texture)
       } else if (json.has("corners")) {
         val c = json.getAsJsonObject("corners")
         val s = json.getAsJsonObject("sides")

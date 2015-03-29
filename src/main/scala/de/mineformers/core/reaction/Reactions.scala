@@ -52,6 +52,8 @@ object Reactions {
     def apply(e: Event) {
       for (p <- parts) if (p isDefinedAt e) p(e)
     }
+
+    override def toString(): String = parts.toString()
   }
 
   class Wrapper(listener: Any)(r: Reaction) extends Reaction with StronglyReferenced with Proxy {

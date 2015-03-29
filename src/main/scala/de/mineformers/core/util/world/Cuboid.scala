@@ -8,7 +8,7 @@ import net.minecraft.util.AxisAlignedBB
  *
  * @author PaleoCrafter
  */
-sealed trait Cuboid[N, C <: Coord3[N]] extends Traversable[C] {
+sealed trait Cuboid[@specialized(Double, Int) N, C <: Coord3[N]] extends Traversable[C] {
   def coordFactory: Coord3Factory[N, C]
 
   def point1: C

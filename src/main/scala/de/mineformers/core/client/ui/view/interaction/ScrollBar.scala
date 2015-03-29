@@ -21,15 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.interaction
+package de.mineformers.core.client.ui.view.interaction
 
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.ScrollPanel
-import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation._
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.ScrollPanel
+import de.mineformers.core.client.ui.view.interaction.ScrollBar.Orientation._
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
-import de.mineformers.core.client.ui.state.ComponentState
+import de.mineformers.core.client.ui.state.ViewState
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
 import net.minecraft.client.gui.GuiScreen

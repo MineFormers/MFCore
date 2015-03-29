@@ -24,8 +24,8 @@
 package de.mineformers.core.client.ui.util
 
 import de.mineformers.core.util.math.shape2d.Point
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.interaction.Button
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.interaction.Button
 import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.reaction.Event
 
@@ -35,19 +35,23 @@ trait Positioned extends Event {
   def pos: Point = p
 }
 
-object ComponentEvent {
+object ViewEvent {
 
-  case class ValueChanged(c: View, oldVal: Any, newVal: Any) extends ComponentEvent(c)
+  case class ValueChanged(v: View, oldVal: Any, newVal: Any) extends ViewEvent(v)
 
-  case class ComponentClicked(c: View, mousePos: Point, button: MouseButton) extends ComponentEvent(c)
+  case class ViewClicked(v: View, mousePos: Point, button: MouseButton) extends ViewEvent(v)
 
-  case class ButtonPressed(b: Button) extends ComponentEvent(b)
+  case class ButtonPressed(b: Button) extends ViewEvent(b)
 
 }
 
-class ComponentEvent(c: View) extends Event
+class ViewEvent(v: View) extends Event
 
 object MouseEvent {
+
+  case class Press(p: Point, buttonCode: Int) extends MouseEvent(p) {
+    def button = MouseButton.get(buttonCode)
+  }
 
   case class Click(p: Point, buttonCode: Int) extends MouseEvent(p) {
     def button = MouseButton.get(buttonCode)
@@ -79,8 +83,8 @@ abstract class MouseEvent(p: Point) extends Event with Positioned
 
 object KeyEvent {
 
-  case class Type(private val char: Char, private val code: Int) extends KeyEvent(char, code)
+  case class Type(char0: Char, code0: Int) extends KeyEvent(char0, code0)
 
 }
 
-abstract class KeyEvent(char: Char, code: Int) extends Event
+abstract class KeyEvent(val char: Char, val code: Int) extends Event

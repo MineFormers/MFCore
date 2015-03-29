@@ -1,9 +1,9 @@
 {
-    "gui": {
-        "target": "worldSnapshotView[shadow]",
-        "type": "dynamic"
-    },
-    "texture": {
-        "blur": true
-    }
+  "gui": {
+    "target": "worldSnapshotView[shadow]",
+    "type": "dynamic"
+  },
+  "texture": {
+    "blur": true
+  }
 }

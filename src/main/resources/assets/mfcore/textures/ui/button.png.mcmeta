@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "button",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "button",
+    "type": "dynamic"
+  }
 }

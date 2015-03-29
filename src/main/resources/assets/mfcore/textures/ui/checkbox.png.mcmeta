@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "checkBox",
-        "type": "static"
-    }
+  "gui": {
+    "target": "checkBox",
+    "type": "static"
+  }
 }

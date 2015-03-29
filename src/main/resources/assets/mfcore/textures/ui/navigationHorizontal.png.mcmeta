@@ -1,90 +1,90 @@
 {
-    "gui": {
-        "multi": [
-            {
-                "target": "navigationButton[orientation=right]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        0,
-                        0
-                    ],
-                    "size": [
-                        10,
-                        15
-                    ]
-                }
-            },
-            {
-                "target": "navigationButton[orientation=right,hovered]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        10,
-                        0
-                    ],
-                    "size": [
-                        10,
-                        15
-                    ]
-                }
-            },
-            {
-                "target": "navigationButton[orientation=right,disabled]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        20,
-                        0
-                    ],
-                    "size": [
-                        10,
-                        15
-                    ]
-                }
-            },
-            {
-                "target": "navigationButton[orientation=left]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        0,
-                        15
-                    ],
-                    "size": [
-                        10,
-                        15
-                    ]
-                }
-            },
-            {
-                "target": "navigationButton[orientation=left,hovered]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        10,
-                        15
-                    ],
-                    "size": [
-                        10,
-                        15
-                    ]
-                }
-            },
-            {
-                "target": "navigationButton[orientation=left,disabled]",
-                "type": "static",
-                "uv": {
-                    "start": [
-                        20,
-                        15
-                    ],
-                    "size": [
-                        10,
-                        15
-                    ]
-                }
-            }
-        ]
-    }
+  "gui": {
+    "multi": [
+      {
+        "target": "navigationButton[orientation=right]",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            0
+          ],
+          "size": [
+            10,
+            15
+          ]
+        }
+      },
+      {
+        "target": "navigationButton[orientation=right,hovered]",
+        "type": "static",
+        "uv": {
+          "start": [
+            10,
+            0
+          ],
+          "size": [
+            10,
+            15
+          ]
+        }
+      },
+      {
+        "target": "navigationButton[orientation=right,disabled]",
+        "type": "static",
+        "uv": {
+          "start": [
+            20,
+            0
+          ],
+          "size": [
+            10,
+            15
+          ]
+        }
+      },
+      {
+        "target": "navigationButton[orientation=left]",
+        "type": "static",
+        "uv": {
+          "start": [
+            0,
+            15
+          ],
+          "size": [
+            10,
+            15
+          ]
+        }
+      },
+      {
+        "target": "navigationButton[orientation=left,hovered]",
+        "type": "static",
+        "uv": {
+          "start": [
+            10,
+            15
+          ],
+          "size": [
+            10,
+            15
+          ]
+        }
+      },
+      {
+        "target": "navigationButton[orientation=left,disabled]",
+        "type": "static",
+        "uv": {
+          "start": [
+            20,
+            15
+          ],
+          "size": [
+            10,
+            15
+          ]
+        }
+      }
+    ]
+  }
 }

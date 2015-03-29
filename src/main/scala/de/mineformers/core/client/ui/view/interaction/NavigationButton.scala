@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.interaction
+package de.mineformers.core.client.ui.view.interaction
 
 import de.mineformers.core.util.math.shape2d.Size
-import de.mineformers.core.client.ui.component.interaction.NavigationButton.Orientation.Orientation
-import de.mineformers.core.client.ui.state.{ComponentState, StringProperty}
+import de.mineformers.core.client.ui.view.interaction.NavigationButton.Orientation.Orientation
+import de.mineformers.core.client.ui.state.{ViewState, StringProperty}
 
 /**
  * NavigationButton
@@ -35,7 +35,7 @@ import de.mineformers.core.client.ui.state.{ComponentState, StringProperty}
 class NavigationButton(orientation: Orientation) extends Button("") {
   size = if (orientation.vertical) Size(15, 10) else Size(10, 15)
 
-  override def defaultState(state: ComponentState): Unit = super.defaultState(state.set(NavigationButton.OrientationProperty, orientation.name))
+  override def defaultState(state: ViewState): Unit = super.defaultState(state.set(NavigationButton.OrientationProperty, orientation.name))
 }
 
 object NavigationButton {

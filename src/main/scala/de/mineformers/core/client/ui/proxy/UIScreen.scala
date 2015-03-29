@@ -23,16 +23,18 @@
  */
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.{DebugWindow, Frame}
-import de.mineformers.core.client.ui.component.decoration.Tooltip
 import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.{DebugWindow, Frame}
+import de.mineformers.core.client.ui.view.decoration.Tooltip
+import de.mineformers.core.reaction.{Listener, Event}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.gui.GuiScreen
 import org.lwjgl.input.Mouse
 
 import scala.collection.mutable
+import scala.collection.mutable.ListBuffer
 
 /**
  * UIScreen
@@ -40,6 +42,17 @@ import scala.collection.mutable
  * @author PaleoCrafter
  */
 class UIScreen(frames0: Seq[Frame]) extends GuiScreen with Context {
+  private val tooltip = new Tooltip("")
+  private val continuousClick = mutable.HashMap.empty[Int, (Long, Long)]
+  private val clicked = mutable.HashMap.empty[Int, Boolean]
+  private var lastButton = -1
+  private var lastClickTime = 0L
+  private var lastMousePosition = Point(0, 0)
+  private var lastDragPosition = Point(0, 0)
+  val listeners = ListBuffer.empty[Listener]
+
+  frames = frames0 ++ frames
+
   override def initGui(): Unit = {
     frames foreach {
       f => f.proxy = this
@@ -59,6 +72,16 @@ class UIScreen(frames0: Seq[Frame]) extends GuiScreen with Context {
 
     lastButton = button
     lastClickTime = currentTime
+    clicked += button -> true
+  }
+
+  override def canReceiveEvent(view: View, event: Event): Boolean = {
+    var result = true
+    for(f <- frames) {
+          if(!f.canReceiveEvent(view, event))
+            result = false
+    }
+    result
   }
 
   override def mouseClickMove(x: Int, y: Int, lastButton: Int, timeSinceClick: Long): Unit = {
@@ -68,6 +91,9 @@ class UIScreen(frames0: Seq[Frame]) extends GuiScreen with Context {
 
   override def mouseReleased(x: Int, y: Int, button: Int): Unit = {
     publish(MouseEvent.Release(Point(x, y), button))
+    if(clicked.getOrElse(button, false))
+      publish(MouseEvent.Press(Point(x, y), button))
+    clicked += button -> false
   }
 
   override def keyTyped(char: Char, code: Int): Unit = {
@@ -137,21 +163,12 @@ class UIScreen(frames0: Seq[Frame]) extends GuiScreen with Context {
       tooltip.skin.draw(p)
   }
 
-  override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
+  override def findView(mousePos: Point, predicate: View => Boolean): View = {
     for (frame <- frames.sortBy(_.zIndex).reverse) {
-      val comp = frame.findComponent(mousePos, predicate)
+      val comp = frame.findView(mousePos, predicate)
       if (comp != null)
         return comp
     }
     null
   }
-
-  private val debug = true
-  val frames = frames0 ++ (if (debug) Seq(new DebugWindow) else Seq())
-  private val tooltip = new Tooltip("")
-  private val continuousClick = mutable.HashMap.empty[Int, (Long, Long)]
-  private var lastButton = -1
-  private var lastClickTime = 0L
-  private var lastMousePosition = Point(0, 0)
-  private var lastDragPosition = Point(0, 0)
 }

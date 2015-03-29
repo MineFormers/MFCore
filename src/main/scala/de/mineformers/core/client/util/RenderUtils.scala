@@ -24,10 +24,12 @@
 package de.mineformers.core.client.util
 
 import de.mineformers.core.client.renderer.shape.Vertex
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle}
 import de.mineformers.core.util.math.{Camera, Matrix4, Vector2, Vector3}
+import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
-import net.minecraft.client.renderer.{GLAllocation, OpenGlHelper, RenderHelper, Tessellator}
+import net.minecraft.client.renderer._
 import net.minecraft.entity.Entity
 import net.minecraft.util.{EnumFacing, MathHelper, ResourceLocation, Timer}
 import net.minecraftforge.fml.client.FMLClientHandler
@@ -90,6 +92,14 @@ object RenderUtils {
         val zOff = radius * math.sin(theta)
         Vertex(Vector3(x + xOff, y + zOff, z))
     } reverse)
+  }
+
+  def drawLine(start: Vector3, end: Vector3, lineWidth: Int = 10, color: Color = Color.black(1)): Unit = {
+    glLineWidth(lineWidth)
+    glDisable(GL_TEXTURE_2D)
+    GlStateManager.color(color.r, color.g, color.b, color.a)
+    drawVertices(GL_LINES, Seq(Vertex(start), Vertex(end)))
+    glEnable(GL_TEXTURE_2D)
   }
 
   def createCircle(x: Double, y: Double, z: Double, radius: Double, vertices: Int) = ((0 until vertices) map {
@@ -255,10 +265,10 @@ object RenderUtils {
     GL11.glMatrixMode(GL11.GL_PROJECTION)
     GL11.glLoadIdentity()
     Project.gluPerspective(this.mc.gameSettings.fovSetting, cam.viewport.width.toFloat / cam.viewport.height.toFloat, 0.05F, 256 * MathHelper.SQRT_2)
-//    loadMatrix(cam.projectionMatrix)
+    //    loadMatrix(cam.projectionMatrix)
     GL11.glMatrixMode(GL11.GL_MODELVIEW)
     GL11.glLoadIdentity()
-//    loadMatrix(cam.viewMatrix)
+    //    loadMatrix(cam.viewMatrix)
     GL11.glTranslated(-eye.x, -eye.y, -eye.z)
   }
 
@@ -300,7 +310,29 @@ object RenderUtils {
     particlesField.get(Minecraft.getMinecraft.effectRenderer).asInstanceOf[Array[java.util.List[EntityFX]]] map collectionAsScalaIterable
   }
 
+  def pickedPoint(mousePos: Point, viewport: Rectangle, eyeZ: Float, zNear: Float, zFar: Float): Vector3 = {
+    val scaledMousePos = mousePos * GuiUtils.scaledResolution.getScaleFactor
+    val eyeZInverse = 1F / eyeZ
+    ZBuffer.rewind()
+    GL11.glReadPixels(scaledMousePos.x, mc.displayHeight - scaledMousePos.y, 1, 1, GL11.GL_DEPTH_COMPONENT, GL11.GL_FLOAT, ZBuffer)
+    val mouseZ = ZBuffer.get()
+    val m33 = -(1 - zFar / eyeZInverse) / (zNear - zFar)
+    val viewZ = (mouseZ + m33 * zNear) / (mouseZ * eyeZInverse + m33)
+    val hWidth = viewport.width / 2 * GuiUtils.scaledResolution.getScaleFactor
+    val hHeight = viewport.width / 2 * GuiUtils.scaledResolution.getScaleFactor
+    val pixelToViewRatio = hWidth * 2 / mc.displayWidth
+
+    val viewX = scaledMousePos.x * pixelToViewRatio - hWidth
+    val viewY = -(scaledMousePos.y * pixelToViewRatio - hHeight)
+
+    val viewXProjected = viewX - viewX * viewZ * eyeZInverse
+    val viewYProjected = viewY - viewX * viewZ * eyeZInverse
+
+    Vector3(viewXProjected, viewYProjected, viewZ)
+  }
+
   private val particlesField = ReflectionHelper.findField(classOf[EffectRenderer], "fxLayers", "field_78876_b")
   private val timerField = ReflectionHelper.findField(classOf[Minecraft], "timer", "field_71428_T")
   private final val MatrixBuffer = GLAllocation.createDirectFloatBuffer(16)
+  private final val ZBuffer = GLAllocation.createDirectFloatBuffer(16)
 }

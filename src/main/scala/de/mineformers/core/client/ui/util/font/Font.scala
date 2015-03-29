@@ -8,6 +8,8 @@ import de.mineformers.core.util.math.shape2d.Size
  * @author PaleoCrafter
  */
 trait Font {
+  def withColor(color: Int): Font
+
   def color: Int
 
   def draw(text: String, x: Int, y: Int): Unit = draw(text, x, y, 0, color)

@@ -53,8 +53,8 @@ minecraft {
     } else {
         runDir = "eclipse"
     }
-    version = "1.8-11.14.0.1281-1.8"
-	mappings = "snapshot_20141231"
+    version = "1.8-11.14.1.1344"
+	mappings = "snapshot_20150329"
 }
 
 configurations {
@@ -63,6 +63,7 @@ configurations {
 
 //Include provided for compilation
 sourceSets.main.compileClasspath += configurations.provided
+sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
 
 dependencies {
     provided 'com.nativelibs4java:scalaxy-loops_2.11:0.1.1'

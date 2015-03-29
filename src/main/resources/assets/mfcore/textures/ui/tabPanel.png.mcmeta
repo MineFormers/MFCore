@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "tabbedPanel",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "tabbedPanel",
+    "type": "dynamic"
+  }
 }

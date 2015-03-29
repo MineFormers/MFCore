@@ -1,6 +1,6 @@
 package de.mineformers.core.client.ui.skin
 
-import de.mineformers.core.client.ui.component.View
+import de.mineformers.core.client.ui.view.View
 
 /**
  * SkinSelector
@@ -27,16 +27,16 @@ case class SkinSelector(query: String) {
 
   private var properties: Map[String, Any] = null
 
-  def priority(component: View) = {
+  def priority(view: View) = {
     if(properties != null) {
-      properties.foldLeft(0)((acc, s) => acc + component.state.propertyPriority(s._1))
+      properties.foldLeft(0)((acc, s) => acc + view.state.propertyPriority(s._1))
     } else 0
   }
 
-  def initProperties(component: View): Unit = {
+  def initProperties(view: View): Unit = {
     if (properties == null && rawProperties != null) {
       properties = Map.empty[String, Any]
-      val props = component.state.properties.keySet
+      val props = view.state.properties.keySet
       props foreach { p =>
         if (rawProperties.contains(p.name)) {
           val value = p.parse(rawProperties(p.name))
@@ -47,11 +47,11 @@ case class SkinSelector(query: String) {
     }
   }
 
-  def matches(component: View): Boolean = {
+  def matches(view: View): Boolean = {
     if (rawProperties == null)
       true
     else {
-      properties.forall(p => component.state.byName(p._1).orNull == p._2)
+      properties.forall(p => view.state.byName(p._1).orNull == p._2)
     }
   }
 

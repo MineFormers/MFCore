@@ -21,37 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.interaction
+package de.mineformers.core.client.ui.view
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{View, TextView}
-import de.mineformers.core.client.ui.state.ComponentState
-import de.mineformers.core.client.ui.util.ComponentEvent.{ButtonPressed, ComponentClicked}
-import de.mineformers.core.client.ui.util.MouseButton
-import de.mineformers.core.client.ui.util.font.{Font, MCFont}
-import net.minecraft.client.audio.PositionedSoundRecord
-import net.minecraft.util.ResourceLocation
+import de.mineformers.core.util.math.shape2d.Point
+import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.util.font.Font
+import org.lwjgl.opengl.GL11
 
 /**
- * Button
+ * TextView
  *
  * @author PaleoCrafter
  */
-class Button(var text: String, initSize: Size = Size(50, 20)) extends View with TextView {
-  this.size = initSize
+trait TextView extends View {
+  def font: Font
 
-  globalReactions += {
-    case ComponentClicked(c, pos, button) =>
-      if (button == MouseButton.Left && (c eq this)) {
-        mc.getSoundHandler.playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F))
-        publish(ButtonPressed(this))
-      }
+  def font_=(font: Font): Unit
+
+  def text: String
+
+  def text_=(text: String): Unit
+
+  def textOff: Point = Point(0, 0)
+
+  override var skin: Skin = new TextSkin
+
+  abstract override def defaultState(state: ViewState): Unit = super.defaultState(state.set(Property.Text, ""))
+
+  class TextSkin extends Skin {
+    def drawForeground(mousePos: Point): Unit = {
+      GL11.glColor4f(1, 1, 1, 1)
+      font.draw(text, view.screen.x + textOff.x, view.screen.y + textOff.y, view.zIndex, font.color)
+      GL11.glColor4f(1, 1, 1, 1)
+    }
   }
 
-  override def update(mousePos: Point): Unit = {
-  }
-
-  override def textOff: Point = bounds.centerInSize(font.size(text))
-
-  var font: Font = MCFont.DefaultShadow
 }

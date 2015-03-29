@@ -65,6 +65,12 @@ object GuiUtils {
     scaleFactor
   }
 
+  def customScale(size: Size, scale: Int): Size = {
+    val res = scaledResolution
+    val scaled = Size(size.width / res.getScaleFactor, size.height / res.getScaleFactor)
+    Size(scaled.width * scale, size.width * scale)
+  }
+
   def scaledResolution: ScaledResolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight)
 
   def scaledWidth(width: Int): Int = width / scaledResolution.getScaleFactor

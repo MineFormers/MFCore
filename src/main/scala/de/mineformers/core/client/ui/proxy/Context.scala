@@ -23,10 +23,11 @@
  */
 package de.mineformers.core.client.ui.proxy
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{View, Focus}
 import de.mineformers.core.client.ui.util.Positioned
-import de.mineformers.core.reaction.{GlobalPublisher, Event, Publisher}
+import de.mineformers.core.client.ui.view.container.{DebugWindow, Frame}
+import de.mineformers.core.client.ui.view.{Focus, View}
+import de.mineformers.core.reaction.{Event, GlobalPublisher}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 
 /**
  * Context
@@ -34,6 +35,8 @@ import de.mineformers.core.reaction.{GlobalPublisher, Event, Publisher}
  * @author PaleoCrafter
  */
 trait Context extends GlobalPublisher {
+  final val debug = true
+  protected var frames: Seq[Frame] = if (debug) Seq(new DebugWindow) else Seq()
   var attached: View = _
   var focused: Focus = _
 
@@ -41,17 +44,26 @@ trait Context extends GlobalPublisher {
 
   def size: Size
 
-  def findAffectedComponent(mousePos: Point): View = findComponent(mousePos, c => c.hovered(mousePos) && c.visible && c.enabled)
+  def findAffectedView(mousePos: Point): View = findView(mousePos, c => c.hovered(mousePos) && c.visible && c.enabled)
 
-  def findHoveredComponent(mousePos: Point): View = findComponent(mousePos, c => c.hovered(mousePos))
+  def findHoveredView(mousePos: Point): View = findView(mousePos, c => c.hovered(mousePos))
 
-  def findComponent(mousePos: Point, predicate: View => Boolean): View
+  def findView(mousePos: Point, predicate: View => Boolean): View
+
+  def canReceiveEvent(view: View, event: Event): Boolean
+
+  def addFrames(frames: Frame*): Unit = {
+    if(debug)
+      this.frames = this.frames.dropRight(1) ++ frames ++ Seq(this.frames.last)
+    else
+      this.frames ++= frames
+  }
 
   override def publish(e: Event): Unit = {
     e match {
       case p: Positioned =>
-        val reactor = findAffectedComponent(p.pos)
-        if (reactor != null)
+        val reactor = findAffectedView(p.pos)
+        if (reactor != null && canReceiveEvent(reactor, e))
           reactor.reactions(p)
       case _ =>
     }

@@ -21,16 +21,16 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.container
+package de.mineformers.core.client.ui.view.container
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.View
-import de.mineformers.core.client.ui.component.container.Panel.Padding
-import de.mineformers.core.client.ui.component.interaction.ScrollBar
-import de.mineformers.core.client.ui.component.interaction.ScrollBar.Orientation
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.util.MouseEvent
+import de.mineformers.core.client.ui.view.View
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.interaction.ScrollBar
+import de.mineformers.core.client.ui.view.interaction.ScrollBar.Orientation
 import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 import net.minecraft.client.gui.GuiScreen
 import org.lwjgl.opengl.GL11
 
@@ -47,9 +47,9 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
 
   reactions += {
     case e: MouseEvent.Scroll =>
-      if(scrollBarHorizontal.enabled && scrollHorizontal && (GuiScreen.isCtrlKeyDown || !scrollVertical))
+      if (scrollBarHorizontal.enabled && scrollHorizontal && (GuiScreen.isCtrlKeyDown || !scrollVertical))
         scrollBarHorizontal.scroll(e.direction)
-      if(scrollBarVertical.enabled && scrollVertical && (!GuiScreen.isCtrlKeyDown || !scrollHorizontal))
+      if (scrollBarVertical.enabled && scrollVertical && (!GuiScreen.isCtrlKeyDown || !scrollHorizontal))
         scrollBarVertical.scroll(e.direction)
   }
 
@@ -70,8 +70,8 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
     scrollBarVertical.screen = screen + scrollBarVertical.position
   }
 
-  override def findComponent(mousePos: Point, predicate: View => Boolean): View = {
-    var result = super.findComponent(mousePos, predicate)
+  override def findView(mousePos: Point, predicate: View => Boolean): View = {
+    var result = super.findView(mousePos, predicate)
     if (result eq this) {
       if (predicate(scrollBarHorizontal))
         result = scrollBarHorizontal
@@ -85,6 +85,8 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
     super.onParentResized(newSize, oldSize, delta)
     resetScrollBars()
   }
+
+  override def contains(view: View): Boolean = super.contains(view) || (view eq scrollBarHorizontal) || (view eq scrollBarVertical)
 
   override def update(mousePos: Point): Unit = {
     scrollBarHorizontal.screen = screen + scrollBarHorizontal.position
@@ -138,8 +140,8 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
     scrollBarVertical.init(channel, context)
   }
 
-  private[component] var scrollBarHorizontal = new ScrollBar(size.width - (if (scrollVertical) 16 else 2), Orientation.Horizontal)
-  private[component] var scrollBarVertical = new ScrollBar(size.height - (if (scrollHorizontal) 16 else 2), Orientation.Vertical)
+  private[view] var scrollBarHorizontal = new ScrollBar(size.width - (if (scrollVertical) 16 else 2), Orientation.Horizontal)
+  private[view] var scrollBarVertical = new ScrollBar(size.height - (if (scrollHorizontal) 16 else 2), Orientation.Vertical)
   private var channel: GlobalPublisher = _
 
   class ScrollPanelSkin extends PanelSkin {

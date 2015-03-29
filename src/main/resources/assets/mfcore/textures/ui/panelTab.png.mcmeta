@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "tab[type=panel]",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "tab[type=panel]",
+    "type": "dynamic"
+  }
 }

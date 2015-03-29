@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "tooltip",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "tooltip",
+    "type": "dynamic"
+  }
 }

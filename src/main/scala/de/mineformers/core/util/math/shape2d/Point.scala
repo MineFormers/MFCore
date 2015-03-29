@@ -172,7 +172,7 @@ class Point private(p: Coordinates) {
     false
   }
 
-  override def toString = "( " + x + ", " + y + " )"
+  override def toString = "(" + x + ", " + y + ")"
 
   def >(o: Point): Boolean = xGreater(o)
 

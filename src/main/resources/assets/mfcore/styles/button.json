@@ -1,14 +1,14 @@
 {
-    "[]": {
-        "texture": {
-            "resource": "mfcore:button",
-            "type": "dynamic"
-        }
-    },
-    "[disabled]": {
-        "texture": {
-            "resource": "mfcore:button_disabled",
-            "type": "dynamic"
-        }
+  "[]": {
+    "texture": {
+      "resource": "mfcore:button",
+      "type": "dynamic"
     }
+  },
+  "[disabled]": {
+    "texture": {
+      "resource": "mfcore:button_disabled",
+      "type": "dynamic"
+    }
+  }
 }

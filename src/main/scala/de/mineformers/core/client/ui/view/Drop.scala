@@ -1,4 +1,4 @@
-package de.mineformers.core.client.ui.component
+package de.mineformers.core.client.ui.view
 
 import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle}

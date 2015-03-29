@@ -21,11 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package de.mineformers.core.client.ui.component.decoration
+package de.mineformers.core.client.ui.view.decoration
 
 import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.component.{View, TextView}
-import de.mineformers.core.client.ui.state.ComponentState
+import de.mineformers.core.client.ui.view.{View, TextView}
+import de.mineformers.core.client.ui.state.ViewState
 import de.mineformers.core.client.ui.util.font.{Font, MCFont}
 
 /**

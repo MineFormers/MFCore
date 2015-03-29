@@ -1,6 +1,6 @@
 {
-    "gui": {
-        "target": "frame",
-        "type": "dynamic"
-    }
+  "gui": {
+    "target": "frame",
+    "type": "dynamic"
+  }
 }
