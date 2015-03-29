@@ -126,8 +126,8 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
   def texture: String = _texture
 
   def resource = _resource
-  
-  override def setCommandStat(`type`: Type, amount: Int): Unit = super.setCommandStat(`type`, amount)
+
+  override def setCommandStat(`type`: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, `type`, amount)
 
   var scale: Float = 0
   private val _resource = new ResourceLocation(texture)

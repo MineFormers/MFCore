@@ -131,7 +131,7 @@ class WorldSnapshotView(val snapshot: WorldSnapshot, size0: Size) extends View w
 
     override def readEntityFromNBT(tagCompound: NBTTagCompound): Unit = ()
 
-    override def setCommandStat(`type`: Type, amount: Int): Unit = super.setCommandStat(`type`, amount)
+    override def setCommandStat(`type`: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, `type`, amount)
   }
 
 }
