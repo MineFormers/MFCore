@@ -13,6 +13,7 @@ import de.mineformers.core.util.world.RichWorld
 import de.mineformers.core.util.world.snapshot.WorldSnapshot
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.command.CommandResultStats.Type
+import net.minecraft.command.ICommandSender
 import net.minecraft.entity.Entity
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.MathHelper
@@ -114,7 +115,7 @@ class WorldSnapshotView(val snapshot: WorldSnapshot, size0: Size) extends View w
     }
   }
 
-  class CameraEntity extends Entity(snapshot) {
+  class CameraEntity extends Entity(snapshot) with ICommandSender {
     val camera = new Camera(null, null, null)
 
     def updateCamera(viewport: Rectangle): Boolean = {
@@ -131,7 +132,7 @@ class WorldSnapshotView(val snapshot: WorldSnapshot, size0: Size) extends View w
 
     override def readEntityFromNBT(tagCompound: NBTTagCompound): Unit = ()
 
-    override def setCommandStat(`type`: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, `type`, amount)
+    override def setCommandStat(tpe: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, tpe, amount)
   }
 
 }

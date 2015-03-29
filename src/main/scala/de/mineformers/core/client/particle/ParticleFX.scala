@@ -31,6 +31,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
 import net.minecraft.client.renderer.{Tessellator, WorldRenderer}
 import net.minecraft.command.CommandResultStats.Type
+import net.minecraft.command.ICommandSender
 import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
@@ -40,7 +41,7 @@ import net.minecraft.world.World
  *
  * @author PaleoCrafter
  */
-class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val lifespan: Int, _texture: String) extends EntityFX(world, startPos.x, startPos.y, startPos.z) {
+class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val lifespan: Int, _texture: String) extends EntityFX(world, startPos.x, startPos.y, startPos.z) with ICommandSender {
   this.motionX = 0
   this.motionY = 0
   this.motionZ = 0
@@ -127,7 +128,7 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
 
   def resource = _resource
 
-  override def setCommandStat(`type`: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, `type`, amount)
+  override def setCommandStat(tpe: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, tpe, amount)
 
   var scale: Float = 0
   private val _resource = new ResourceLocation(texture)
