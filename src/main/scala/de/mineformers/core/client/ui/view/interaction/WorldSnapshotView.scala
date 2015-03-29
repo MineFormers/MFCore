@@ -12,6 +12,7 @@ import de.mineformers.core.util.math.{Camera, Vector3}
 import de.mineformers.core.util.world.RichWorld
 import de.mineformers.core.util.world.snapshot.WorldSnapshot
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.command.CommandResultStats.Type
 import net.minecraft.entity.Entity
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.MathHelper
@@ -129,6 +130,8 @@ class WorldSnapshotView(val snapshot: WorldSnapshot, size0: Size) extends View w
     override def writeEntityToNBT(tagCompound: NBTTagCompound): Unit = ()
 
     override def readEntityFromNBT(tagCompound: NBTTagCompound): Unit = ()
+
+    override def setCommandStat(`type`: Type, amount: Int): Unit = super.setCommandStat(`type`, amount)
   }
 
 }

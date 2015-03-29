@@ -30,6 +30,7 @@ import de.mineformers.core.util.math.Vector3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
 import net.minecraft.client.renderer.{Tessellator, WorldRenderer}
+import net.minecraft.command.CommandResultStats.Type
 import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World
@@ -125,6 +126,8 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
   def texture: String = _texture
 
   def resource = _resource
+  
+  override def setCommandStat(`type`: Type, amount: Int): Unit = super.setCommandStat(`type`, amount)
 
   var scale: Float = 0
   private val _resource = new ResourceLocation(texture)
