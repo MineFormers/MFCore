@@ -45,7 +45,6 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
   this.motionX = 0
   this.motionY = 0
   this.motionZ = 0
-  this.scale = 1
 
   override def onUpdate(): Unit = {
     updater.update(this)
@@ -128,9 +127,7 @@ class ParticleFX(world: World, startPos: Vector3, updater: ParticleUpdater, val 
 
   def resource = _resource
 
-  override def setCommandStat(tpe: Type, amount: Int): Unit = getCommandStats.func_179672_a(this, tpe, amount)
-
-  var scale: Float = 0
+  var scale: Float = 1
   private val _resource = new ResourceLocation(texture)
   private var color: Int = 0
 }
