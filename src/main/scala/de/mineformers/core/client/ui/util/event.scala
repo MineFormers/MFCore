@@ -23,11 +23,11 @@
  */
 package de.mineformers.core.client.ui.util
 
-import de.mineformers.core.util.math.shape2d.Point
+import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.client.ui.view.View
 import de.mineformers.core.client.ui.view.interaction.Button
-import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.reaction.Event
+import de.mineformers.core.util.math.shape2d.Point
 
 trait Positioned extends Event {
   private[util] val p: Point

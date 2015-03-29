@@ -23,14 +23,14 @@
  */
 package de.mineformers.core.client.ui.view.decoration
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.view.container.Panel.Padding
-import de.mineformers.core.client.ui.view.{View, TextView}
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.util.Shadow
 import de.mineformers.core.client.ui.util.font.{Font, MCFont}
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.{TextView, View}
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 
 /**
  * Label

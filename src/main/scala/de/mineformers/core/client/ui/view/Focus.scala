@@ -23,7 +23,7 @@
  */
 package de.mineformers.core.client.ui.view
 
-import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.state.{Property, ViewState}
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 
 /**

@@ -23,10 +23,9 @@
  */
 package de.mineformers.core.client.ui.view.decoration
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.view.{View, TextView}
-import de.mineformers.core.client.ui.state.ViewState
 import de.mineformers.core.client.ui.util.font.{Font, MCFont}
+import de.mineformers.core.client.ui.view.{TextView, View}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 
 /**
  * Tooltip

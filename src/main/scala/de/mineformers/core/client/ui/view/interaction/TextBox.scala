@@ -25,14 +25,14 @@ package de.mineformers.core.client.ui.view.interaction
 
 import java.text.DecimalFormat
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
-import de.mineformers.core.client.ui.view.{View, Focus, TextView}
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.state.{Property, ViewState}
 import de.mineformers.core.client.ui.util.ViewEvent.ValueChanged
 import de.mineformers.core.client.ui.util._
 import de.mineformers.core.client.ui.util.font.{Font, MCFont}
+import de.mineformers.core.client.ui.view.{Focus, TextView, View}
 import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.util.ChatAllowedCharacters
 import org.lwjgl.opengl.GL11

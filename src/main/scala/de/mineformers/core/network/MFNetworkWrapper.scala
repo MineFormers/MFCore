@@ -29,8 +29,8 @@ import de.mineformers.core.util.Log
 import io.netty.channel.{ChannelFutureListener, ChannelHandlerContext, SimpleChannelInboundHandler}
 import net.minecraft.entity.player.EntityPlayerMP
 import net.minecraft.network.{INetHandler, Packet}
-import net.minecraftforge.fml.common.network.{NetworkRegistry, FMLOutboundHandler}
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleIndexedCodec
+import net.minecraftforge.fml.common.network.{FMLOutboundHandler, NetworkRegistry}
 import net.minecraftforge.fml.relauncher.Side
 import org.apache.logging.log4j.Level
 

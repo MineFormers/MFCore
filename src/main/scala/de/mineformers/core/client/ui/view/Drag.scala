@@ -1,9 +1,8 @@
 package de.mineformers.core.client.ui.view
 
-import de.mineformers.core.client.ui.util.MouseButton
 import de.mineformers.core.client.ui.util.MouseButton.MouseButton
+import de.mineformers.core.client.ui.util.MouseEvent
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle}
-import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 
 import scala.collection.mutable
 

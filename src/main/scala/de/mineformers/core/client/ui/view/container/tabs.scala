@@ -23,20 +23,20 @@
  */
 package de.mineformers.core.client.ui.view.container
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.layout.StackLayout
+import de.mineformers.core.client.ui.proxy.Context
+import de.mineformers.core.client.ui.skin.drawable.Drawable
+import de.mineformers.core.client.ui.state.{BooleanProperty, Property, StringProperty, ViewState}
+import de.mineformers.core.client.ui.util.SimpleShadow
+import de.mineformers.core.client.ui.util.ViewEvent.ViewClicked
 import de.mineformers.core.client.ui.view.View
 import de.mineformers.core.client.ui.view.container.Panel.Padding
 import de.mineformers.core.client.ui.view.container.Tab.Orientation
 import de.mineformers.core.client.ui.view.container.Tab.Orientation.Orientation
 import de.mineformers.core.client.ui.view.decoration.Label
-import de.mineformers.core.client.ui.layout.StackLayout
-import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.skin.drawable.Drawable
-import de.mineformers.core.client.ui.state.{Property, BooleanProperty, ViewState, StringProperty}
-import de.mineformers.core.client.ui.util.ViewEvent.ViewClicked
-import de.mineformers.core.client.ui.util.SimpleShadow
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 
 import scala.collection.mutable
 

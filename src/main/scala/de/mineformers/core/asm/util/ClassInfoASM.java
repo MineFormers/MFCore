@@ -1,11 +1,7 @@
 package de.mineformers.core.asm.util;
 
-import com.google.common.collect.ImmutableList;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.MethodNode;
-import sun.management.MethodInfo;
-import sun.reflect.FieldInfo;
 
 import java.util.List;
 

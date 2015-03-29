@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.client.ui.skin.drawable
 
-import de.mineformers.core.util.math.shape2d.Size
 import de.mineformers.core.util.ResourceUtils.Resource
+import de.mineformers.core.util.math.shape2d.Size
 
 /**
  * DrawableTexture

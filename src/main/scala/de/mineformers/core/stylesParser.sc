@@ -1,6 +1,7 @@
 import de.mineformers.core.client.ui.view.container.Panel.Padding
 import de.mineformers.core.client.util.Color
 import de.mineformers.core.util.ResourceUtils.Resource
+
 import scala.collection.mutable
 import scala.util.parsing.combinator.JavaTokenParsers
 val input =

@@ -3,10 +3,7 @@ package de.mineformers.core.asm.util;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.objectweb.asm.Type;
-import sun.management.MethodInfo;
-import sun.reflect.FieldInfo;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 /**

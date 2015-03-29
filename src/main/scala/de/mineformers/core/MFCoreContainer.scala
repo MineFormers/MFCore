@@ -35,7 +35,7 @@ import de.mineformers.core.registry.{SharedBlockRegistry, SharedItemRegistry}
 import de.mineformers.core.tileentity.Describable
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.Minecraft
-import net.minecraft.client.resources.{I18n, SimpleReloadableResourceManager}
+import net.minecraft.client.resources.SimpleReloadableResourceManager
 import net.minecraft.profiler.Profiler
 import net.minecraftforge.fml.client.{FMLFileResourcePack, FMLFolderResourcePack}
 import net.minecraftforge.fml.common.event.{FMLInitializationEvent, FMLPreInitializationEvent}

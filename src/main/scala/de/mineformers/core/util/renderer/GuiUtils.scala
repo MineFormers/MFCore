@@ -26,10 +26,10 @@ package de.mineformers.core.util.renderer
 import java.io.IOException
 import javax.imageio.ImageIO
 
-import de.mineformers.core.util.math.shape2d.{Rectangle, Size}
 import de.mineformers.core.client.ui.util.font.MCFont
 import de.mineformers.core.client.util.RenderUtils._
 import de.mineformers.core.util.ResourceUtils.Resource
+import de.mineformers.core.util.math.shape2d.{Rectangle, Size}
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.{GlStateManager, OpenGlHelper, RenderHelper, Tessellator}

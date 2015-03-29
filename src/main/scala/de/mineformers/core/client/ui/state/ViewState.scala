@@ -1,6 +1,6 @@
 package de.mineformers.core.client.ui.state
 
-import de.mineformers.core.util.collection.{MutableHMap, HMap}
+import de.mineformers.core.util.collection.{HMap, MutableHMap}
 
 /**
  * ViewState

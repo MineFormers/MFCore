@@ -24,10 +24,10 @@
 package de.mineformers.core.client.ui.skin.drawable
 
 import com.google.gson.JsonObject
-import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.client.ui.skin.DrawableDeserializer
 import de.mineformers.core.client.util.RenderUtils
 import de.mineformers.core.util.ResourceUtils.Resource
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 
 /**
  * StaticTexture

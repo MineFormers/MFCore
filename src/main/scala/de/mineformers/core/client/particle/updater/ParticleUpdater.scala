@@ -26,7 +26,7 @@ package de.mineformers.core.client.particle.updater
 import de.mineformers.core.client.particle.ParticleFX
 import de.mineformers.core.client.util.RenderUtils
 import net.minecraft.client.particle.EntityFX
-import net.minecraft.client.renderer.{WorldRenderer, Tessellator}
+import net.minecraft.client.renderer.{Tessellator, WorldRenderer}
 import org.lwjgl.opengl.GL11
 
 /**

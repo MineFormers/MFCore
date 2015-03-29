@@ -25,9 +25,9 @@ package de.mineformers.core.client.ui.proxy
 
 import de.mineformers.core.client.ui.util.{KeyEvent, MouseEvent}
 import de.mineformers.core.client.ui.view.View
-import de.mineformers.core.client.ui.view.container.{DebugWindow, Frame}
+import de.mineformers.core.client.ui.view.container.Frame
 import de.mineformers.core.client.ui.view.decoration.Tooltip
-import de.mineformers.core.reaction.{Listener, Event}
+import de.mineformers.core.reaction.{Event, Listener}
 import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.gui.GuiScreen

@@ -23,13 +23,12 @@
  */
 package de.mineformers.core.client.ui.view.interaction
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.util.ViewEvent.{ButtonPressed, ValueChanged}
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.client.ui.view.container.Panel
 import de.mineformers.core.client.ui.view.container.Panel.Padding
 import de.mineformers.core.client.ui.view.interaction.NavigationButton.Orientation
-import de.mineformers.core.client.ui.util.ViewEvent.{ButtonPressed, ValueChanged}
-import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
-import org.lwjgl.input.Mouse
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 
 /**
  * NumberSpinner

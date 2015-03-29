@@ -1,7 +1,7 @@
 package de.mineformers.core.item
 
-import de.mineformers.core.util.world.snapshot.WorldSnapshot
 import de.mineformers.core.util.Implicits.VBlockPos
+import de.mineformers.core.util.world.snapshot.WorldSnapshot
 import de.mineformers.core.util.world.{BlockCuboid, BlockPos}
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.player.EntityPlayer

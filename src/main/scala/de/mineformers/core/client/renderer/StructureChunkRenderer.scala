@@ -8,7 +8,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.texture.TextureMap
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher
 import net.minecraft.client.renderer.{OpenGlHelper, Tessellator}
-import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.ForgeHooksClient
 import org.lwjgl.opengl.GL11

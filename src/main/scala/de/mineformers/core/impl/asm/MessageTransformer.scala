@@ -24,9 +24,9 @@
 package de.mineformers.core.impl.asm
 
 import de.mineformers.core.asm.transformer.ClassTransformer
+import de.mineformers.core.asm.util.ClassInfo
 import de.mineformers.core.asm.util.Hierarchy.Conversions._
 import de.mineformers.core.asm.util.Hierarchy.{Field, Method}
-import de.mineformers.core.asm.util.{ClassInfo, Hierarchy, Instruction}
 import de.mineformers.core.asm.util.Instruction._
 import de.mineformers.core.network.Message
 import org.objectweb.asm.Opcodes._

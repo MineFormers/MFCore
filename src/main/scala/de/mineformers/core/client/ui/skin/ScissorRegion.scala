@@ -23,8 +23,8 @@
  */
 package de.mineformers.core.client.ui.skin
 
-import de.mineformers.core.util.math.shape2d.Rectangle
 import de.mineformers.core.client.util.RenderUtils
+import de.mineformers.core.util.math.shape2d.Rectangle
 import de.mineformers.core.util.renderer.GuiUtils
 import org.lwjgl.opengl.GL11._
 

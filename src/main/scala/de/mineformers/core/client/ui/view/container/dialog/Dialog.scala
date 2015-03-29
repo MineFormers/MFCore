@@ -8,7 +8,6 @@ import de.mineformers.core.client.ui.view.container.dialog.Dialog.{Buttons, Dial
 import de.mineformers.core.client.ui.view.container.{Frame, Panel}
 import de.mineformers.core.client.ui.view.interaction.Button
 import de.mineformers.core.util.math.shape2d.Size
-import net.minecraft.world.World
 
 /**
  * Dialog

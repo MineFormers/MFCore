@@ -3,10 +3,7 @@ package de.mineformers.core.block
 import de.mineformers.core.client.ui.util.ViewEvent.ButtonPressed
 import de.mineformers.core.client.ui.view.container.dialog.Dialog
 import de.mineformers.core.client.ui.view.container.{Frame, Panel, ScrollPanel, TabbedPanel}
-import de.mineformers.core.client.ui.view.decoration.Label
-import de.mineformers.core.client.ui.view.interaction.{Button, NumberSpinner, WorldSnapshotView}
-import de.mineformers.core.client.ui.util.font.MCFont
-import de.mineformers.core.client.util.RenderUtils
+import de.mineformers.core.client.ui.view.interaction.{Button, NumberSpinner}
 import de.mineformers.core.reaction.Listener
 import de.mineformers.core.util.Implicits.VBlockPos
 import de.mineformers.core.util.math.shape2d.{Point, Size}
@@ -18,7 +15,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraft.util
 import net.minecraft.util.{EnumFacing, EnumWorldBlockLayer}

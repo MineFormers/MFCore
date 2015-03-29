@@ -23,9 +23,9 @@
  */
 package de.mineformers.core.client.ui.layout
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.client.ui.view.View
 import de.mineformers.core.client.ui.view.container.Panel
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 
 import scala.collection.mutable
 

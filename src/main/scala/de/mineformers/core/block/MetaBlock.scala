@@ -30,7 +30,7 @@ import net.minecraft.creativetab.CreativeTabs
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.{Item, ItemStack}
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{EnumFacing, MovingObjectPosition, BlockPos => VBlockPos}
+import net.minecraft.util.{BlockPos => VBlockPos, EnumFacing, MovingObjectPosition}
 import net.minecraft.world.World
 
 /**

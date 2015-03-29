@@ -23,9 +23,9 @@
  */
 package de.mineformers.core.client.ui.view.interaction
 
-import de.mineformers.core.util.math.shape2d.Size
+import de.mineformers.core.client.ui.state.{StringProperty, ViewState}
 import de.mineformers.core.client.ui.view.interaction.NavigationButton.Orientation.Orientation
-import de.mineformers.core.client.ui.state.{ViewState, StringProperty}
+import de.mineformers.core.util.math.shape2d.Size
 
 /**
  * NavigationButton

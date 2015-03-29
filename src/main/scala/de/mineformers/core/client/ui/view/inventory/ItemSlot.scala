@@ -23,16 +23,14 @@
  */
 package de.mineformers.core.client.ui.view.inventory
 
-import de.mineformers.core.util.math.shape2d.{Point, Size}
+import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
 import de.mineformers.core.client.ui.view.View
 import de.mineformers.core.client.ui.view.container.Panel
 import de.mineformers.core.client.ui.view.container.Panel.Padding
-import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
+import de.mineformers.core.util.math.shape2d.{Point, Size}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumChatFormatting
-import org.lwjgl.opengl.GL11
-import org.lwjgl.util.glu.GLU
 
 /**
  * ItemStack

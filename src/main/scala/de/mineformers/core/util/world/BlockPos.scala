@@ -28,7 +28,7 @@ import java.lang.{Integer => JInt}
 import com.google.common.base.Objects
 import de.mineformers.core.util.math.Vector3
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraft.util.{AxisAlignedBB, Vec3, BlockPos => VBlockPos}
+import net.minecraft.util.{AxisAlignedBB, BlockPos => VBlockPos, Vec3}
 
 import scala.collection.mutable
 

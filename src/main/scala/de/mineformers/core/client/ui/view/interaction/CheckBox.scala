@@ -1,10 +1,10 @@
 package de.mineformers.core.client.ui.view.interaction
 
-import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
+import de.mineformers.core.client.ui.state.{BooleanProperty, Property, ViewState}
+import de.mineformers.core.client.ui.util.ViewEvent.{ValueChanged, ViewClicked}
 import de.mineformers.core.client.ui.view.View
 import de.mineformers.core.client.ui.view.decoration.Label
-import de.mineformers.core.client.ui.state.{BooleanProperty, ViewState, Property}
-import de.mineformers.core.client.ui.util.ViewEvent.{ViewClicked, ValueChanged}
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 
 /**
  * CheckBox

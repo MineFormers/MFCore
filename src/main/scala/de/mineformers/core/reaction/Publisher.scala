@@ -26,7 +26,7 @@ package de.mineformers.core.reaction
 import de.mineformers.core.reaction.Reactions.{Reaction, StronglyReferenced}
 
 import scala.collection.mutable
-import scala.ref.{ReferenceWrapper, ReferenceQueue, Reference}
+import scala.ref.{Reference, ReferenceQueue, ReferenceWrapper}
 
 /** <p>
   * Notifies registered reactions when an event is published. Publishers are

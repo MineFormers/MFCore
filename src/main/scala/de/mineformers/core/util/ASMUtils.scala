@@ -30,8 +30,6 @@ import org.objectweb.asm.Opcodes._
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree._
 
-import scala.util.control.Breaks
-
 /**
  * ASMUtil
  *

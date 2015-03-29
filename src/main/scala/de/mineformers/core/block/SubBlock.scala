@@ -28,7 +28,7 @@ import de.mineformers.core.util.world.BlockPos
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.tileentity.TileEntity
-import net.minecraft.util.{IStringSerializable, EnumFacing}
+import net.minecraft.util.{EnumFacing, IStringSerializable}
 import net.minecraft.world.World
 
 /**

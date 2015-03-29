@@ -23,14 +23,14 @@
  */
 package de.mineformers.core.client.ui.view.container
 
-import de.mineformers.core.client.ui.view.container.Frame.Anchor
-import de.mineformers.core.client.ui.view.container.Panel.Padding
-import de.mineformers.core.client.ui.view.interaction.FrameControl
-import de.mineformers.core.client.ui.view.{Drag, View}
 import de.mineformers.core.client.ui.proxy.{Context, UIScreen}
 import de.mineformers.core.client.ui.state.{BooleanProperty, ViewState}
 import de.mineformers.core.client.ui.util.MouseButton.MouseButton
 import de.mineformers.core.client.ui.util.font.MCFont
+import de.mineformers.core.client.ui.view.container.Frame.Anchor
+import de.mineformers.core.client.ui.view.container.Panel.Padding
+import de.mineformers.core.client.ui.view.interaction.FrameControl
+import de.mineformers.core.client.ui.view.{Drag, View}
 import de.mineformers.core.reaction.GlobalPublisher
 import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import net.minecraft.client.Minecraft

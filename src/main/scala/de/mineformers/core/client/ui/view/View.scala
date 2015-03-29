@@ -23,17 +23,15 @@
  */
 package de.mineformers.core.client.ui.view
 
-import javafx.scene.control.Skin
-
-import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
-import de.mineformers.core.client.ui.view.container.Panel
 import de.mineformers.core.client.ui.proxy.Context
 import de.mineformers.core.client.ui.skin.TextureManager
 import de.mineformers.core.client.ui.skin.drawable.StaticTexture
-import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.state.{Property, ViewState}
 import de.mineformers.core.client.ui.util.ViewEvent.ViewClicked
 import de.mineformers.core.client.ui.util.{MouseButton, MouseEvent}
-import de.mineformers.core.reaction.{GlobalPublisher, Publisher}
+import de.mineformers.core.client.ui.view.container.Panel
+import de.mineformers.core.reaction.GlobalPublisher
+import de.mineformers.core.util.math.shape2d.{Point, Rectangle, Size}
 import de.mineformers.core.util.renderer.GuiUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -49,7 +47,7 @@ abstract class View extends GlobalPublisher {
     this.state.set(Property.Name, name)
     listenTo(channel)
     this.context = context
-    maxSize = Size(if(maxSize.width == 0) context.size.width else maxSize.width, if(maxSize.height == 0) context.size.height else maxSize.height)
+    maxSize = Size(if (maxSize.width == 0) context.size.width else maxSize.width, if (maxSize.height == 0) context.size.height else maxSize.height)
   }
 
   reactions += {
@@ -81,7 +79,7 @@ abstract class View extends GlobalPublisher {
   }
 
   def onParentResized(newSize: Size, oldSize: Size, delta: Size): Unit = {
-    if(parent != null) {
+    if (parent != null) {
       val usable = parent.usableSize(this)
       if (maxSize.width == Integer.MAX_VALUE) {
         this.size = Size(usable.width, size.height)

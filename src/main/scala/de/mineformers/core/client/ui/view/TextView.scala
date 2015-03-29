@@ -23,9 +23,9 @@
  */
 package de.mineformers.core.client.ui.view
 
-import de.mineformers.core.util.math.shape2d.Point
-import de.mineformers.core.client.ui.state.{ViewState, Property}
+import de.mineformers.core.client.ui.state.{Property, ViewState}
 import de.mineformers.core.client.ui.util.font.Font
+import de.mineformers.core.util.math.shape2d.Point
 import org.lwjgl.opengl.GL11
 
 /**

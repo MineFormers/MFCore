@@ -29,7 +29,7 @@ import de.mineformers.core.client.particle.updater.ParticleUpdater
 import de.mineformers.core.util.math.Vector3
 import net.minecraft.client.Minecraft
 import net.minecraft.client.particle.{EffectRenderer, EntityFX}
-import net.minecraft.client.renderer.{WorldRenderer, Tessellator}
+import net.minecraft.client.renderer.{Tessellator, WorldRenderer}
 import net.minecraft.entity.Entity
 import net.minecraft.util.ResourceLocation
 import net.minecraft.world.World

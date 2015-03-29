@@ -19,7 +19,7 @@ package de.mineformers.core.client.ui.util.font
  */
 
 import java.awt.image.{BufferedImage, DataBuffer, DataBufferByte, DataBufferInt}
-import java.awt.{FontMetrics, Graphics2D, RenderingHints, Color => JColor, Font => JFont}
+import java.awt.{Color => JColor, Font => JFont, FontMetrics, Graphics2D, RenderingHints}
 import java.io.File
 import java.nio.{ByteBuffer, ByteOrder, IntBuffer}
 import javax.imageio.ImageIO

@@ -26,7 +26,7 @@
 package de.mineformers.core.asm.util
 
 import org.objectweb.asm.tree._
-import org.objectweb.asm.{Label, Opcodes, tree}
+import org.objectweb.asm.{Label, Opcodes}
 
 import scala.language.implicitConversions
 

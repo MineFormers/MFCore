@@ -7,7 +7,7 @@ import de.mineformers.core.util.world.{BlockCuboid, BlockPos}
 import net.minecraft.entity.EnumCreatureType
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.util.IProgressUpdate
-import net.minecraft.world.chunk.{EmptyChunk, Chunk, IChunkProvider}
+import net.minecraft.world.chunk.{Chunk, EmptyChunk, IChunkProvider}
 import net.minecraft.world.storage.{SaveHandlerMP, WorldInfo}
 import net.minecraft.world.{World, WorldProvider, WorldSettings, WorldType}
 

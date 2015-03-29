@@ -31,7 +31,7 @@ import net.minecraft.block.Block
 import net.minecraft.item.ItemBlock
 import net.minecraft.tileentity.TileEntity
 import net.minecraftforge.fml.common.registry.GameRegistry
-import net.minecraftforge.fml.common.{LoaderState, Loader}
+import net.minecraftforge.fml.common.{Loader, LoaderState}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 import scala.language.existentials
