@@ -56,7 +56,8 @@ abstract class View extends GlobalPublisher {
   }
 
   def updateState(mousePos: Point): Unit = {
-    state.set(Property.Hovered, context.findHoveredView(mousePos) eq this)
+    if (context != null)
+      state.set(Property.Hovered, context.findHoveredView(mousePos) eq this)
   }
 
   def update(mousePos: Point): Unit

@@ -64,6 +64,14 @@ case class Color(r: Float, g: Float, b: Float, a: Float) {
     i
   }
 
+  def rInt = (r * 255).toInt
+
+  def gInt = (g * 255).toInt
+
+  def bInt = (b * 255).toInt
+
+  def aInt = (a * 255).toInt
+
   def lighten(amount: Float) = {
     val hsv = java.awt.Color.RGBtoHSB((r * 255).toInt, (g * 255).toInt, (b * 255).toInt, null)
     Color.fromHSV(hsv(0), hsv(1), MathHelper.clamp_float(hsv(2) + amount, 0, 1), a)

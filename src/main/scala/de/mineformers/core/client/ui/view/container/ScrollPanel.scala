@@ -45,12 +45,14 @@ class ScrollPanel(_size: Size, private var _scrollHorizontal: Boolean = true, pr
   skin = new ScrollPanelSkin
   clip = true
 
-  reactions += {
+  globalReactions += {
     case e: MouseEvent.Scroll =>
-      if (scrollBarHorizontal.enabled && scrollHorizontal && (GuiScreen.isCtrlKeyDown || !scrollVertical))
-        scrollBarHorizontal.scroll(e.direction)
-      if (scrollBarVertical.enabled && scrollVertical && (!GuiScreen.isCtrlKeyDown || !scrollHorizontal))
-        scrollBarVertical.scroll(e.direction)
+      if(context.findAffectedView(e.p) == this || (hovered(e.p) && enabled && !context.findAffectedView(e.p).isInstanceOf[ScrollPanel])) {
+        if (scrollBarHorizontal.enabled && scrollHorizontal && (GuiScreen.isCtrlKeyDown || !scrollVertical))
+          scrollBarHorizontal.scroll(e.direction)
+        if (scrollBarVertical.enabled && scrollVertical && (!GuiScreen.isCtrlKeyDown || !scrollHorizontal))
+          scrollBarVertical.scroll(e.direction)
+      }
   }
 
   override def init(channel: GlobalPublisher, context: Context): Unit = {

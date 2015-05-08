@@ -2,7 +2,7 @@
   "gui": {
     "multi": [
       {
-        "target": "tab[type=frame,orientation=top]",
+        "target": "tab[type=frame,orientation=top,disabled]",
         "type": "static",
         "uv": {
           "start": [
@@ -16,7 +16,7 @@
         }
       },
       {
-        "target": "tab[type=frame,orientation=top,disabled]",
+        "target": "tab[type=frame,orientation=top]",
         "type": "static",
         "uv": {
           "start": [
@@ -30,7 +30,7 @@
         }
       },
       {
-        "target": "tab[type=frame,orientation=top,first]",
+        "target": "tab[type=frame,orientation=top,disabled,first]",
         "type": "static",
         "uv": {
           "start": [
@@ -44,7 +44,7 @@
         }
       },
       {
-        "target": "tab[type=frame,orientation=bottom]",
+        "target": "tab[type=frame,orientation=bottom,disabled]",
         "type": "static",
         "uv": {
           "start": [
@@ -58,7 +58,7 @@
         }
       },
       {
-        "target": "tab[type=frame,orientation=bottom,disabled]",
+        "target": "tab[type=frame,orientation=bottom]",
         "type": "static",
         "uv": {
           "start": [
@@ -72,7 +72,7 @@
         }
       },
       {
-        "target": "tab[type=frame,orientation=bottom,first]",
+        "target": "tab[type=frame,orientation=bottom,disabled,first]",
         "type": "static",
         "uv": {
           "start": [

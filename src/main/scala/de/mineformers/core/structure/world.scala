@@ -24,6 +24,7 @@
 package de.mineformers.core.structure
 
 import de.mineformers.core.client.renderer.StructureChunkRenderer
+import de.mineformers.core.structure.StructureWorld.WorldProviderStructure
 import de.mineformers.core.util.Implicits.VBlockPos
 import de.mineformers.core.util.world.BlockPos
 import net.minecraft.block.state.IBlockState
@@ -46,7 +47,8 @@ import scala.collection.mutable
  *
  * @author PaleoCrafter
  */
-class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) extends World(new SaveHandlerMP, new WorldInfo(StructureWorld.Settings, "Structure"), null, null, side.isClient) {
+class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) extends World(new SaveHandlerMP, new WorldInfo(StructureWorld.Settings, "Structure"), new WorldProviderStructure, de.mineformers.core.Proxy.profiler, side.isClient) {
+  provider.registerWorld(this)
   import scala.collection.JavaConversions._
   val structure = _structure.copy
   val tiles = mutable.HashMap.empty[BlockPos, TileEntity]
@@ -166,6 +168,12 @@ class StructureWorld(_structure: Structure, val pos: BlockPos, val side: Side) e
 
 object StructureWorld {
   private final val Settings = new WorldSettings(0, WorldSettings.GameType.CREATIVE, false, false, WorldType.FLAT)
+
+  class WorldProviderStructure extends WorldProvider {
+    override def getDimensionName: String = "Snapshot"
+
+    override def getInternalNameSuffix: String = "Snapshot"
+  }
 }
 
 trait StructureWorldAccess extends IWorldAccess {

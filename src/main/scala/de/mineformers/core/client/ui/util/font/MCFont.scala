@@ -67,7 +67,7 @@ class MCFont(name: String, val color: Int = 0xe0e0e0, val drawShadow: Boolean = 
     GL11.glDisable(GL12.GL_RESCALE_NORMAL)
     GL11.glTranslatef(0, 0, z)
     val rgba = Color(color)
-    //    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
+    GL11.glColor4f(rgba.r, rgba.g, rgba.b, rgba.a)
     var i = 0
     for (line <- text.split("\\n").mkString("<br>").split("<br>")) {
       renderer.drawString(line, x, y + i * (height + 1), color, drawShadow)

@@ -20,11 +20,11 @@ trait Font {
 
   def height: Int
 
-  def width(text: String): Int = width(text.split("\\n").mkString("\\\\n").split("\\\\n"): _*)
+  def width(text: String): Int = width(text.split("\\n").mkString("<br>").split("<br>"): _*)
 
   def width(lines: String*): Int
 
-  def height(text: String): Int = height(text.split("\\n").mkString("\\\\n").split("\\\\n"): _*)
+  def height(text: String): Int = height(text.split("\\n").mkString("<br>").split("<br>"): _*)
 
   def height(lines: String*): Int = (height + 1) * lines.length - 1
 

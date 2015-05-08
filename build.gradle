@@ -26,6 +26,7 @@ repositories {
 apply plugin: 'scala'
 apply plugin: 'forge'
 apply plugin: 'maven'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
@@ -39,7 +40,7 @@ ext {
 }
 
 if (System.getenv("BUILD_NUMBER") != null) {
-    if(System.getenv("BUILD_NUMBER").isInteger()) {
+    if (System.getenv("BUILD_NUMBER").isInteger()) {
         jarVersion = ".${System.getenv("BUILD_NUMBER")}"
     }
     displayVersion = System.getenv("BUILD_NUMBER")
@@ -53,8 +54,8 @@ minecraft {
     } else {
         runDir = "eclipse"
     }
-    version = "1.8-11.14.1.1344"
-	mappings = "snapshot_20150329"
+    version = "1.8-11.14.1.1354"
+    mappings = "snapshot_20150329"
 }
 
 configurations {
@@ -63,7 +64,7 @@ configurations {
 
 //Include provided for compilation
 sourceSets.main.compileClasspath += configurations.provided
-sourceSets.main.output.resourcesDir = sourceSets.main.output.classesDir
+idea.module.inheritOutputDirs = true
 
 dependencies {
     provided 'com.nativelibs4java:scalaxy-loops_2.11:0.1.1'
@@ -86,6 +87,18 @@ processResources {
     // copy everything else, thats not the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
         exclude 'mcmod.info', 'version.properties'
+    }
+}
+
+task copySrgs(type: Copy, dependsOn: "genSrgs") {
+    // using some FG hacks here
+    from plugins.getPlugin("forge").delayedFile("{SRG_DIR}")    
+    include '**/*.srg'
+    into 'build/srgs'
+
+    doLast {
+        def file = project.file('build/srgs/mcp-srg.srg')
+        file.text = file.text + "\n" + project.file("extraSrg.srg").text
     }
 }
 

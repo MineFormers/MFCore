@@ -27,6 +27,7 @@ import java.io.IOException
 import javax.imageio.ImageIO
 
 import de.mineformers.core.client.ui.util.font.MCFont
+import de.mineformers.core.client.util.Color
 import de.mineformers.core.client.util.RenderUtils._
 import de.mineformers.core.util.ResourceUtils.Resource
 import de.mineformers.core.util.math.shape2d.{Rectangle, Size}
@@ -38,7 +39,6 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11._
 import org.lwjgl.opengl.GL20._
-import org.lwjgl.util.Color
 
 /**
  * GuiUtils
@@ -83,10 +83,6 @@ object GuiUtils {
 
   def colorFromRGB(r: Int, g: Int, b: Int): Int = (0xFF0000 & (r << 16)) | (0x00FF00 & (g << 8)) | (0x0000FF & b)
 
-  def colorFromRGB(color: Color): Int = (0xFF0000 & (color.getRed << 16)) | (0x00FF00 & (color.getGreen << 8)) | (0x0000FF & color.getBlue)
-
-  def rgbFromColor(color: Int): Color = new Color((0xFF0000 & color) >> 16, (0x00FF00 & color) >> 8, 0x0000FF & color)
-
   def stringWidth(text: String): Int = mc.fontRendererObj.getStringWidth(text)
 
   def longestString(strings: String*): String = {
@@ -130,11 +126,10 @@ object GuiUtils {
   }
 
   def drawLine(color: Color, startX: Int, startY: Int, endX: Int, endY: Int, width: Float, zLevel: Int) {
-    val multiplier: Float = 1F / 255F
     glDisable(GL11.GL_TEXTURE_2D)
     glEnable(GL11.GL_BLEND)
     glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
-    glColor4f(multiplier * color.getRed, multiplier * color.getGreen, multiplier * color.getBlue, multiplier * color.getAlpha)
+    glColor4f(color.r, color.g, color.b, color.a)
     glLineWidth(width)
     glBegin(GL11.GL_LINES)
     glVertex3f(startX, startY, zLevel)
@@ -150,14 +145,13 @@ object GuiUtils {
   }
 
   def drawRectangle(color: Int, alpha: Float, x: Int, y: Int, z: Int, width: Int, height: Int) {
-    val rgb: Color = rgbFromColor(color)
-    rgb.setAlpha((alpha * 255).asInstanceOf[Int])
+    val rgb: Color = Color(color, alpha)
     drawRectangle(rgb, x, y, z, width, height)
   }
 
   def drawRectangle(color: Color, x: Int, y: Int, z: Int, width: Int, height: Int) {
     GL11.glDisable(GL11.GL_TEXTURE_2D)
-    GL11.glColor4f(color.getRed / 255F, color.getGreen / 255F, color.getBlue / 255F, color.getAlpha / 255F)
+    GL11.glColor4f(color.r, color.g, color.b, color.a)
     drawQuad(x, y, z, width, height, 0, 0, 1, 1)
     GL11.glColor4f(1F, 1F, 1F, 1F)
     GL11.glEnable(GL11.GL_TEXTURE_2D)

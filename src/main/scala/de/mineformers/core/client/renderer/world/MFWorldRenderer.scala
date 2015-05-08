@@ -38,7 +38,8 @@ object MFWorldRenderer {
       val oldEntity = RenderUtils.mc.getRenderViewEntity
       RenderUtils.mc.setRenderViewEntity(viewEntity)
       val i = Math.max(Minecraft.getDebugFPS, 30)
-      this.renderWorld(viewEntity, world, render.get.asInstanceOf[RenderWorld], RenderUtils.partialTicks, lastRender + 1000000000L / i)
+      this.renderWorld(viewEntity, world, render.get.asInstanceOf[RenderWorld], RenderUtils.partialTicks, lastRender
+        + 1000000000L / i)
       lastRender = System.nanoTime()
       RenderUtils.mc.setRenderViewEntity(oldEntity)
     }
@@ -49,11 +50,15 @@ object MFWorldRenderer {
     GlStateManager.enableAlpha()
     GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1F)
 
-    RenderUtils.drawLine(Vector3(viewEntity.posX, viewEntity.posY - 100, viewEntity.posZ - 0.02), Vector3(viewEntity.posX, viewEntity.posY + 100, viewEntity.posZ - 0.02), 1, Color(1, 0, 0, 1))
-    RenderUtils.drawLine(Vector3(viewEntity.posX - 100, viewEntity.posY, viewEntity.posZ - 0.02), Vector3(viewEntity.posX + 100, viewEntity.posY, viewEntity.posZ - 0.02), 1, Color(1, 0, 0, 1))
+    RenderUtils.drawLine(Vector3(viewEntity.posX, viewEntity.posY - 100, viewEntity.posZ - 0.02), Vector3(viewEntity
+      .posX, viewEntity.posY + 100, viewEntity.posZ - 0.02), 1, Color(1, 0, 0, 1))
+    RenderUtils.drawLine(Vector3(viewEntity.posX - 100, viewEntity.posY, viewEntity.posZ - 0.02), Vector3(viewEntity
+      .posX + 100, viewEntity.posY, viewEntity.posZ - 0.02), 1, Color(1, 0, 0, 1))
 
-    GlStateManager.rotate(viewEntity.prevRotationPitch + (viewEntity.rotationPitch - viewEntity.prevRotationPitch) * partialTicks, 1.0F, 0.0F, 0.0F)
-    GlStateManager.rotate(viewEntity.prevRotationYaw + (viewEntity.rotationYaw - viewEntity.prevRotationYaw) * partialTicks + 180, 0.0F, 1.0F, 0.0F)
+    GlStateManager.rotate(viewEntity.prevRotationPitch + (viewEntity.rotationPitch - viewEntity.prevRotationPitch) *
+      partialTicks, 1.0F, 0.0F, 0.0F)
+    GlStateManager.rotate(viewEntity.prevRotationYaw + (viewEntity.rotationYaw - viewEntity.prevRotationYaw) *
+      partialTicks + 180, 0.0F, 1.0F, 0.0F)
 
     GlStateManager.color(1f, 1f, 0f, 1)
     RenderUtils.drawCuboid(viewEntity.posX - 0.25, viewEntity.posY - 0.25, viewEntity.posZ - 5, 0.5, 0.5, 0.5)
@@ -65,7 +70,12 @@ object MFWorldRenderer {
     this.renderWorldPass(2, viewEntity, world, render, partialTicks, time)
   }
 
-  private def renderWorldPass(pass: Int, viewEntity: Entity, world: World, render: RenderWorld, partialTicks: Float, time: Long): Unit = {
+  private def renderWorldPass(pass: Int,
+                              viewEntity: Entity,
+                              world: World,
+                              render: RenderWorld,
+                              partialTicks: Float,
+                              time: Long): Unit = {
     updateRenderInfo(viewEntity)
     ClippingHelperImpl.getInstance()
     val frustum = new Frustum

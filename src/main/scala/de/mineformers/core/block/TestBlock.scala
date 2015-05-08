@@ -18,7 +18,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util
 import net.minecraft.util.{EnumFacing, EnumWorldBlockLayer}
-import net.minecraft.world.World
+import net.minecraft.world.{IBlockAccess, World}
 import net.minecraftforge.fml.relauncher.{Side, SideOnly}
 
 /**
@@ -28,11 +28,17 @@ import net.minecraftforge.fml.relauncher.{Side, SideOnly}
  */
 class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, Material.rock) {
   this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1F, 1.0F)
+//  setLightLevel(1)
 
   var snapshot: WorldSnapshot = _
 
   override def onBlockPlacedBy(worldIn: World, pos: util.BlockPos, state: IBlockState, placer: EntityLivingBase, stack: ItemStack): Unit = if (!worldIn.isRemote) {
     snapshot = WorldSnapshot.fromArea(worldIn, new BlockCuboid(pos, BlockPos(3, -3, 3) + pos))
+  }
+
+  override def getMixedBrightnessForBlock(worldIn: IBlockAccess, pos: VBlockPos): Int = {
+    println(super.getMixedBrightnessForBlock(worldIn, pos))
+    15728640
   }
 
   override def onBlockActivated(worldIn: World, pos: VBlockPos, state: IBlockState, playerIn: EntityPlayer, side: EnumFacing, hitX: Float, hitY: Float, hitZ: Float): Boolean = {
@@ -68,20 +74,14 @@ class TestBlock extends BaseBlock("test123", "test123", CreativeTabs.tabBlock, M
     false
   }
 
-  override def isOpaqueCube: Boolean = {
-    false
-  }
+  override def isOpaqueCube: Boolean = false
 
   /**
    * The type of render function that is called for this block
    */
-  override def getRenderType: Int = {
-    3
-  }
+  override def getRenderType: Int = 3
 
-  override def isFullCube: Boolean = {
-    false
-  }
+  override def isFullCube: Boolean =false
 
   override def isReplaceable(worldIn: World, pos: util.BlockPos): Boolean = true
 

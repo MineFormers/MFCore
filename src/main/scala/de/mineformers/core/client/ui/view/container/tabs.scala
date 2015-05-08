@@ -25,7 +25,7 @@ package de.mineformers.core.client.ui.view.container
 
 import de.mineformers.core.client.ui.layout.StackLayout
 import de.mineformers.core.client.ui.proxy.Context
-import de.mineformers.core.client.ui.skin.drawable.Drawable
+import de.mineformers.core.client.ui.skin.drawable.{DrawableTexture, StaticTexture, Drawable}
 import de.mineformers.core.client.ui.state.{BooleanProperty, Property, StringProperty, ViewState}
 import de.mineformers.core.client.ui.util.SimpleShadow
 import de.mineformers.core.client.ui.util.ViewEvent.ViewClicked
@@ -53,6 +53,8 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
   private var _active: String = _
   private var channel: GlobalPublisher = _
   skin = new TabFrameSkin
+  tabPanel.clip = false
+  clip = false
 
   globalReactions += {
     case ViewClicked(c, pos, button) =>
@@ -97,22 +99,34 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
       val tab = activeTab
       if (tab != null && tab.panel != null) {
         tab.panel.deafTo(channel)
-        tab.enabled = false
+        tab.enabled = true
       }
       _active = key
-      content = Seq(tabs(key).panel)
-      activeTab.enabled = true
+      content = Seq(activeTab.panel)
+      if (channel != null) {
+        activeTab.panel.parent = this
+        activeTab.panel.init(channel, context)
+      }
+      sizeUpdate = false
+      activeTab.enabled = false
     }
   }
 
   def addTab(key: String, title: String, icon: Drawable, panel: Panel): Unit = {
     val tab = Tab(key, title, icon, panel, tabs.isEmpty)
-    tab.enabled = false
+    tab.enabled = true
     listenTo(tab)
     tabs += key -> tab
     tabPanel.add(tab)
     if (active == null)
       active = key
+  }
+
+  override def findView(mousePos: Point, predicate: (View) => Boolean): View = super.findView(mousePos, predicate) match {
+    case null =>
+      tabPanel.findView(mousePos, predicate)
+    case v =>
+      v
   }
 
   case class Tab(key: String, title: String, icon: Drawable, panel: Panel, first: Boolean = false) extends View {
@@ -121,17 +135,29 @@ class TabbedFrame(size0: Size, orientation: Orientation = Orientation.Top) exten
 
     import de.mineformers.core.client.ui.view.container.{Tab => TabO}
 
-    override def defaultState(state: ViewState): Unit = super.defaultState(state.set(TabO.FirstProperty, first)
-      .set(TabO.OrientationProperty, orientation.name)
-      .set(TabO.TypeProperty, "panel"))
+    override def defaultState(state: ViewState): Unit = {
+      super.defaultState(state.set(TabO.FirstProperty, first)
+        .set(TabO.OrientationProperty, orientation.name)
+        .set(TabO.TypeProperty, "frame"))
+    }
 
     override def update(mousePos: Point): Unit = ()
 
     override var skin: Skin = new TabSkin
 
+    override def hovered(mousePosition: Point): Boolean = {
+      screenBounds contains mousePosition
+    }
+
     class TabSkin extends Skin {
       override protected def drawForeground(mousePos: Point): Unit = {
-        icon.draw(mousePos, screen + Point(6 + (if (orientation.vertical) 2 else 0), 6 + (if (!orientation.vertical) 2 else 0)), zIndex)
+        icon match {
+          case t: DrawableTexture =>
+            t.size = t.textureSize
+          case _ =>
+            icon.size = size
+        }
+        icon.draw(mousePos, screen + Point(6 + (if (orientation.vertical) 2 else 0), 6 + (if (!orientation.vertical) 2 else 0)), zIndex + 1)
       }
     }
 
@@ -220,7 +246,7 @@ class TabbedPanel(orientation: Orientation = Orientation.Top) extends Panel {
 
     override def updateState(mousePos: Point): Unit = {
       super.updateState(mousePos)
-      if(enabled && !state(Property.Hovered))
+      if (enabled && !state(Property.Hovered))
         shadow = SimpleShadow(0, 1, Color.black(0.2f))
       else
         shadow = SimpleShadow(0, 1, Color.black(0.3f))
@@ -238,10 +264,10 @@ object Tab {
 
   object Orientation extends Enumeration {
     type Orientation = OrientationVal
-    final val Left = Value("tab", vertical = true)
-    final val Right = Value("tab", vertical = true)
-    final val Top = Value("tab", vertical = false)
-    final val Bottom = Value("tab", vertical = false)
+    final val Left = Value("left", vertical = true)
+    final val Right = Value("right", vertical = true)
+    final val Top = Value("top", vertical = false)
+    final val Bottom = Value("bottom", vertical = false)
 
     class OrientationVal(val name: String, val vertical: Boolean) extends Val(nextId, name) {
       override def toString(): String = name
